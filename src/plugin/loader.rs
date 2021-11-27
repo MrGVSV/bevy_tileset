@@ -16,27 +16,33 @@ use bevy::utils::Uuid;
 /// The default assets directory path where all tiles should be defined
 pub const DEFAULT_TILES_ASSET_DIR: &str = "tiles";
 
+/// Events used for the loading of tilesets
 pub enum TilesetLoadEvent {
-	LoadTiles(TilesetLoader),
-	GeneratedTileset(String),
+	/// A tileset load request event
+	///
+	/// Send this event to start loading a tileset
+	LoadTiles(TilesetLoadRequest),
+	/// A tileset loaded event
+	///
+	/// This event is fired whenever a new tileset is fully loaded.
+	///
+	/// It is **not** recommended that this event be triggered manually.
+	LoadedTileset(String),
 }
 
-#[derive(Default)]
-pub(crate) struct TilesetHandlesMap(HashMap<String, TilesetRequest>);
-
-#[derive(Default)]
-struct TilesetRequest {
-	handles: TilesetHandles,
-	max_columns: Option<usize>,
-}
-
-/// A structure defining how the tileset should be loaded
-pub struct TilesetLoader {
+/// A structure defining how a tileset should be loaded
+pub struct TilesetLoadRequest {
 	/// The name of this Tileset
 	///
 	/// This is mainly used for identifying tilesets after generation
 	pub name: String,
+	/// The directories used to load this tileset
 	pub dirs: Vec<TilesetDirs>,
+	/// The maximum number of columns to place tiles before wrapping in the generated texture atlas
+	///
+	/// If `None`, tiles will be placed in a single row with no wrapping
+	///
+	/// Currently, this is most useful for debugging the generated texture atlas
 	pub max_columns: Option<usize>,
 }
 
@@ -53,7 +59,30 @@ pub struct TilesetDirs {
 	pub texture_directory: String,
 }
 
-impl TilesetLoader {
+#[derive(Default)]
+pub(crate) struct TilesetHandlesMap(HashMap<String, TilesetGenerationRequest>);
+
+#[derive(Default)]
+struct TilesetGenerationRequest {
+	handles: TilesetHandles,
+	max_columns: Option<usize>,
+}
+
+impl TilesetLoadRequest {
+	/// Create a load request for a named tileset
+	///
+	/// # Arguments
+	///
+	/// * `name`: The tileset name
+	/// * `dirs`: The directories for loading
+	///
+	/// returns: TilesetLoader
+	///
+	/// # Examples
+	///
+	/// ```
+	///	let request = TilesetLoadRequest::named("My Tileset", dirs);
+	/// ```
 	pub fn named(name: &str, dirs: Vec<TilesetDirs>) -> Self {
 		Self {
 			name: name.to_string(),
@@ -62,6 +91,21 @@ impl TilesetLoader {
 		}
 	}
 
+	/// Create a load request for an unnamed tileset.
+	///
+	/// Unnamed tilesets are given a random, UUIDv4-generated name
+	///
+	/// # Arguments
+	///
+	/// * `dirs`: The directories for loading
+	///
+	/// returns: TilesetLoadRequest
+	///
+	/// # Examples
+	///
+	/// ```
+	/// let request = TilesetLoadRequest::unnamed(dirs);
+	/// ```
 	pub fn unnamed(dirs: Vec<TilesetDirs>) -> Self {
 		Self {
 			name: get_unique_name(),
@@ -71,7 +115,7 @@ impl TilesetLoader {
 	}
 }
 
-impl Default for TilesetLoader {
+impl Default for TilesetLoadRequest {
 	fn default() -> Self {
 		Self {
 			name: get_unique_name(),
@@ -81,9 +125,41 @@ impl Default for TilesetLoader {
 	}
 }
 
-impl From<TilesetLoader> for TilesetLoadEvent {
-	fn from(loader: TilesetLoader) -> Self {
-		TilesetLoadEvent::LoadTiles(loader)
+impl TilesetDirs {
+	/// Sets the "tiles" directory.
+	///
+	/// This is where the desired tile config files should be located
+	///
+	/// # Arguments
+	///
+	/// * `tile_directory`: The path to the directory containing the tile config files
+	///
+	/// returns: TilesetDirs
+	///
+	pub fn from_dir(tile_directory: &str) -> Self {
+		Self {
+			tile_directory: tile_directory.to_string(),
+			texture_directory: tile_directory.to_string(),
+		}
+	}
+
+	/// Sets both the "tiles" and the "textures" directory.
+	///
+	/// The "tiles" directory is where the desired tile config files should be located. The
+	/// "textures" directory is where the corresponding textures should be located.
+	///
+	/// # Arguments
+	///
+	/// * `tile_directory`: The path to the directory containing the tile config files
+	/// * `texture_directory`: The path to the directory containing the tile texture files
+	///
+	/// returns: TilesetDirs
+	///
+	pub fn from_dirs(tile_directory: &str, texture_directory: &str) -> Self {
+		Self {
+			tile_directory: tile_directory.to_string(),
+			texture_directory: texture_directory.to_string(),
+		}
 	}
 }
 
@@ -92,34 +168,6 @@ impl Default for TilesetDirs {
 		Self {
 			tile_directory: DEFAULT_TILES_ASSET_DIR.to_string(),
 			texture_directory: DEFAULT_TILES_ASSET_DIR.to_string(),
-		}
-	}
-}
-
-impl From<&str> for TilesetDirs {
-	fn from(dir: &str) -> Self {
-		TilesetDirs::from_dir(dir)
-	}
-}
-
-impl From<(&str, &str)> for TilesetDirs {
-	fn from(dirs: (&str, &str)) -> Self {
-		TilesetDirs::from_dirs(dirs.0, dirs.1)
-	}
-}
-
-impl TilesetDirs {
-	pub fn from_dir(tile_directory: &str) -> Self {
-		Self {
-			tile_directory: tile_directory.to_string(),
-			texture_directory: tile_directory.to_string(),
-		}
-	}
-
-	pub fn from_dirs(tile_directory: &str, texture_directory: &str) -> Self {
-		Self {
-			tile_directory: tile_directory.to_string(),
-			texture_directory: texture_directory.to_string(),
 		}
 	}
 }
@@ -167,7 +215,7 @@ pub(crate) fn create_tileset(
 		builder.add_handles(tileset_handles, &textures);
 		if let Ok(tileset) = builder.build(tileset_name.clone(), id, &mut textures) {
 			tilesets.register(tileset);
-			events_writer.send(TilesetLoadEvent::GeneratedTileset(tileset_name.clone()));
+			events_writer.send(TilesetLoadEvent::LoadedTileset(tileset_name.clone()));
 		}
 
 		false
@@ -175,7 +223,7 @@ pub(crate) fn create_tileset(
 }
 
 fn load_tiles(
-	loader: &TilesetLoader,
+	loader: &TilesetLoadRequest,
 	handles_map: &mut ResMut<TilesetHandlesMap>,
 	asset_server: &Res<AssetServer>,
 ) {
@@ -188,8 +236,7 @@ fn load_tiles(
 	let request = handles_map
 		.0
 		.entry(tileset_name)
-		.or_insert_with(TilesetRequest::default);
-
+		.or_insert_with(TilesetGenerationRequest::default);
 	request.max_columns = loader.max_columns;
 
 	for TilesetDirs {
@@ -227,10 +274,29 @@ fn load_tiles(
 			}
 		}
 
+		// Make sure we mark this as dirty
 		request.handles.is_dirty = true;
 	}
 }
 
 fn get_unique_name() -> String {
 	Uuid::new_v4().to_hyphenated().to_string()
+}
+
+impl From<TilesetLoadRequest> for TilesetLoadEvent {
+	fn from(loader: TilesetLoadRequest) -> Self {
+		TilesetLoadEvent::LoadTiles(loader)
+	}
+}
+
+impl From<&str> for TilesetDirs {
+	fn from(dir: &str) -> Self {
+		TilesetDirs::from_dir(dir)
+	}
+}
+
+impl From<(&str, &str)> for TilesetDirs {
+	fn from(dirs: (&str, &str)) -> Self {
+		TilesetDirs::from_dirs(dirs.0, dirs.1)
+	}
 }

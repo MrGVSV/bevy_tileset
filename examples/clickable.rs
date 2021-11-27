@@ -2,9 +2,7 @@ mod helpers;
 
 use bevy::prelude::*;
 
-use bevy_ecs_tilemap::{
-	GPUAnimated, MapQuery, Tile,
-};
+use bevy_ecs_tilemap::{GPUAnimated, MapQuery, Tile};
 use bevy_ecs_tilemap_tileset::debug::DebugTilesetPlugin;
 use bevy_ecs_tilemap_tileset::prelude::*;
 
@@ -37,7 +35,7 @@ fn main() {
 }
 
 fn load_tiles(mut writer: EventWriter<TilesetLoadEvent>) {
-	writer.send(TilesetLoader::named(MY_TILESET, vec![TilesetDirs::from_dir("tiles")]).into());
+	writer.send(TilesetLoadRequest::named(MY_TILESET, vec![TilesetDirs::from_dir("tiles")]).into());
 }
 
 #[derive(Default)]
