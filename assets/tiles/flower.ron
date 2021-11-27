@@ -1,0 +1,14 @@
+#![enable(implicit_some)]
+#![enable(unwrap_newtypes)]
+
+(
+    name: "Flower",
+    tile: Animated((
+        speed: 3.5,
+        frames: [
+            "flowers/flower-001.png",
+            "flowers/flower-002.png",
+            "flowers/flower-003.png",
+        ],
+    )),
+)

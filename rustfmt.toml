@@ -1,0 +1,13 @@
+unstable_features = true
+chain_width = 60
+editon = "2018"
+fn_args_layout = "Tall"
+hard_tabs = true
+match_block_trailing_comma = true
+newline_style = "Unix"
+tab_spaces = 4
+use_field_init_shorthand = true
+imports_granularity = "Crate"
+imports_layout = "HorizontalVertical"
+format_strings = true
+fn_single_line = true

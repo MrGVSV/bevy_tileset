@@ -1,0 +1,158 @@
+#![enable(implicit_some)]
+#![enable(unwrap_newtypes)]
+
+(
+    name: "Wall",
+    tile: Auto([
+        (
+            // Center
+            rule: (
+                north: true,
+                west: true,
+                east: true,
+                south: true,
+                north_west: true,
+                south_west: true,
+                north_east: true,
+                south_east: true,
+            ),
+            variants: [
+                (
+                    tile: Standard("walls/wall-005.png")
+                )
+            ]
+        ),
+        (
+            // North-West
+            rule: (
+                north: false,
+                west: false,
+                east: true,
+                south: true,
+                north_west: false,
+                south_west: false,
+            ),
+            variants: [
+                (
+                    tile: Standard("walls/wall-001.png")
+                )
+            ]
+        ),
+        (
+            // North-East
+            rule: (
+                north: false,
+                west: true,
+                east: false,
+                south: true,
+                north_east: false,
+                south_east: false,
+            ),
+            variants: [
+                (
+                    tile: Standard("walls/wall-003.png")
+                )
+            ]
+        ),
+        (
+            // South-West
+            rule: (
+                north: true,
+                west: false,
+                east: true,
+                south: false,
+                north_west: false,
+                south_west: false,
+            ),
+            variants: [
+                (
+                    tile: Standard("walls/wall-007.png")
+                )
+            ]
+        ),
+        (
+            // South-East
+            rule: (
+                north: true,
+                west: true,
+                east: false,
+                south: false,
+                north_east: false,
+                south_east: false,
+            ),
+            variants: [
+                (
+                    tile: Standard("walls/wall-009.png")
+                )
+            ]
+        ),
+        (
+            // North
+            rule: (
+                north: false,
+                west: true,
+                east: true,
+                south: true,
+                south_west: true,
+                south_east: true,
+            ),
+            variants: [
+                (
+                    tile: Standard("walls/wall-002.png")
+                )
+            ]
+        ),
+        (
+            // South
+            rule: (
+                north: true,
+                west: true,
+                east: true,
+                south: false,
+                north_west: true,
+                north_east: true,
+            ),
+            variants: [
+                (
+                    tile: Standard("walls/wall-008.png")
+                )
+            ]
+        ),
+        (
+            // West
+            rule: (
+                north: true,
+                west: false,
+                east: true,
+                south: true,
+            ),
+            variants: [
+                (
+                    tile: Standard("walls/wall-004.png")
+                )
+            ]
+        ),
+        (
+            // East
+            rule: (
+                north: true,
+                west: true,
+                east: false,
+                south: true,
+            ),
+            variants: [
+                (
+                    tile: Standard("walls/wall-006.png")
+                )
+            ]
+        ),
+        (
+            // Default
+            variants: [
+                (
+                    tile: Standard("walls/wall-010.png")
+                )
+            ]
+        )
+    ])
+)
