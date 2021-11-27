@@ -17,11 +17,8 @@ use bevy::utils::Uuid;
 /// The default assets directory path where all tiles should be defined
 pub const DEFAULT_TILES_ASSET_DIR: &str = "tiles";
 
-pub enum TilesetLoadEvent<TMeta = ()>
-where
-	TMeta: Default,
-{
-	LoadTiles(TilesetLoader<TMeta>),
+pub enum TilesetLoadEvent {
+	LoadTiles(TilesetLoader),
 	GeneratedTileset(String),
 }
 
@@ -35,17 +32,13 @@ struct TilesetRequest {
 }
 
 /// A structure defining how the tileset should be loaded
-pub struct TilesetLoader<TMeta = ()>
-where
-	TMeta: Default,
-{
+pub struct TilesetLoader {
 	/// The name of this Tileset
 	///
 	/// This is mainly used for identifying tilesets after generation
 	pub name: String,
 	pub dirs: Vec<TilesetDirs>,
 	pub max_columns: Option<usize>,
-	pub meta: TMeta,
 }
 
 /// Directories for the tileset to be loaded
@@ -61,16 +54,12 @@ pub struct TilesetDirs {
 	pub texture_directory: String,
 }
 
-impl<TMeta> TilesetLoader<TMeta>
-where
-	TMeta: Default,
-{
+impl TilesetLoader {
 	pub fn named(name: &str, dirs: Vec<TilesetDirs>) -> Self {
 		Self {
 			name: name.to_string(),
 			dirs,
 			max_columns: None,
-			meta: TMeta::default(),
 		}
 	}
 
@@ -79,30 +68,22 @@ where
 			name: get_unique_name(),
 			dirs,
 			max_columns: None,
-			meta: TMeta::default(),
 		}
 	}
 }
 
-impl<TMeta> Default for TilesetLoader<TMeta>
-where
-	TMeta: Default,
-{
+impl Default for TilesetLoader {
 	fn default() -> Self {
 		Self {
 			name: get_unique_name(),
 			dirs: vec![TilesetDirs::default()],
 			max_columns: Default::default(),
-			meta: TMeta::default(),
 		}
 	}
 }
 
-impl<TMeta> From<TilesetLoader<TMeta>> for TilesetLoadEvent<TMeta>
-where
-	TMeta: Default,
-{
-	fn from(loader: TilesetLoader<TMeta>) -> Self {
+impl From<TilesetLoader> for TilesetLoadEvent {
+	fn from(loader: TilesetLoader) -> Self {
 		TilesetLoadEvent::LoadTiles(loader)
 	}
 }
