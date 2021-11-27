@@ -18,8 +18,11 @@ use crate::tileset::Tilesets;
 /// The default assets directory path where all tiles should be defined
 pub const DEFAULT_TILES_ASSET_DIR: &str = "tiles";
 
-pub enum TilesetLoadEvent {
-	LoadTiles(TilesetLoader),
+pub enum TilesetLoadEvent<TMeta = ()>
+where
+	TMeta: Default,
+{
+	LoadTiles(TilesetLoader<TMeta>),
 	GeneratedTileset(String),
 }
 
@@ -86,12 +89,33 @@ where
 	}
 }
 
+impl<TMeta> Into<TilesetLoadEvent<TMeta>> for TilesetLoader<TMeta>
+where
+	TMeta: Default,
+{
+	fn into(self) -> TilesetLoadEvent<TMeta> {
+		TilesetLoadEvent::LoadTiles(self)
+	}
+}
+
 impl Default for TilesetDirs {
 	fn default() -> Self {
 		Self {
 			tile_directory: DEFAULT_TILES_ASSET_DIR.to_string(),
 			texture_directory: DEFAULT_TILES_ASSET_DIR.to_string(),
 		}
+	}
+}
+
+impl Into<TilesetDirs> for &str {
+	fn into(self) -> TilesetDirs {
+		TilesetDirs::from_dir(self)
+	}
+}
+
+impl Into<TilesetDirs> for (&str, &str) {
+	fn into(self) -> TilesetDirs {
+		TilesetDirs::from_dirs(self.0, self.1)
 	}
 }
 

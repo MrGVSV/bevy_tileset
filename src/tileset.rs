@@ -1,8 +1,11 @@
 //! Contains tileset-related things
 
+use bevy::math::Vec2;
+use std::collections::hash_map::{Values, ValuesMut};
 use std::collections::HashMap;
 
 use bevy::prelude::{Assets, Commands, Entity, Handle, Texture, UVec2};
+use bevy::reflect::List;
 
 use bevy::sprite::TextureAtlas;
 use bevy_ecs_tilemap::{GPUAnimated, LayerBuilder, MapQuery, Tile, TileBundle};
@@ -13,6 +16,7 @@ use rand::thread_rng;
 use crate::auto_tile::{AutoTile, AutoTileRule};
 use crate::data::{AutoTileData, TileData, TileType, VariantTileData};
 use crate::handles::TileHandleBase;
+use crate::SimpleTileType;
 
 /// An ID used to identify a [`Tileset`]
 pub type TilesetId = u8;
@@ -30,6 +34,8 @@ pub struct Tileset {
 	tiles: HashMap<TileId, TileData>,
 	/// The atlas for all registered tiles
 	atlas: TextureAtlas,
+	/// The size of the tiles in this tileset
+	tile_size: Vec2,
 	/// The tile IDs mapped by their name
 	tile_ids: HashMap<String, TileId>,
 	/// The tile names mapped by their ID
@@ -41,7 +47,6 @@ pub struct Tileset {
 }
 
 /// A builder for constructing a [`Tileset`]
-#[derive(Default)]
 pub struct TilesetBuilder {
 	/// The registered tiles mapped by their ID
 	tiles: HashMap<TileId, TileData>,
@@ -103,6 +108,11 @@ impl Tileset {
 		&self.atlas.texture
 	}
 
+	/// Gets the tile size for this tileset
+	pub fn tile_size(&self) -> Vec2 {
+		self.tile_size
+	}
+
 	/// Get the name of a tile by its ID
 	///
 	/// # Arguments
@@ -113,6 +123,19 @@ impl Tileset {
 	///
 	pub fn get_tile_name(&self, id: &TileId) -> Option<&String> {
 		self.tile_names.get(id)
+	}
+
+	/// Get the base tile name for the given index
+	///
+	/// # Arguments
+	///
+	/// * `index`: The texture index
+	///
+	/// returns: Option<&String>
+	///
+	pub fn get_tile_name_by_index(&self, index: &usize) -> Option<&String> {
+		let id = self.tile_indices.get(index)?;
+		self.get_tile_name(id)
 	}
 
 	/// Get the ID of a tile by its name
@@ -169,11 +192,48 @@ impl Tileset {
 	/// # Examples
 	///
 	/// ```
-	///	let index = tileset.get_tile_index("My Tile").unwrap();
+	/// use bevy_ecs_tilemap_tileset::TileIndex;
+	/// let index: TileIndex = tileset.get_tile_index("My Tile").unwrap();
 	/// ```
 	pub fn get_tile_index(&self, name: &str) -> Option<TileIndex> {
 		let (index, ..) = self.get_tile_index_and_data(name)?;
 		Some(index)
+	}
+
+	/// Tries to get the base index into the [`TextureAtlas`] for a tile with the given name
+	///
+	/// This is a convenience method around [`get_tile_index`] that performs the match expression
+	/// returning the index if [`TileIndex::Standard`] or the start index if [`TileIndex::Animated`]
+	///
+	/// # Arguments
+	///
+	/// * `name`: The name of the tile
+	///
+	/// returns: Option<usize>
+	///
+	/// # Examples
+	///
+	/// ```
+	/// let index: usize = tileset.get_base_tile_index("My Tile").unwrap();
+	/// ```
+	pub fn get_base_tile_index(&self, name: &str) -> Option<usize> {
+		match self.get_tile_index(name)? {
+			TileIndex::Standard(index) => Some(index),
+			TileIndex::Animated(start, ..) => Some(start),
+		}
+	}
+
+	/// Get the data of a tile by its name
+	///
+	/// # Arguments
+	///
+	/// * `name`: The tile's name
+	///
+	/// returns: Option<&TileData>
+	///
+	pub fn get_tile_data(&self, name: &str) -> Option<&TileData> {
+		let id = self.tile_ids.get(name)?;
+		self.tiles.get(id)
 	}
 
 	/// Tries to get the [`TileIndex`] into the [`TextureAtlas`] for a tile with the given name,
@@ -193,7 +253,7 @@ impl Tileset {
 	/// ```
 	/// use bevy::prelude::{Commands, Res};
 	/// use bevy_ecs_tilemap::prelude::MapQuery;
-	/// use bevy_ecs_tilemap_tileset::AutoTileRule;
+	/// use bevy_ecs_tilemap_tileset::{AutoTileRule, Tileset};
 	///
 	/// fn place_tile(tileset: Res<Tileset>, mut commands: Commands, mut map_query: MapQuery) {
 	/// 	// Matches:
@@ -201,12 +261,12 @@ impl Tileset {
 	/// 	// ✓ o ✓
 	/// 	// - x -
 	///    	let rule = AutoTileRule {
-	/// 		north: Some(true),
-	/// 		east: Some(true),
-	/// 		west: Some(true),
-	/// 		south: Some(false),
-	/// 		..Default::default()
-	/// 	};
+	///         north: Some(true),
+	///         east: Some(true),
+	///         west: Some(true),
+	///         south: Some(false),
+	///         ..Default::default()
+	///     };
 	///
 	/// 	let index = tileset.get_auto_tile_index("My Auto Tile", rule);
 	/// }
@@ -321,9 +381,10 @@ impl Tileset {
 	/// ```
 	/// use bevy::prelude::{Commands, Res};
 	/// use bevy_ecs_tilemap::prelude::MapQuery;
+	/// use bevy_ecs_tilemap_tileset::Tileset;
 	///
 	/// fn place_tile(tileset: Res<Tileset>, mut commands: Commands, mut map_query: MapQuery) {
-	///		tileset.place_tile(
+	///    	tileset.place_tile(
 	/// 		"My Tile",
 	/// 		UVec2::new(10, 10),
 	/// 		0u16,
@@ -463,6 +524,44 @@ impl Tileset {
 		variants.get(idx)
 	}
 
+	/// Checks if the given index is a variant for a given auto tile rule
+	///
+	/// This is an important method because it allows the auto tile system to skip tiles that
+	/// already match a given rule.
+	///
+	/// Without this, for example, an auto tile with two variants may seem to swap between them
+	/// when a neighbor requests that they check their state. The chosen auto tile hasn't changed,
+	/// but the selected variant within that tile has. This method can be used to prevent something
+	/// like this.
+	///
+	/// # Arguments
+	///
+	/// * `name`: The name of the auto tile
+	/// * `index`: The texture index to check
+	/// * `rule`: The rule that is a superset over the auto tile to match
+	///
+	/// returns: bool
+	///
+	pub fn is_auto_variant(&self, name: &str, index: &usize, rule: &AutoTileRule) -> bool {
+		if let Some(data) = self.get_tile_data(name) {
+			match data.tile() {
+				TileType::Auto(autos) => {
+					if let Some(auto) = autos.iter().find(|a| a.rule().is_subset_of(rule)) {
+						// Check if _any_ variant matches the given index
+						auto.variants()
+							.iter()
+							.any(|v| v.tile().contains_index(index))
+					} else {
+						false
+					}
+				}
+				_ => false,
+			}
+		} else {
+			false
+		}
+	}
+
 	fn auto_index(auto_tiles: &[AutoTileData], rule: AutoTileRule) -> Option<TileIndex> {
 		let tile = match auto_tiles
 			.iter()
@@ -499,6 +598,12 @@ impl Tileset {
 	}
 }
 
+//    _____ _ _             _     ___      _ _    _
+//   |_   _(_) |___ ___ ___| |_  | _ )_  _(_) |__| |___ _ _
+//     | | | | / -_|_-</ -_)  _| | _ \ || | | / _` / -_) '_|
+//     |_| |_|_\___/__/\___|\__| |___/\_,_|_|_\__,_\___|_|
+//
+
 impl TilesetBuilder {
 	/// Build the tileset
 	///
@@ -522,6 +627,7 @@ impl TilesetBuilder {
 			tile_indices: self.tile_indices,
 			tile_names: self.tile_names,
 			tile_handles: self.tile_handles,
+			tile_size: self.atlas_builder.get_tile_size().unwrap_or_default(),
 			atlas: self.atlas_builder.finish(texture_store)?,
 		})
 	}
@@ -572,6 +678,46 @@ impl TilesetBuilder {
 		Some(index)
 	}
 }
+
+impl Default for TilesetBuilder {
+	fn default() -> Self {
+		Self {
+			atlas_builder: TileAtlasBuilder::default().max_columns(None),
+			tile_ids: Default::default(),
+			tile_counter: Default::default(),
+			tile_indices: Default::default(),
+			tile_names: Default::default(),
+			tiles: Default::default(),
+			tile_handles: Default::default(),
+		}
+	}
+}
+
+//    _____ _ _       ___         _
+//   |_   _(_) |___  |_ _|_ _  __| |_____ __
+//     | | | | / -_)  | || ' \/ _` / -_) \ /
+//     |_| |_|_\___| |___|_||_\__,_\___/_\_\
+//
+
+impl TileIndex {
+	/// Get the base index
+	///
+	/// This is the regular index for [`TileIndex::Standard`] and the start index
+	/// for [`TileIndex::Animated`]
+	///
+	pub fn base_index(&self) -> &usize {
+		match self {
+			Self::Standard(idx) => idx,
+			Self::Animated(idx, ..) => idx,
+		}
+	}
+}
+
+//    _____ _ _             _
+//   |_   _(_) |___ ___ ___| |_ ___
+//     | | | | / -_|_-</ -_)  _(_-<
+//     |_| |_|_\___/__/\___|\__/__/
+//
 
 impl Tilesets {
 	/// Get the ID of the tileset by name
@@ -659,5 +805,15 @@ impl Tilesets {
 	pub fn deregister_by_name(&mut self, name: &str) -> Option<Tileset> {
 		let id = self.ids.get(name)?;
 		self.tilesets.remove(id)
+	}
+
+	/// Iterate over all registered tilesets
+	pub fn iter(&self) -> Values<'_, TilesetId, Tileset> {
+		self.tilesets.values()
+	}
+
+	/// Iterate mutably over all registered tilesets
+	pub fn iter_mut(&mut self) -> ValuesMut<'_, TilesetId, Tileset> {
+		self.tilesets.values_mut()
 	}
 }

@@ -1,7 +1,7 @@
 use crate::auto_tile::{on_change_auto_tile, on_remove_auto_tile, RemoveAutoTileEvent};
 use bevy::app::AppBuilder;
 use bevy::prelude::*;
-use bevy_ecs_tilemap::TilemapStage;
+use bevy_ecs_tilemap::{TilemapPlugin, TilemapStage};
 
 use crate::loader::{create_tileset, on_load_tileset_event, TilesetHandlesMap, TilesetLoadEvent};
 
@@ -24,11 +24,13 @@ pub enum TilesetLabel {
 	All,
 }
 
+/// Plugin for setting up tilesets
 pub struct TilesetPlugin;
 
 impl Plugin for TilesetPlugin {
 	fn build(&self, app: &mut AppBuilder) {
-		app.init_resource::<TilesetHandlesMap>()
+		app.add_plugin(TilemapPlugin)
+			.init_resource::<TilesetHandlesMap>()
 			.init_resource::<Tilesets>()
 			.add_stage_before(TilemapStage, TilesetStage, SystemStage::parallel())
 			.add_event::<TilesetLoadEvent>()

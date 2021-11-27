@@ -240,22 +240,59 @@ impl TileType {
 	) -> Option<Self> {
 		Some(match tile.tile {
 			TileHandle::Standard(handle) => {
-				let index = handle.into_tile_data(builder, texture_store)?;
+				let index = handle.try_into_tile_data(builder, texture_store)?;
 				TileType::Standard(index)
 			}
 			TileHandle::Animated(anim) => {
-				let anim = anim.into_tile_data(builder, texture_store)?;
+				let anim = anim.try_into_tile_data(builder, texture_store)?;
 				TileType::Animated(anim)
 			}
 			TileHandle::Variant(variants) => {
-				let variants = variants.into_tile_data(builder, texture_store)?;
+				let variants = variants.try_into_tile_data(builder, texture_store)?;
 				TileType::Variant(variants)
 			}
 			TileHandle::Auto(autos) => {
-				let autos = autos.into_tile_data(builder, texture_store)?;
+				let autos = autos.try_into_tile_data(builder, texture_store)?;
 				TileType::Auto(autos)
 			}
 		})
+	}
+
+	/// Checks if the given index exists within this tile
+	///
+	/// # Arguments
+	///
+	/// * `index`: The index to check
+	///
+	/// returns: bool
+	///
+	pub fn contains_index(&self, index: &usize) -> bool {
+		match self {
+			Self::Standard(idx) => idx == index,
+			Self::Animated(anim) => anim.start() <= *index && *index <= anim.end(),
+			Self::Variant(variants) => variants.iter().any(|v| v.tile().contains_index(index)),
+			Self::Auto(autos) => autos
+				.iter()
+				.flat_map(|a| a.variants())
+				.any(|v| v.tile().contains_index(index)),
+		}
+	}
+}
+
+impl SimpleTileType {
+	/// Checks if the given index exists within this tile
+	///
+	/// # Arguments
+	///
+	/// * `index`: The index to check
+	///
+	/// returns: bool
+	///
+	pub fn contains_index(&self, index: &usize) -> bool {
+		match self {
+			Self::Standard(idx) => idx == index,
+			Self::Animated(anim) => anim.start() <= *index && *index <= anim.end(),
+		}
 	}
 }
 
@@ -288,20 +325,20 @@ impl Into<TileIndex> for &SimpleTileType {
 //   |___|_| |_|\__\___/    |_| |_|_|\___| |____/ \__,_|\__\__,_|
 //
 
-trait IntoTileData {
+trait TryIntoTileData {
 	type DataType: TileDataTrait;
 
-	fn into_tile_data(
+	fn try_into_tile_data(
 		self,
 		builder: &mut TilesetBuilder,
 		texture_store: &Assets<Texture>,
 	) -> Option<Self::DataType>;
 }
 
-impl IntoTileData for Handle<Texture> {
+impl TryIntoTileData for Handle<Texture> {
 	type DataType = usize;
 
-	fn into_tile_data(
+	fn try_into_tile_data(
 		self,
 		builder: &mut TilesetBuilder,
 		texture_store: &Assets<Texture>,
@@ -310,10 +347,10 @@ impl IntoTileData for Handle<Texture> {
 	}
 }
 
-impl IntoTileData for AnimatedTileHandle {
+impl TryIntoTileData for AnimatedTileHandle {
 	type DataType = AnimatedTileData;
 
-	fn into_tile_data(
+	fn try_into_tile_data(
 		self,
 		builder: &mut TilesetBuilder,
 		texture_store: &Assets<Texture>,
@@ -341,10 +378,10 @@ impl IntoTileData for AnimatedTileHandle {
 	}
 }
 
-impl IntoTileData for VariantTileHandle {
+impl TryIntoTileData for VariantTileHandle {
 	type DataType = VariantTileData;
 
-	fn into_tile_data(
+	fn try_into_tile_data(
 		self,
 		builder: &mut TilesetBuilder,
 		texture_store: &Assets<Texture>,
@@ -353,11 +390,11 @@ impl IntoTileData for VariantTileHandle {
 			weight: self.weight,
 			tile: match self.tile {
 				SimpleTileHandle::Standard(handle) => {
-					let index = handle.into_tile_data(builder, texture_store)?;
+					let index = handle.try_into_tile_data(builder, texture_store)?;
 					SimpleTileType::Standard(index)
 				}
 				SimpleTileHandle::Animated(anim) => {
-					let anim_data = anim.into_tile_data(builder, texture_store)?;
+					let anim_data = anim.try_into_tile_data(builder, texture_store)?;
 					SimpleTileType::Animated(anim_data)
 				}
 			},
@@ -365,49 +402,49 @@ impl IntoTileData for VariantTileHandle {
 	}
 }
 
-impl IntoTileData for Vec<VariantTileHandle> {
+impl TryIntoTileData for Vec<VariantTileHandle> {
 	type DataType = Vec<VariantTileData>;
 
-	fn into_tile_data(
+	fn try_into_tile_data(
 		self,
 		builder: &mut TilesetBuilder,
 		texture_store: &Assets<Texture>,
 	) -> Option<Self::DataType> {
 		let mut data: Vec<VariantTileData> = Vec::with_capacity(self.len());
 		for variant in self {
-			let variant = variant.into_tile_data(builder, texture_store)?;
+			let variant = variant.try_into_tile_data(builder, texture_store)?;
 			data.push(variant);
 		}
 		Some(data)
 	}
 }
 
-impl IntoTileData for AutoTileHandle {
+impl TryIntoTileData for AutoTileHandle {
 	type DataType = AutoTileData;
 
-	fn into_tile_data(
+	fn try_into_tile_data(
 		self,
 		builder: &mut TilesetBuilder,
 		texture_store: &Assets<Texture>,
 	) -> Option<Self::DataType> {
 		Some(AutoTileData {
 			rule: self.rule,
-			variants: self.variants.into_tile_data(builder, texture_store)?,
+			variants: self.variants.try_into_tile_data(builder, texture_store)?,
 		})
 	}
 }
 
-impl IntoTileData for Vec<AutoTileHandle> {
+impl TryIntoTileData for Vec<AutoTileHandle> {
 	type DataType = Vec<AutoTileData>;
 
-	fn into_tile_data(
+	fn try_into_tile_data(
 		self,
 		builder: &mut TilesetBuilder,
 		texture_store: &Assets<Texture>,
 	) -> Option<Self::DataType> {
 		let mut data: Vec<AutoTileData> = Vec::with_capacity(self.len());
 		for auto in self {
-			let auto = auto.into_tile_data(builder, texture_store)?;
+			let auto = auto.try_into_tile_data(builder, texture_store)?;
 			data.push(auto);
 		}
 		Some(data)

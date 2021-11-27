@@ -157,9 +157,12 @@ impl TilesetHandles {
 	/// # Examples
 	///
 	/// ```
-	/// fn (mut handles: ResMut<TilesetHandles>, asset_server: Res<AssetServer>) {
+	/// use bevy::prelude::*;
+	/// use bevy_ecs_tilemap_tileset::TileDef;
+	///
+	/// fn load(mut handles: ResMut<TilesetHandles>, asset_server: Res<AssetServer>) {
 	/// 	let image_dir = String::from("images");
-	///		let tile_def = TileDef {
+	///    	let tile_def = TileDef {
 	/// 		name: String::from("My Tile"),
 	/// 		tile: TileDefType::Standard(String::from("my_tile.png"))
 	/// 	};
