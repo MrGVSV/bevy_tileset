@@ -1,8 +1,7 @@
-//! Module used for loading and creating the tileset resource
+//! Module used for loading and creating tilesets
 //!
-//! Currently, only one tileset can be loaded at a time. Loading additional
-//! tiles will just regenerate the tileset with the changes (note that this
-//! may affect index ordering!)
+//! Currently, all generated tilesets are stored in the [`Tilesets`] resource,
+//! where they may be accessed by name directly once loaded
 
 use bevy::log::warn;
 use std::collections::HashMap;
