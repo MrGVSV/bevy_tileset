@@ -11,5 +11,5 @@ pub use definitions::{
 };
 
 pub(crate) mod internal {
-	pub(crate) use super::data::{TileDataTrait, TryIntoTileData};
+	pub(crate) use super::data::{TryIntoTileData};
 }

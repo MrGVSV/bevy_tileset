@@ -5,14 +5,14 @@
 use std::path::{Path, PathBuf};
 
 use bevy::asset::LoadState;
-use bevy::prelude::{AssetServer, Assets, Handle, Texture};
-use bevy_tile_atlas::TileAtlasBuilderError;
+use bevy::prelude::{AssetServer, Handle, Texture};
+
 
 use crate::tiles::auto_tile::AutoTileRule;
 use crate::tiles::definitions::{
 	AnimatedTileDef, AutoTileDef, SimpleTileDefType, TileDef, TileDefType, VariantTileDef,
 };
-use crate::tileset::{Tileset, TilesetBuilder};
+
 
 /// Resource containing all tile handles waiting to be processed
 #[derive(Debug, Default, Clone)]
@@ -110,11 +110,7 @@ impl TileHandleBase {
 	///
 	pub(crate) fn is_loaded(&self, asset_server: &AssetServer) -> bool {
 		let ids = self.tile.iter_handle().map(|handle| handle.id);
-		if LoadState::Loaded == asset_server.get_group_load_state(ids) {
-			true
-		} else {
-			false
-		}
+		LoadState::Loaded == asset_server.get_group_load_state(ids)
 	}
 }
 

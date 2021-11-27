@@ -98,12 +98,12 @@ where
 	}
 }
 
-impl<TMeta> Into<TilesetLoadEvent<TMeta>> for TilesetLoader<TMeta>
+impl<TMeta> From<TilesetLoader<TMeta>> for TilesetLoadEvent<TMeta>
 where
 	TMeta: Default,
 {
-	fn into(self) -> TilesetLoadEvent<TMeta> {
-		TilesetLoadEvent::LoadTiles(self)
+	fn from(loader: TilesetLoader<TMeta>) -> Self {
+		TilesetLoadEvent::LoadTiles(loader)
 	}
 }
 
@@ -116,15 +116,15 @@ impl Default for TilesetDirs {
 	}
 }
 
-impl Into<TilesetDirs> for &str {
-	fn into(self) -> TilesetDirs {
-		TilesetDirs::from_dir(self)
+impl From<&str> for TilesetDirs {
+	fn from(dir: &str) -> Self {
+		TilesetDirs::from_dir(dir)
 	}
 }
 
-impl Into<TilesetDirs> for (&str, &str) {
-	fn into(self) -> TilesetDirs {
-		TilesetDirs::from_dirs(self.0, self.1)
+impl From<(&str, &str)> for TilesetDirs {
+	fn from(dirs: (&str, &str)) -> Self {
+		TilesetDirs::from_dirs(dirs.0, dirs.1)
 	}
 }
 
@@ -208,7 +208,7 @@ fn load_tiles(
 	let request = handles_map
 		.0
 		.entry(tileset_name)
-		.or_insert(TilesetRequest::default());
+		.or_insert_with(TilesetRequest::default);
 
 	request.max_columns = loader.max_columns;
 
@@ -219,7 +219,7 @@ fn load_tiles(
 	{
 		// === Load Config Files === //
 		let dir = ::std::fs::read_dir(format!("assets/{}", tile_directory))
-			.expect(&format!("Could not find directory `{}`", tile_directory));
+			.unwrap_or_else(|_| panic!("Could not find directory `{}`", tile_directory));
 
 		let config_files = dir.filter_map::<DirEntry, _>(Result::ok).filter(|file| {
 			if let Some(ext) = file.path().extension() {
@@ -236,7 +236,7 @@ fn load_tiles(
 			if let Ok(tile_def) = tile_def {
 				request
 					.handles
-					.add_tile(tile_def, texture_directory, &asset_server);
+					.add_tile(tile_def, texture_directory, asset_server);
 			} else if let Err(err) = tile_def {
 				warn!(
 					"Failed to load tile: {:?} ({:?} @ {:?})",

@@ -1,10 +1,9 @@
 mod helpers;
 
 use bevy::prelude::*;
-use bevy::render::camera::Camera;
+
 use bevy_ecs_tilemap::{
-	GPUAnimated, LayerBuilder, LayerSettings, Map, MapQuery, Tile, TileBundle, TileBundleTrait,
-	TilemapPlugin,
+	GPUAnimated, MapQuery, Tile,
 };
 use bevy_ecs_tilemap_tileset::debug::DebugTilesetPlugin;
 use bevy_ecs_tilemap_tileset::prelude::*;
@@ -69,7 +68,7 @@ fn build_map(
 			TileIndex::Animated(start, ..) => start,
 		} as u16;
 		let _map = helpers::build_map(
-			&tileset,
+			tileset,
 			map_size,
 			chunk_size,
 			layer_count,
@@ -168,7 +167,7 @@ fn update_text(
 ) {
 	for mut text in query.iter_mut() {
 		text.sections[1].value = format!("{}", tilesets.get_by_name(MY_TILESET).is_some());
-		text.sections[4].value = format!("{}", build_mode.tile_name);
+		text.sections[4].value = build_mode.tile_name.to_string();
 		text.sections[7].value = format!("{}", build_mode.active_layer + 1);
 		text.sections[9].value = String::from("3");
 	}
@@ -179,7 +178,7 @@ fn setup_hud(mut commands: Commands, asset_server: Res<AssetServer>) {
 	let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
 
 	let style_key = TextStyle {
-		font: font_bold.clone(),
+		font: font_bold,
 		font_size: 20.0,
 		color: Color::rgba(0.15, 0.15, 0.15, 0.75),
 	};
@@ -189,7 +188,7 @@ fn setup_hud(mut commands: Commands, asset_server: Res<AssetServer>) {
 		color: Color::rgba(0.75, 0.75, 0.75, 0.75),
 	};
 	let style_small = TextStyle {
-		font: font.clone(),
+		font,
 		font_size: 14.0,
 		color: Color::rgba(0.75, 0.75, 0.75, 0.65),
 	};
@@ -252,7 +251,7 @@ fn setup_hud(mut commands: Commands, asset_server: Res<AssetServer>) {
 					},
 					TextSection {
 						value: "\n".to_string(),
-						style: style_value.clone(),
+						style: style_value,
 					},
 					TextSection {
 						value: "Options :\n".to_string(),
@@ -284,11 +283,11 @@ fn setup_hud(mut commands: Commands, asset_server: Res<AssetServer>) {
 					},
 					TextSection {
 						value: "  ( e ) Set tile to 'Empty'\n".to_string(),
-						style: style_small.clone(),
+						style: style_small,
 					},
 					TextSection {
 						value: "\nClick to add/remove tiles".to_string(),
-						style: style_key.clone(),
+						style: style_key,
 					},
 				],
 				alignment: Default::default(),

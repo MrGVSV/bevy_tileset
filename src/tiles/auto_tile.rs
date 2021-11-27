@@ -78,9 +78,8 @@ struct TileUpdateRequest {
 /// A builder object that takes in auto tiles and calculates what changes need to be made
 /// in accordance with their rules (including neighboring auto tiles as well)
 struct AutoTiler<'a, 'b> {
-	tiles_query: Box<&'a dyn FindTile>,
+	tiles_query: &'a dyn FindTile,
 	map_query: &'a MapQuery<'b>,
-	tilesets: &'a Tilesets,
 	cache: HashMap<TileCoord, TileObject>,
 	requests: Vec<TileUpdateRequest>,
 	requested: HashSet<TileCoord>,
@@ -273,14 +272,12 @@ impl<'a, 'b> AutoTiler<'a, 'b> {
 	fn new(
 		tiles_query: &'a Query<(Entity, &UVec2, &TileParent, &AutoTile), With<Tile>>,
 		map_query: &'a MapQuery<'b>,
-		tilesets: &'a Tilesets,
 	) -> Self {
 		let total = tiles_query.iter().count();
 		let capacity = total * 9usize;
 		Self {
-			tiles_query: Box::new(tiles_query),
+			tiles_query,
 			map_query,
-			tilesets,
 			cache: HashMap::with_capacity_and_hasher(capacity, Default::default()),
 			requested: HashSet::with_capacity_and_hasher(capacity, Default::default()),
 			requests: Vec::with_capacity(capacity),
@@ -365,7 +362,7 @@ impl<'a, 'b> AutoTiler<'a, 'b> {
 					None
 				}
 			})
-			.filter_map(|n| n)
+			.flatten()
 			.collect::<Vec<_>>()
 	}
 
@@ -530,7 +527,7 @@ pub(crate) fn on_change_auto_tile(
 		return;
 	}
 
-	let mut tiler = AutoTiler::new(query.q1(), &map_query, &tilesets);
+	let mut tiler = AutoTiler::new(query.q1(), &map_query);
 
 	for (entity, pos, parent, auto_tile) in query.q0().iter() {
 		tiler.add_tile(entity, pos, parent, auto_tile, true);
@@ -571,7 +568,7 @@ pub(crate) fn on_remove_auto_tile(
 	mut map_query: MapQuery,
 	mut commands: Commands,
 ) {
-	let mut tiler = AutoTiler::new(&query.q0(), &map_query, &tilesets);
+	let mut tiler = AutoTiler::new(query.q0(), &map_query);
 
 	for RemoveAutoTileEvent(entity) in event.iter() {
 		if let Ok((entity, pos, parent, auto_tile)) = query.q0().get(*entity) {

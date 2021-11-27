@@ -1,11 +1,10 @@
 //! Contains tileset-related things
 
 use bevy::math::Vec2;
-use std::collections::hash_map::{Values, ValuesMut};
+
 use std::collections::HashMap;
 
 use bevy::prelude::{Assets, Commands, Entity, Handle, Texture, UVec2};
-use bevy::reflect::List;
 
 use bevy::sprite::TextureAtlas;
 use bevy_ecs_tilemap::{GPUAnimated, LayerBuilder, MapQuery, Tile, TileBundle};

@@ -3,10 +3,7 @@
 //! These structures should only ever be generated alongside their respective
 //! [`Tileset`](tileset::Tileset) since they mostly define their indices into the [`TextureAtlas`]
 
-use crate::handles::{
-	AnimatedTileHandle, AutoTileHandle, SimpleTileHandle, TileHandle, TileHandleBase,
-	VariantTileHandle,
-};
+use crate::handles::{AnimatedTileHandle, AutoTileHandle, SimpleTileHandle, VariantTileHandle};
 use crate::tiles::auto_tile::AutoTileRule;
 use crate::tileset::{TileIndex, TilesetBuilder};
 use bevy::prelude::{Assets, Handle, Texture};
@@ -142,34 +139,22 @@ impl TileData {
 
 	/// Checks if the underlying tile is a [`TileType::Standard`] tile
 	pub fn is_standard(&self) -> bool {
-		match self.tile {
-			TileType::Standard(_) => true,
-			_ => false,
-		}
+		matches!(self.tile, TileType::Standard(_))
 	}
 
 	/// Checks if the underlying tile is a [`TileType::Animated`] tile
 	pub fn is_animated(&self) -> bool {
-		match self.tile {
-			TileType::Animated(_) => true,
-			_ => false,
-		}
+		matches!(self.tile, TileType::Animated(_))
 	}
 
 	/// Checks if the underlying tile is a [`TileType::Variant`] tile
 	pub fn is_variant(&self) -> bool {
-		match self.tile {
-			TileType::Variant(_) => true,
-			_ => false,
-		}
+		matches!(self.tile, TileType::Variant(_))
 	}
 
 	/// Checks if the underlying tile is a [`TileType::Auto`] tile
 	pub fn is_auto(&self) -> bool {
-		match self.tile {
-			TileType::Auto(_) => true,
-			_ => false,
-		}
+		matches!(self.tile, TileType::Auto(_))
 	}
 }
 
@@ -220,44 +205,6 @@ impl AutoTileData {
 }
 
 impl TileType {
-	/// Attempts to convert a [tile handle](TileHandleBase) to a valid [`TileType`]
-	///
-	/// This should almost always contain [`Some`] value. If [`None`] is returned, then
-	/// it likely has to do with the textures not being fully/properly loaded before calling
-	/// this method.
-	///
-	/// # Arguments
-	///
-	/// * `tile`: The tile handle object
-	/// * `atlas`: The atlas builder
-	/// * `texture_store`: The texture assets
-	///
-	/// returns: Option<TileType>
-	pub(crate) fn add_to_tileset(
-		tile: TileHandleBase,
-		builder: &mut TilesetBuilder,
-		texture_store: &Assets<Texture>,
-	) -> Option<Self> {
-		Some(match tile.tile {
-			TileHandle::Standard(handle) => {
-				let index = handle.try_into_tile_data(builder, texture_store)?;
-				TileType::Standard(index)
-			}
-			TileHandle::Animated(anim) => {
-				let anim = anim.try_into_tile_data(builder, texture_store)?;
-				TileType::Animated(anim)
-			}
-			TileHandle::Variant(variants) => {
-				let variants = variants.try_into_tile_data(builder, texture_store)?;
-				TileType::Variant(variants)
-			}
-			TileHandle::Auto(autos) => {
-				let autos = autos.try_into_tile_data(builder, texture_store)?;
-				TileType::Auto(autos)
-			}
-		})
-	}
-
 	/// Checks if the given index exists within this tile
 	///
 	/// # Arguments
@@ -303,15 +250,30 @@ impl SimpleTileType {
 //   |___|_| |_|\__\___/    |_| |_|_|\___| |___|_| |_|\__,_|\___/_/\_\
 //
 
-impl Into<TileIndex> for &AnimatedTileData {
-	fn into(self) -> TileIndex {
-		TileIndex::Animated(self.start(), self.end(), self.speed())
+impl From<AnimatedTileData> for TileIndex {
+	fn from(data: AnimatedTileData) -> Self {
+		TileIndex::Animated(data.start(), data.end(), data.speed())
 	}
 }
 
-impl Into<TileIndex> for &SimpleTileType {
-	fn into(self) -> TileIndex {
-		match self {
+impl From<&AnimatedTileData> for TileIndex {
+	fn from(data: &AnimatedTileData) -> Self {
+		TileIndex::Animated(data.start(), data.end(), data.speed())
+	}
+}
+
+impl From<SimpleTileType> for TileIndex {
+	fn from(data: SimpleTileType) -> Self {
+		match data {
+			SimpleTileType::Standard(index) => TileIndex::Standard(index),
+			SimpleTileType::Animated(anim) => anim.into(),
+		}
+	}
+}
+
+impl From<&SimpleTileType> for TileIndex {
+	fn from(data: &SimpleTileType) -> Self {
+		match data {
 			SimpleTileType::Standard(index) => TileIndex::Standard(*index),
 			SimpleTileType::Animated(anim) => anim.into(),
 		}

@@ -20,7 +20,7 @@ pub fn build_map(
 	let mut map = Map::new(0u16, map_entity);
 
 	let layers = build_layers(
-		&tileset,
+		tileset,
 		map_size,
 		chunk_size,
 		layer_count,
@@ -32,7 +32,6 @@ pub fn build_map(
 
 	for (index, layer) in layers.iter().enumerate() {
 		let layer_id = index as u16;
-		println!("Adding Layer: {:?} [{}]", layer, layer_id);
 		map.add_layer(commands, layer_id, *layer);
 	}
 
@@ -64,7 +63,7 @@ pub fn build_layers(
 	commands: &mut Commands,
 	map_query: &mut MapQuery,
 ) -> Vec<Entity> {
-	let mut settings = LayerSettings::new(
+	let settings = LayerSettings::new(
 		map_size,
 		chunk_size,
 		tileset.tile_size(),

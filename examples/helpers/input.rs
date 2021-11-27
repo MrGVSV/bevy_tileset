@@ -1,7 +1,7 @@
 use crate::helpers::WorldCamera;
 use bevy::math::Vec4Swizzles;
 use bevy::prelude::*;
-use bevy::render::camera::{Camera, OrthographicProjection};
+use bevy::render::camera::Camera;
 
 pub struct ClickEvent(pub UVec2);
 
@@ -29,6 +29,7 @@ pub fn on_click(
 	}
 }
 
+#[allow(dead_code)]
 pub fn click_to_coord(
 	query: &Query<&Transform, With<Camera>>,
 	wnds: &Windows,
