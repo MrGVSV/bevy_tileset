@@ -1,5 +1,6 @@
 mod auto_tile;
 mod data;
+pub mod debug;
 mod definitions;
 mod handles;
 mod loader;
