@@ -1,0 +1,19 @@
+#![enable(implicit_some)]
+#![enable(unwrap_newtypes)]
+
+(
+    name: "Glass",
+    tile: Animated((
+        speed: 1.5,
+        frames: [
+            "glass/glass-001.png",
+            "glass/glass-002.png",
+            "glass/glass-003.png",
+            "glass/glass-004.png",
+            "glass/glass-005.png",
+            "glass/glass-006.png",
+            "glass/glass-007.png",
+            "glass/glass-008.png",
+        ],
+    )),
+)
