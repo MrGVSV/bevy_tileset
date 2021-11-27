@@ -1,11 +1,11 @@
-use crate::auto_tile::{on_change_auto_tile, on_remove_auto_tile, RemoveAutoTileEvent};
+use crate::plugin::loader::{create_tileset, on_load_tileset_event, TilesetHandlesMap};
+use crate::prelude::TilesetLoadEvent;
+use crate::tiles::auto_tile::{on_change_auto_tile, on_remove_auto_tile, RemoveAutoTileEvent};
 use bevy::app::AppBuilder;
 use bevy::prelude::*;
 use bevy_ecs_tilemap::{TilemapPlugin, TilemapStage};
 
-use crate::loader::{create_tileset, on_load_tileset_event, TilesetHandlesMap, TilesetLoadEvent};
-
-use crate::tileset::Tilesets;
+use crate::Tilesets;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, StageLabel)]
 pub struct TilesetStage;

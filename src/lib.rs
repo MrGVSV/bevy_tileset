@@ -1,32 +1,20 @@
-mod auto_tile;
-mod data;
+pub use tileset::{TileIndex, Tileset, Tilesets};
+
 pub mod debug;
-mod definitions;
 mod handles;
-mod loader;
-mod plugin;
-mod tileset;
+pub mod plugin;
+pub mod tiles;
+pub mod tileset;
 
-pub use auto_tile::{AutoTile, AutoTileRule, RemoveAutoTileEvent};
-pub use data::{
-	AnimatedTileData, AutoTileData, SimpleTileType, TileData, TileType, VariantTileData,
-};
-pub use definitions::{AnimatedTileDef, AutoTileDef, SimpleTileDefType, TileDef, VariantTileDef};
-pub use loader::{TilesetDirs, TilesetLoadEvent, TilesetLoader};
-pub use plugin::{TilesetLabel, TilesetPlugin, TilesetStage};
-pub use tileset::{TileId, TileIndex, Tileset, TilesetBuilder, TilesetId, Tilesets};
+/// An ID used to identify a [`Tileset`]
+pub type TilesetId = u8;
+/// An ID used to identify a tile in a [`Tileset`]
+pub type TileId = u32;
 
-pub mod load {
-	pub use super::loader::{
-		TilesetDirs, TilesetLoadEvent, TilesetLoader, DEFAULT_TILES_ASSET_DIR,
-	};
-}
-
-#[cfg(test)]
-mod tests {
-	#[test]
-	fn it_works() {
-		let result = 2 + 2;
-		assert_eq!(result, 4);
-	}
+/// A collection of commonly used modules (import via `bevy_ecs_tilemap_tileset::prelude::*`)
+pub mod prelude {
+	pub use super::plugin::*;
+	pub use super::tiles::*;
+	pub use super::tileset::*;
+	pub use super::{TileId, TilesetId};
 }

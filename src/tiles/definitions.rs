@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::auto_tile::AutoTileRule;
+use crate::tiles::auto_tile::AutoTileRule;
 
 /// Top-level tile definition structure
 #[derive(Deserialize, Serialize, Debug, Clone)]

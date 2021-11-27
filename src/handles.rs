@@ -8,11 +8,11 @@ use bevy::asset::LoadState;
 use bevy::prelude::{AssetServer, Assets, Handle, Texture};
 use bevy_tile_atlas::TileAtlasBuilderError;
 
-use crate::auto_tile::AutoTileRule;
-use crate::definitions::{
+use crate::tiles::auto_tile::AutoTileRule;
+use crate::tiles::definitions::{
 	AnimatedTileDef, AutoTileDef, SimpleTileDefType, TileDef, TileDefType, VariantTileDef,
 };
-use crate::tileset::{Tileset, TilesetBuilder, TilesetId};
+use crate::tileset::{Tileset, TilesetBuilder};
 
 /// Resource containing all tile handles waiting to be processed
 #[derive(Debug, Default, Clone)]
@@ -176,33 +176,6 @@ impl TilesetHandles {
 		asset_server: &AssetServer,
 	) {
 		self.add_handle(tile.name, tile.tile.as_handle(texture_dir, asset_server));
-	}
-
-	/// Attempts to build the tileset using the stored tiles
-	///
-	/// If this fails, check that all textures are correctly loaded and that
-	/// they are all of the same size.
-	///
-	/// # Arguments
-	///
-	/// * `texture_store`: The texture assets
-	///
-	/// returns: Result<Tileset, TextureAtlasBuilderError>
-	///
-	pub(crate) fn build_tileset(
-		&self,
-		name: String,
-		id: TilesetId,
-		texture_store: &mut Assets<Texture>,
-	) -> Result<Tileset, TileAtlasBuilderError> {
-		let mut tiles_builder = TilesetBuilder::default();
-
-		// Unideal clone, however, it's required since Resources cannot be consumed
-		for base in self.tiles.clone().into_iter() {
-			tiles_builder.add_tile(base, texture_store);
-		}
-
-		tiles_builder.build(name, id, texture_store)
 	}
 
 	pub(crate) fn len(&self) -> usize {

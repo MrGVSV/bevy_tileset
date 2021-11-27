@@ -3,11 +3,11 @@
 //! These structures should only ever be generated alongside their respective
 //! [`Tileset`](tileset::Tileset) since they mostly define their indices into the [`TextureAtlas`]
 
-use crate::auto_tile::AutoTileRule;
 use crate::handles::{
 	AnimatedTileHandle, AutoTileHandle, SimpleTileHandle, TileHandle, TileHandleBase,
 	VariantTileHandle,
 };
+use crate::tiles::auto_tile::AutoTileRule;
 use crate::tileset::{TileIndex, TilesetBuilder};
 use bevy::prelude::{Assets, Handle, Texture};
 use serde::Serialize;
@@ -325,7 +325,7 @@ impl Into<TileIndex> for &SimpleTileType {
 //   |___|_| |_|\__\___/    |_| |_|_|\___| |____/ \__,_|\__\__,_|
 //
 
-trait TryIntoTileData {
+pub(crate) trait TryIntoTileData {
 	type DataType: TileDataTrait;
 
 	fn try_into_tile_data(

@@ -8,12 +8,11 @@ use bevy::log::warn;
 use std::collections::HashMap;
 use std::fs::DirEntry;
 
+use crate::handles::TilesetHandles;
+use crate::prelude::{TileDef, TilesetBuilder};
+use crate::Tilesets;
 use bevy::prelude::{AssetServer, Assets, EventReader, EventWriter, Res, ResMut, Texture};
 use bevy::utils::Uuid;
-
-use crate::definitions::TileDef;
-use crate::handles::TilesetHandles;
-use crate::tileset::Tilesets;
 
 /// The default assets directory path where all tiles should be defined
 pub const DEFAULT_TILES_ASSET_DIR: &str = "tiles";
@@ -27,7 +26,13 @@ where
 }
 
 #[derive(Default)]
-pub(crate) struct TilesetHandlesMap(HashMap<String, TilesetHandles>);
+pub(crate) struct TilesetHandlesMap(HashMap<String, TilesetRequest>);
+
+#[derive(Default)]
+struct TilesetRequest {
+	handles: TilesetHandles,
+	max_columns: Option<usize>,
+}
 
 /// A structure defining how the tileset should be loaded
 pub struct TilesetLoader<TMeta = ()>
@@ -39,6 +44,7 @@ where
 	/// This is mainly used for identifying tilesets after generation
 	pub name: String,
 	pub dirs: Vec<TilesetDirs>,
+	pub max_columns: Option<usize>,
 	pub meta: TMeta,
 }
 
@@ -63,6 +69,7 @@ where
 		Self {
 			name: name.to_string(),
 			dirs,
+			max_columns: None,
 			meta: TMeta::default(),
 		}
 	}
@@ -71,6 +78,7 @@ where
 		Self {
 			name: get_unique_name(),
 			dirs,
+			max_columns: None,
 			meta: TMeta::default(),
 		}
 	}
@@ -84,6 +92,7 @@ where
 		Self {
 			name: get_unique_name(),
 			dirs: vec![TilesetDirs::default()],
+			max_columns: Default::default(),
 			meta: TMeta::default(),
 		}
 	}
@@ -156,7 +165,9 @@ pub(crate) fn create_tileset(
 	mut events_writer: EventWriter<TilesetLoadEvent>,
 	asset_server: Res<AssetServer>,
 ) {
-	handles_map.0.retain(|tileset_name, tileset_handles| {
+	handles_map.0.retain(|tileset_name, tileset_request| {
+		let tileset_handles = &tileset_request.handles;
+
 		if tileset_handles.len() == 0usize {
 			return false;
 		}
@@ -172,8 +183,9 @@ pub(crate) fn create_tileset(
 		}
 
 		let id = tilesets.next_id();
-		if let Ok(tileset) = tileset_handles.build_tileset(tileset_name.clone(), id, &mut textures)
-		{
+		let mut builder = TilesetBuilder::default();
+		builder.add_handles(tileset_handles, &textures);
+		if let Ok(tileset) = builder.build(tileset_name.clone(), id, &mut textures) {
 			tilesets.register(tileset);
 			events_writer.send(TilesetLoadEvent::GeneratedTileset(tileset_name.clone()));
 		}
@@ -193,10 +205,12 @@ fn load_tiles(
 		loader.name.clone()
 	};
 
-	let tileset_handles = handles_map
+	let request = handles_map
 		.0
 		.entry(tileset_name)
-		.or_insert(TilesetHandles::default());
+		.or_insert(TilesetRequest::default());
+
+	request.max_columns = loader.max_columns;
 
 	for TilesetDirs {
 		ref tile_directory,
@@ -220,7 +234,9 @@ fn load_tiles(
 			let tile_def = ron::de::from_bytes::<TileDef>(bytes.as_slice());
 
 			if let Ok(tile_def) = tile_def {
-				tileset_handles.add_tile(tile_def, texture_directory, &asset_server);
+				request
+					.handles
+					.add_tile(tile_def, texture_directory, &asset_server);
 			} else if let Err(err) = tile_def {
 				warn!(
 					"Failed to load tile: {:?} ({:?} @ {:?})",
@@ -231,7 +247,7 @@ fn load_tiles(
 			}
 		}
 
-		tileset_handles.is_dirty = true;
+		request.handles.is_dirty = true;
 	}
 }
 

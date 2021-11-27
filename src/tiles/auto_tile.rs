@@ -6,12 +6,10 @@ use std::hash::Hash;
 use bevy::math::{IVec2, UVec2};
 use bevy::prelude::{Changed, Commands, Entity, EventReader, Query, QuerySet, Res, With};
 
-use crate::Tileset;
+use crate::{TileId, TileIndex, TilesetId, Tilesets};
 use bevy::utils::{HashMap, HashSet};
 use bevy_ecs_tilemap::{GPUAnimated, MapQuery, Tile, TileParent};
 use serde::{Deserialize, Serialize};
-
-use crate::tileset::{TileId, TileIndex, TilesetId, Tilesets};
 
 //     _____ _                   _
 //    / ____| |                 | |
@@ -37,21 +35,21 @@ pub struct AutoTile(TileId, TilesetId);
 #[derive(Debug, Default, Deserialize, Copy, Clone, Eq, PartialEq, Serialize)]
 pub struct AutoTileRule {
 	#[serde(alias = "n")]
-	north: Option<bool>,
+	pub north: Option<bool>,
 	#[serde(alias = "e")]
-	east: Option<bool>,
+	pub east: Option<bool>,
 	#[serde(alias = "s")]
-	south: Option<bool>,
+	pub south: Option<bool>,
 	#[serde(alias = "w")]
-	west: Option<bool>,
+	pub west: Option<bool>,
 	#[serde(alias = "ne")]
-	north_east: Option<bool>,
+	pub north_east: Option<bool>,
 	#[serde(alias = "nw")]
-	north_west: Option<bool>,
+	pub north_west: Option<bool>,
 	#[serde(alias = "se")]
-	south_east: Option<bool>,
+	pub south_east: Option<bool>,
 	#[serde(alias = "sw")]
-	south_west: Option<bool>,
+	pub south_west: Option<bool>,
 }
 
 /// The corrdinates of the tile, including the `map_id` and `layer_id`
@@ -187,9 +185,9 @@ impl AutoTileRule {
 	/// # Examples
 	///
 	/// ```
-	/// use bevy_ecs_tilemap_tileset::AutoTileRule;
+	/// use bevy_ecs_tilemap_tileset::prelude::*;
 	/// let a = AutoTileRule { north: Some(true), ..Default::default() };
-	/// let b = AutoTileRule { north: Some(true), east: Some(true), south: Some(false) ..Default::default() };
+	/// let b = AutoTileRule { north: Some(true), east: Some(true), south: Some(false), ..Default::default() };
 	///
 	/// assert!(a.is_subset_of(&b)); // True since `b` contains `north: Some(true)`
 	/// assert!(!b.is_subset_of(&a)); // False since `a` does not contain `east: Some(true)` nor `south: Some(false)`

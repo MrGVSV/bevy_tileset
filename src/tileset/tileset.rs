@@ -13,15 +13,10 @@ use bevy_tile_atlas::{TileAtlasBuilder, TileAtlasBuilderError};
 use rand::distributions::{Distribution, WeightedIndex};
 use rand::thread_rng;
 
-use crate::auto_tile::{AutoTile, AutoTileRule};
-use crate::data::{AutoTileData, TileData, TileType, VariantTileData};
-use crate::handles::TileHandleBase;
-use crate::SimpleTileType;
-
-/// An ID used to identify a [`Tileset`]
-pub type TilesetId = u8;
-/// An ID used to identify a tile in a [`Tileset`]
-pub type TileId = u32;
+use crate::handles::{TileHandle, TileHandleBase, TilesetHandles};
+use crate::prelude::internal::TryIntoTileData;
+use crate::tiles::{AutoTile, AutoTileData, AutoTileRule, TileData, TileType, VariantTileData};
+use crate::{TileId, TileIndex, TilesetId};
 
 /// A structure containing the registered tiles as well as their generated [`TextureAtlas`]
 #[derive(Debug)]
@@ -47,6 +42,7 @@ pub struct Tileset {
 }
 
 /// A builder for constructing a [`Tileset`]
+#[derive(Default)]
 pub struct TilesetBuilder {
 	/// The registered tiles mapped by their ID
 	tiles: HashMap<TileId, TileData>,
@@ -64,38 +60,15 @@ pub struct TilesetBuilder {
 	tile_counter: TileId,
 }
 
-/// A structure defining the index or indexes into the texture atlas
-#[derive(Debug, Copy, Clone)]
-pub enum TileIndex {
-	/// Index for a standard tile
-	Standard(usize),
-	/// Indexes for an animated tile.
-	///
-	/// Takes the form (start, end, speed)
-	Animated(usize, usize, f32),
-}
-
-/// A resource containing all registered tilesets
-#[derive(Default)]
-pub struct Tilesets {
-	ids: HashMap<String, TilesetId>,
-	tilesets: HashMap<TilesetId, Tileset>,
-	counter: TilesetId,
-}
-
-//    _____                 _
-//   |_   _|               | |
-//     | |  _ __ ___  _ __ | |___
-//     | | | '_ ` _ \| '_ \| / __|
-//    _| |_| | | | | | |_) | \__ \
-//   |_____|_| |_| |_| .__/|_|___/
-//                   | |
-//                   |_|
-
 impl Tileset {
 	/// Gets the name of this tileset
 	pub fn name(&self) -> &str {
 		&self.name
+	}
+
+	/// Gets the ID of this tileset
+	pub fn id(&self) -> &TilesetId {
+		&self.id
 	}
 
 	/// Gets the tileset [`TextureAtlas`]
@@ -252,8 +225,7 @@ impl Tileset {
 	///
 	/// ```
 	/// use bevy::prelude::{Commands, Res};
-	/// use bevy_ecs_tilemap::prelude::MapQuery;
-	/// use bevy_ecs_tilemap_tileset::{AutoTileRule, Tileset};
+	/// use bevy_ecs_tilemap::prelude::*;
 	///
 	/// fn place_tile(tileset: Res<Tileset>, mut commands: Commands, mut map_query: MapQuery) {
 	/// 	// Matches:
@@ -605,6 +577,18 @@ impl Tileset {
 //
 
 impl TilesetBuilder {
+	pub fn new(max_columns: Option<usize>) -> Self {
+		Self {
+			atlas_builder: TileAtlasBuilder::default().max_columns(max_columns),
+			tile_ids: Default::default(),
+			tile_counter: Default::default(),
+			tile_indices: Default::default(),
+			tile_names: Default::default(),
+			tiles: Default::default(),
+			tile_handles: Default::default(),
+		}
+	}
+
 	/// Build the tileset
 	///
 	/// # Arguments
@@ -632,6 +616,16 @@ impl TilesetBuilder {
 		})
 	}
 
+	pub(crate) fn add_handles(
+		&mut self,
+		handles: &TilesetHandles,
+		texture_store: &Assets<Texture>,
+	) {
+		for handle in handles.tiles.clone().into_iter() {
+			self.add_handle(handle, texture_store);
+		}
+	}
+
 	/// Add a tile to the tileset
 	///
 	/// # Arguments
@@ -641,17 +635,17 @@ impl TilesetBuilder {
 	///
 	/// returns: Option<TileData>
 	///
-	pub(crate) fn add_tile(
+	pub(crate) fn add_handle(
 		&mut self,
-		tile: TileHandleBase,
+		tile_handle: TileHandleBase,
 		texture_store: &Assets<Texture>,
 	) -> Option<TileData> {
-		let name = tile.name.clone();
+		let name = tile_handle.name.clone();
 
 		let id = self.tile_counter;
 		let tile = TileData::new(
 			name.clone(),
-			TileType::add_to_tileset(tile, self, texture_store)?,
+			self.try_convert_handle(tile_handle, texture_store)?,
 		);
 		self.tile_counter += 1u32;
 
@@ -677,143 +671,29 @@ impl TilesetBuilder {
 
 		Some(index)
 	}
-}
 
-impl Default for TilesetBuilder {
-	fn default() -> Self {
-		Self {
-			atlas_builder: TileAtlasBuilder::default().max_columns(None),
-			tile_ids: Default::default(),
-			tile_counter: Default::default(),
-			tile_indices: Default::default(),
-			tile_names: Default::default(),
-			tiles: Default::default(),
-			tile_handles: Default::default(),
-		}
-	}
-}
-
-//    _____ _ _       ___         _
-//   |_   _(_) |___  |_ _|_ _  __| |_____ __
-//     | | | | / -_)  | || ' \/ _` / -_) \ /
-//     |_| |_|_\___| |___|_||_\__,_\___/_\_\
-//
-
-impl TileIndex {
-	/// Get the base index
-	///
-	/// This is the regular index for [`TileIndex::Standard`] and the start index
-	/// for [`TileIndex::Animated`]
-	///
-	pub fn base_index(&self) -> &usize {
-		match self {
-			Self::Standard(idx) => idx,
-			Self::Animated(idx, ..) => idx,
-		}
-	}
-}
-
-//    _____ _ _             _
-//   |_   _(_) |___ ___ ___| |_ ___
-//     | | | | / -_|_-</ -_)  _(_-<
-//     |_| |_|_\___/__/\___|\__/__/
-//
-
-impl Tilesets {
-	/// Get the ID of the tileset by name
-	///
-	/// # Arguments
-	///
-	/// * `name`: The tileset's name
-	///
-	/// returns: Option<&u8>
-	///
-	pub fn get_id(&self, name: &str) -> Option<&u8> {
-		self.ids.get(name)
-	}
-
-	/// Get the tileset by ID
-	///
-	/// # Arguments
-	///
-	/// * `id`: The tileset's ID
-	///
-	/// returns: Option<&Tileset>
-	///
-	pub fn get(&self, id: &TilesetId) -> Option<&Tileset> {
-		self.tilesets.get(id)
-	}
-
-	/// Get the tileset by name
-	///
-	/// # Arguments
-	///
-	/// * `name`: The tileset's name
-	///
-	/// returns: Option<&Tileset>
-	///
-	pub fn get_by_name(&self, name: &str) -> Option<&Tileset> {
-		let id = self.get_id(name)?;
-		self.tilesets.get(id)
-	}
-
-	/// Generate a new [`TilesetId`]
-	///
-	/// This should be attached to a tileset that's about to be registered
-	pub fn next_id(&mut self) -> TilesetId {
-		let id = self.counter;
-		self.counter += 1u8;
-		id
-	}
-
-	/// Register a new tileset
-	///
-	/// If the tileset replaces an existing one, the replaced tileset will be returned
-	///
-	/// # Arguments
-	///
-	/// * `tileset`: The tileset to register
-	///
-	/// returns: Option<Tileset>
-	///
-	pub fn register(&mut self, tileset: Tileset) -> Option<Tileset> {
-		let id = tileset.id;
-		self.ids.insert(tileset.name.clone(), id);
-		self.tilesets.insert(id, tileset)
-	}
-
-	/// Deregister a tileset by ID
-	///
-	/// # Arguments
-	///
-	/// * `id`: The tileset's ID
-	///
-	/// returns: Option<Tileset>
-	///
-	pub fn deregister(&mut self, id: &TilesetId) -> Option<Tileset> {
-		self.tilesets.remove(id)
-	}
-
-	/// Deregister a tileset by name
-	///
-	/// # Arguments
-	///
-	/// * `name`: The tileset's name
-	///
-	/// returns: Option<Tileset>
-	///
-	pub fn deregister_by_name(&mut self, name: &str) -> Option<Tileset> {
-		let id = self.ids.get(name)?;
-		self.tilesets.remove(id)
-	}
-
-	/// Iterate over all registered tilesets
-	pub fn iter(&self) -> Values<'_, TilesetId, Tileset> {
-		self.tilesets.values()
-	}
-
-	/// Iterate mutably over all registered tilesets
-	pub fn iter_mut(&mut self) -> ValuesMut<'_, TilesetId, Tileset> {
-		self.tilesets.values_mut()
+	fn try_convert_handle(
+		&mut self,
+		tile: TileHandleBase,
+		texture_store: &Assets<Texture>,
+	) -> Option<TileType> {
+		Some(match tile.tile {
+			TileHandle::Standard(handle) => {
+				let index = handle.try_into_tile_data(self, texture_store)?;
+				TileType::Standard(index)
+			}
+			TileHandle::Animated(anim) => {
+				let anim = anim.try_into_tile_data(self, texture_store)?;
+				TileType::Animated(anim)
+			}
+			TileHandle::Variant(variants) => {
+				let variants = variants.try_into_tile_data(self, texture_store)?;
+				TileType::Variant(variants)
+			}
+			TileHandle::Auto(autos) => {
+				let autos = autos.try_into_tile_data(self, texture_store)?;
+				TileType::Auto(autos)
+			}
+		})
 	}
 }
