@@ -48,6 +48,7 @@
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/spirv_cross-3ea9fbca00a5c47a/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/syn-d24964da4a552da2/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/wgpu-core-9e7dcfd45269de6e/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
