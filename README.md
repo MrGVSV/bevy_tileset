@@ -20,7 +20,7 @@ Simply **define** your tiles in a config file:
 
 ```rust
 (
-	name: "My Tile",
+  name: "My Tile",
   tile: Standard("textures/my_tile.png")
 )
 ```
@@ -77,7 +77,7 @@ Defines a basic tile.
 // my-tile.ron
 
 (
-	name: "My Tile",
+  name: "My Tile",
   tile: Standard("textures/my_tile.png")
 )
 ```
@@ -90,9 +90,9 @@ Defines an animated tile that can be generated with the `GPUAnimated` component 
 // my-animated-tile.ron
 
 (
-	name: "My Animated Tile",
+  name: "My Animated Tile",
   tile: Animated((
-  	speed: 2.25,
+    speed: 2.25,
     frames: [
       "textures/animated-001.png",
       "textures/animated-002.png",
@@ -110,10 +110,10 @@ Defines a tile that has a set of possible variants. A random variant is chosen a
 // my-variant-tile.ron
 
 (
-	name: "My Crazy Random Tile",
+  name: "My Crazy Random Tile",
   tile: Variant([
     (
-    	weight: 1.0,
+      weight: 1.0,
       tile: Standard("textures/variant-standard-001.png")
     ),
     (
@@ -121,7 +121,7 @@ Defines a tile that has a set of possible variants. A random variant is chosen a
       tile: Standard("textures/variant-standard-002.png")
     ),
     (
-    	weight: 0.0001, // Wow that's rare!
+      weight: 0.0001, // Wow that's rare!
       tile: Animated((
       	// Default speed: 1.0
         frames: [
@@ -145,8 +145,8 @@ Defines a tile that automatically chooses its active tile based on its neighbors
 #![enable(implicit_some)]
 
 (
-	name: "My Auto Tile",
-	tile: Auto([
+  name: "My Auto Tile",
+  tile: Auto([
     (
       rule: (
         north: true,
@@ -155,11 +155,11 @@ Defines a tile that automatically chooses its active tile based on its neighbors
       ),
       variants: [
         (
-        	tile: Standard("textures/n_w-e-001.png")
+          tile: Standard("textures/n_w-e-001.png")
         ),
         (
           weight: 2.0, 
-        	tile: Standard("textures/n_w-e-002.png")
+          tile: Standard("textures/n_w-e-002.png")
         )
       ]
     ),
@@ -174,7 +174,7 @@ Defines a tile that automatically chooses its active tile based on its neighbors
       ),
       variants: [
         (
-        	tile: Standard("textures/sw-n_s_nw.png")
+          tile: Standard("textures/sw-n_s_nw.png")
         )
       ]
     ),
