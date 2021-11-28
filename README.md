@@ -4,7 +4,7 @@
 
 An extension to the wonderful [`bevy_ecs_tilemap`](https://github.com/StarArawn/bevy_ecs_tilemap) crate for Bevy, allowing for configurable tilesets and basic auto tiling capabilities.
 
-![Smart tile placement](/Users/ginovalente/Projects/Git/rust/bevy_ecs_tilemap_tileset/screenshots/tile_placement_demo.gif)
+![Smart tile placement](./screenshots/tile_placement_demo.gif)
 
 ## 📋 Features
 
@@ -182,7 +182,7 @@ Defines a tile that automatically chooses its active tile based on its neighbors
 )
 ```
 
-![Auto tiling](/Users/ginovalente/Projects/Git/rust/bevy_ecs_tilemap_tileset/screenshots/auto_tiling_demo.gif)
+![Auto tiling](./screenshots/auto_tiling_demo.gif)
 
 ## 🌱 Areas of Growth
 
