@@ -12,3 +12,7 @@ bevy_tile_atlas = "0.1.1"
 ron = "0.7.0"
 serde = "1.0.130"
 rand = "0.8"
+
+[[example]]
+name = "clickable"
+path = "examples/clickable.rs"
