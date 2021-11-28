@@ -1,5 +1,4 @@
 #![enable(implicit_some)]
-#![enable(unwrap_newtypes)]
 
 (
     name: "Wall",
