@@ -14,7 +14,7 @@ An extension to the wonderful [`bevy_ecs_tilemap`](https://github.com/StarArawn/
 
 ## ✨ Usage
 
-Simply define your tiles in a config file:
+Simply **define** your tiles in a config file:
 
 ```rust
 (
@@ -23,7 +23,7 @@ Simply define your tiles in a config file:
 )
 ```
 
-And load it in via a system:
+And **load** it in via a system:
 
 ```rust
 use bevy::prelude::*;
@@ -40,7 +40,7 @@ fn load_tiles(mut writer: EventWriter<TilesetLoadEvent>) {
 }
 ```
 
-Then access the generated tileset from anywhere:
+Then **access** the generated tileset from anywhere:
 
 ```rust
 fn my_system(tilesets: Res<Tilesets>, /* other system params */) {
@@ -67,7 +67,7 @@ fn my_system(tilesets: Res<Tilesets>, /* other system params */) {
 
 Currently there are four main tile types:
 
-### Standard
+### 🖼 Standard
 
 Defines a basic tile.
 
@@ -80,7 +80,7 @@ Defines a basic tile.
 )
 ```
 
-### Animated
+### 🎞️ Animated
 
 Defines an animated tile that can be used with `GPUAnimated` from `bevy_ecs_tilemap`.
 
@@ -100,7 +100,7 @@ Defines an animated tile that can be used with `GPUAnimated` from `bevy_ecs_tile
 )
 ```
 
-### Variant
+### 🎲 Variant
 
 Defines a tile that has a set of possible variants. A random variant is chosen at random when placed. These variants can either be Standard or Animated.
 
@@ -133,7 +133,7 @@ Defines a tile that has a set of possible variants. A random variant is chosen a
 )
 ```
 
-### Auto
+### 🧠 Auto
 
 Defines a tile that automatically chooses its active tile based on its neighbors. This behavior can be controlled with rules. These sub-tiles are themselves Variant tiles.
 
@@ -201,7 +201,7 @@ This crate was made to serve my purposes for my own tile-based games. I really l
 
 As for publishing, I'm hesitant to publish this as its own crate for a few reasons:
 
-* The idea of this being an extension to an existing crate sounds troublesome
+* The idea of this being an extension to an extension of Bevy sounds messy
   * It may cause confusion in the community for those using `bevy_ecs_tilemap`
   * It limits users to this crate's version of `bevy_ecs_tilemap` (more-or-less)
 * The API needs a lot of improvement
