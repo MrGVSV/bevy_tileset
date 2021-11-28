@@ -150,16 +150,17 @@ fn on_tile_click(
 						map_query.despawn_tile(&mut commands, pos, 0, layer_id);
 						// Make sure to notify the chunk!
 						map_query.notify_chunk_for_tile(pos, 0, layer_id);
+					}
 
-						if auto.is_some() {
-							// ! --- VERY IMPORTANT --- ! //
-							// In order to notify the auto tile system that an auto tile has been removed,
-							// we MUST send this event along with the removed entity
-							//
-							// It is possible to do this with every removed tile, though, it's not recommended,
-							// since it may impact performance for large quantities of removals
-							event_writer.send(RemoveAutoTileEvent(entity));
-						}
+					// Whether removed or replaced -> notify auto tile system
+					if auto.is_some() {
+						// ! --- VERY IMPORTANT --- ! //
+						// In order to notify the auto tile system that an auto tile has been removed,
+						// we MUST send this event along with the removed entity
+						//
+						// It is possible to do this with every removed tile, though, it's not recommended,
+						// since it may impact performance for large quantities of removals
+						event_writer.send(RemoveAutoTileEvent(entity));
 					}
 				}
 			}
