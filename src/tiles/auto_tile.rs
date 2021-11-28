@@ -35,20 +35,28 @@ pub struct AutoTile(TileId, TilesetId);
 #[derive(Debug, Default, Deserialize, Copy, Clone, Eq, PartialEq, Serialize)]
 pub struct AutoTileRule {
 	#[serde(alias = "n")]
+	#[serde(default)]
 	pub north: Option<bool>,
 	#[serde(alias = "e")]
+	#[serde(default)]
 	pub east: Option<bool>,
 	#[serde(alias = "s")]
+	#[serde(default)]
 	pub south: Option<bool>,
 	#[serde(alias = "w")]
+	#[serde(default)]
 	pub west: Option<bool>,
 	#[serde(alias = "ne")]
+	#[serde(default)]
 	pub north_east: Option<bool>,
 	#[serde(alias = "nw")]
+	#[serde(default)]
 	pub north_west: Option<bool>,
 	#[serde(alias = "se")]
+	#[serde(default)]
 	pub south_east: Option<bool>,
 	#[serde(alias = "sw")]
+	#[serde(default)]
 	pub south_west: Option<bool>,
 }
 
