@@ -134,7 +134,7 @@ fn on_tile_click(
 ) {
 	if let Some(tileset) = tilesets.get_by_name(MY_TILESET) {
 		for helpers::ClickEvent(ref pos) in event_reader.iter() {
-			let mut was_removed = false;
+			let mut should_place = true;
 			let layer_id = build_mode.active_layer;
 			let tile_name = &build_mode.tile_name;
 			let pos = *pos;
@@ -145,34 +145,30 @@ fn on_tile_click(
 					let name = tileset.get_tile_name_by_index(&(tile.texture_index as usize));
 
 					if Some(tile_name) == name {
-						// Tiles match --> remove
-						was_removed = true;
+						// Tiles match --> Remove
+						should_place = false;
+						map_query.despawn_tile(&mut commands, pos, 0, layer_id);
+						// Make sure to notify the chunk!
+						map_query.notify_chunk_for_tile(pos, 0, layer_id);
 
-						// We'll spawn in an empty tile to act as the removal
-						// Using `map_query.despawn_tile()` seems to break things (likely due to tricky system ordering)
-						tileset.place_tile(
-							"Empty",
-							pos,
-							0u16,
-							layer_id,
-							&mut commands,
-							&mut map_query,
-						);
-					}
-					if auto.is_some() {
-						// ! --- VERY IMPORTANT --- ! //
-						// In order to notify the auto tile system that an auto tile has been removed,
-						// we MUST send this event along with the removed entity
-						//
-						// It is possible to do this with every removed tile, though, it's not recommended,
-						// since it may impact performance for large quantities of removals
-						event_writer.send(RemoveAutoTileEvent(entity));
+						if auto.is_some() {
+							// ! --- VERY IMPORTANT --- ! //
+							// In order to notify the auto tile system that an auto tile has been removed,
+							// we MUST send this event along with the removed entity
+							//
+							// It is possible to do this with every removed tile, though, it's not recommended,
+							// since it may impact performance for large quantities of removals
+							event_writer.send(RemoveAutoTileEvent(entity));
+						}
 					}
 				}
 			}
 
-			if !was_removed {
+			if should_place {
 				// No tile was removed -> Place one
+
+				// The `tileset.place_tile()` method also internally notifies the chunk,
+				// so no need to handle that manually!
 				tileset.place_tile(
 					tile_name,
 					pos,
