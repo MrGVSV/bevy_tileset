@@ -4,13 +4,15 @@
 
 An extension to the wonderful [`bevy_ecs_tilemap`](https://github.com/StarArawn/bevy_ecs_tilemap) crate for Bevy, allowing for configurable tilesets and basic auto tiling capabilities.
 
+![Smart tile placement](/Users/ginovalente/Projects/Git/rust/bevy_ecs_tilemap_tileset/screenshots/tile_placement_demo.gif)
+
 ## 📋 Features
 
 * Configure tiles via [RON](https://github.com/ron-rs/ron) files
 * Generate tilesets that readily work with `bevy_ecs_tilemap`
 * Basic auto tiling
 * Tile variants
-* Smart tile spawning— automatically inserts the necessary components
+* Smart tile spawning— automatically inserts the necessary components based on the tile config
 
 ## ✨ Usage
 
@@ -82,7 +84,7 @@ Defines a basic tile.
 
 ### 🎞️ Animated
 
-Defines an animated tile that can be used with `GPUAnimated` from `bevy_ecs_tilemap`.
+Defines an animated tile that can be generated with the `GPUAnimated` component from `bevy_ecs_tilemap`.
 
 ```rust
 // my-animated-tile.ron
@@ -179,6 +181,8 @@ Defines a tile that automatically chooses its active tile based on its neighbors
   ])
 )
 ```
+
+![Auto tiling](/Users/ginovalente/Projects/Git/rust/bevy_ecs_tilemap_tileset/screenshots/auto_tiling_demo.gif)
 
 ## 🌱 Areas of Growth
 
