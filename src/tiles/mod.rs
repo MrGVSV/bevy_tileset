@@ -1,3 +1,5 @@
+//! Tile data, including tile definitions (for config files) and auto tiling
+
 pub mod auto_tile;
 pub mod data;
 pub mod definitions;
@@ -11,5 +13,5 @@ pub use definitions::{
 };
 
 pub(crate) mod internal {
-	pub(crate) use super::data::{TryIntoTileData};
+	pub(crate) use super::data::TryIntoTileData;
 }

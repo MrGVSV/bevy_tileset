@@ -1,3 +1,5 @@
+//! Contains the basic building blocks for adding this library to a Bevy project
+
 mod loader;
 mod tileset_plugin;
 

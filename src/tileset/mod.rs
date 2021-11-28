@@ -1,3 +1,5 @@
+//! Tileset data and resources that contains, manages, and allows access to individual tiles
+
 mod tile_index;
 mod tileset;
 mod tilesets;
