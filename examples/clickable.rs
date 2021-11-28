@@ -1,3 +1,8 @@
+//! An example showcasing the entire crate, including:
+//! * Auto tiling
+//! * Tileset loading
+//! * Smart tile placement
+
 mod helpers;
 
 use bevy::prelude::*;
@@ -6,43 +11,63 @@ use bevy_ecs_tilemap::{GPUAnimated, MapQuery, Tile};
 use bevy_ecs_tilemap_tileset::debug::DebugTilesetPlugin;
 use bevy_ecs_tilemap_tileset::prelude::*;
 
+/// The name of the tileset we'll be loading in this example
+///
+/// This could be any string and doesn't need to be a constant or static.
 const MY_TILESET: &str = "My Tileset";
 
 fn main() {
 	App::build()
+		// === Required === //
 		.add_plugins(DefaultPlugins)
 		.add_plugin(TilesetPlugin)
+		// /== Required === //
+		// === Exmaple-Specific === //
+		// This is the debug plugin. It basically just spawns our tileset in as a sprite
 		.add_plugin(DebugTilesetPlugin::single_with_position(
 			MY_TILESET,
 			Vec3::new(192.0, -32.0, 1.0),
 		))
-		.add_event::<helpers::ClickEvent>()
 		.insert_resource(BuildMode {
 			tile_name: String::from("Wall"),
 			active_layer: 0u16,
 		})
+		.add_event::<helpers::ClickEvent>()
 		.add_startup_system(load_tiles.system())
 		.add_startup_system(setup_hud.system())
 		.add_system(build_map.system())
 		.add_system(on_keypress.system())
 		.add_system(helpers::on_click.system())
 		.add_system(update_text.system())
+		// ! ---------------------- ! //
+		// ! ⚠️ --- Important --- ⚠️ ! //
+		// ! ---------------------- ! //
+		// Any system that removes an auto tile needs to be placed in the `TilesetStage` stage
+		// AND set to run before `TilesetLabel::RemoveAutoTiles`. Not doing this may leave auto
+		// tiles disjointed and in a visually invalid state.
+		//
+		// This does not need to happen for any other tile type. Removing them as normal shouild
+		// work just fine.
 		.add_system_to_stage(
 			TilesetStage,
 			on_tile_click.system().before(TilesetLabel::RemoveAutoTiles),
 		)
+		// /== Exmaple-Specific === //
 		.run();
 }
 
+/// Starts the tileset loading process
 fn load_tiles(mut writer: EventWriter<TilesetLoadEvent>) {
 	writer.send(TilesetLoadRequest::named(MY_TILESET, vec![TilesetDirs::from_dir("tiles")]).into());
 }
 
+/// A local state noting if the map has been built or not
 #[derive(Default)]
 struct BuildMapState {
 	built: bool,
 }
 
+/// A system used to build the tilemap
 fn build_map(
 	tilesets: Res<Tilesets>,
 	mut commands: Commands,
@@ -56,8 +81,9 @@ fn build_map(
 	}
 
 	if let Some(tileset) = tilesets.get_by_name(MY_TILESET) {
-		println!("My Tileset: {:#?}", tileset);
+		println!("{:#?}", tileset);
 
+		// === Settings === //
 		let map_size = UVec2::new(4, 4);
 		let chunk_size = UVec2::new(5, 5);
 		let layer_count = 3;
@@ -65,7 +91,9 @@ fn build_map(
 			TileIndex::Standard(index) => index,
 			TileIndex::Animated(start, ..) => start,
 		} as u16;
-		let _map = helpers::build_map(
+
+		// === Build === //
+		helpers::build_map(
 			tileset,
 			map_size,
 			chunk_size,
@@ -80,12 +108,21 @@ fn build_map(
 	}
 }
 
+/// A simple resource to control what layer and tile we're using
 #[derive(Debug)]
 struct BuildMode {
 	tile_name: String,
 	active_layer: u16,
 }
 
+/// A system that adds/removes tiles when clicked on
+///
+/// __Note:__ This system has the ability to remove auto tiles. Therefore take notice of how we
+/// need to do two things to account for that:
+///
+/// 1. We must run this system in the proper stage and with the proper ordering (see description in [`main`])
+/// 2. We must send a [`RemoveAutoTileEvent`] whenever we remove an auto tile
+///
 fn on_tile_click(
 	tilesets: Res<Tilesets>,
 	build_mode: Res<BuildMode>,
@@ -104,9 +141,15 @@ fn on_tile_click(
 
 			if let Ok(entity) = map_query.get_tile_entity(pos, 0u16, layer_id) {
 				if let Ok((tile, auto, ..)) = query.get(entity) {
+					// We can get the name of a tile by its texture index (assuming it was spawned correctly)
 					let name = tileset.get_tile_name_by_index(&(tile.texture_index as usize));
+
 					if Some(tile_name) == name {
 						// Tiles match --> remove
+						was_removed = true;
+
+						// We'll spawn in an empty tile to act as the removal
+						// Using `map_query.despawn_tile()` seems to break things (likely due to tricky system ordering)
 						tileset.place_tile(
 							"Empty",
 							pos,
@@ -115,15 +158,21 @@ fn on_tile_click(
 							&mut commands,
 							&mut map_query,
 						);
-						was_removed = true;
 					}
 					if auto.is_some() {
+						// ! --- VERY IMPORTANT --- ! //
+						// In order to notify the auto tile system that an auto tile has been removed,
+						// we MUST send this event along with the removed entity
+						//
+						// It is possible to do this with every removed tile, though, it's not recommended,
+						// since it may impact performance for large quantities of removals
 						event_writer.send(RemoveAutoTileEvent(entity));
 					}
 				}
 			}
 
 			if !was_removed {
+				// No tile was removed -> Place one
 				tileset.place_tile(
 					tile_name,
 					pos,
@@ -137,6 +186,7 @@ fn on_tile_click(
 	}
 }
 
+/// System controlling the "Build Mode"
 fn on_keypress(keys: Res<Input<KeyCode>>, mut build_mode: ResMut<BuildMode>) {
 	if keys.just_pressed(KeyCode::W) {
 		build_mode.tile_name = String::from("Wall");
@@ -156,6 +206,18 @@ fn on_keypress(keys: Res<Input<KeyCode>>, mut build_mode: ResMut<BuildMode>) {
 		build_mode.active_layer = 2u16;
 	}
 }
+
+//    _    _ _    _ _____
+//   | |  | | |  | |  __ \
+//   | |__| | |  | | |  | |
+//   |  __  | |  | | |  | |
+//   | |  | | |__| | |__| |
+//   |_|  |_|\____/|_____/
+//
+//
+
+// All HUD related things from this point onwards
+// No need to scroll further (unless you want to...)
 
 struct HudText;
 fn update_text(
