@@ -30,24 +30,29 @@ pub struct TilesetDef {
 	pub tiles: BTreeMap<TileGroupId, String>,
 }
 
+/// A struct that mimics a Bevy `AssetServer`
+///
+/// Instead of loading an image right away, it tracks the paths to the images to be loaded
+/// later (so we don't need to await on _every_ image).
 struct TilesetTextureLoader<'x, 'y> {
-	context: &'x mut LoadContext<'y>,
-	images: Arc<RwLock<HashMap<HandleId, PathBuf>>>,
+	load_context: &'x mut LoadContext<'y>,
+	/// The images that need to be loaded
+	bytes: Arc<RwLock<HashMap<HandleId, PathBuf>>>,
 }
 
-struct TilesetTextureServer<'x, 'y> {
-	context: &'x mut LoadContext<'y>,
+/// A struct that mimics a Bevy `Assets<Texture>` resource by allowing get/add operations
+struct TilesetTextureStore<'x, 'y> {
+	load_context: &'x mut LoadContext<'y>,
 	images: HashMap<HandleId, Texture>,
-	dep_count: u8,
 }
 
 impl<'x, 'y> TextureLoader for TilesetTextureLoader<'x, 'y> {
 	fn load<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture> {
 		let asset_path = path.into().clone();
-		let handle: Handle<Texture> = self.context.get_handle(asset_path.clone());
+		let handle: Handle<Texture> = self.load_context.get_handle(asset_path.clone());
 		let path = asset_path.path().to_path_buf();
 
-		if let Ok(mut images) = self.images.try_write() {
+		if let Ok(mut images) = self.bytes.try_write() {
 			images.insert(handle.id, path);
 		}
 		handle
@@ -55,13 +60,14 @@ impl<'x, 'y> TextureLoader for TilesetTextureLoader<'x, 'y> {
 }
 
 impl<'x, 'y> TilesetTextureLoader<'x, 'y> {
-	fn collect(self) -> BoxedFuture<'x, Result<HashMap<HandleId, Texture>, TilesetError>> {
-		let images = self.images.read().unwrap().clone();
+	/// Load the images and collect them into a HashMap
+	fn collect_images(self) -> BoxedFuture<'x, Result<HashMap<HandleId, Texture>, TilesetError>> {
+		let images = self.bytes.read().unwrap().clone();
 		Box::pin(async move {
 			let image_map = futures::future::join_all(
 				images
 					.into_iter()
-					.map(|(id, path)| load_image(&self.context, id, path)),
+					.map(|(id, path)| load_image(&self.load_context, id, path)),
 			)
 			.await
 			.into_iter()
@@ -73,28 +79,17 @@ impl<'x, 'y> TilesetTextureLoader<'x, 'y> {
 	}
 }
 
-async fn load_image(
-	context: &LoadContext<'_>,
-	id: HandleId,
-	path: PathBuf,
-) -> Result<(HandleId, Texture), TilesetError> {
-	let bytes = context
-		.read_asset_bytes(path.clone())
-		.await
-		.map_err(|err| TilesetError::AssetIO(err))?;
-	let path = path.as_path();
-	let ext = path.extension().unwrap().to_str().unwrap();
-	let img = Texture::from_buffer(&bytes, ImageType::Extension(ext))
-		.map_err(|err| TilesetError::ImageLoad(err))?;
-	Ok((id, img))
-}
-
-impl<'x, 'y> TextureStore for TilesetTextureServer<'x, 'y> {
+impl<'x, 'y> TextureStore for TilesetTextureStore<'x, 'y> {
 	fn add(&mut self, asset: Texture) -> Handle<Texture> {
-		let prefix = self.context.path().to_str().unwrap_or("UNKNOWN_TILESET");
-		let label = format!("{:?}-{:?}", prefix, self.dep_count);
-		self.dep_count += 1;
-		self.context
+		//! This should only really be called once: When creating the tile texture atlas
+		//! since we'll need to track that asset as well.
+		let prefix = self
+			.load_context
+			.path()
+			.to_str()
+			.unwrap_or("UNKNOWN_TILESET");
+		let label = format!("Tileset__[{:?}]__{:?}", prefix, Uuid::new_v4().to_string());
+		self.load_context
 			.set_labeled_asset(&label, LoadedAsset::new(asset))
 	}
 
@@ -112,29 +107,31 @@ impl AssetLoader for TilesetAssetLoader {
 		Box::pin(async move {
 			let config = ron::de::from_bytes::<TilesetDef>(bytes)?;
 
+			// === Load Handles === //
 			let loader = TilesetTextureLoader {
-				images: Arc::new(RwLock::new(HashMap::new())),
-				context: load_context,
+				bytes: Arc::new(RwLock::new(HashMap::new())),
+				load_context,
 			};
 
 			let tile_handles = get_tile_handles(&loader, &config.tiles).await?;
-			let image_map = loader.collect().await?;
 
-			let mut server = TilesetTextureServer {
-				context: load_context,
-				images: image_map,
-				dep_count: 0,
+			// === Build Tiles === //
+			let images = loader.collect_images().await?;
+			let mut store = TilesetTextureStore {
+				load_context,
+				images,
 			};
 
 			let mut builder = TilesetBuilder::default();
 			for (group_id, tile_handle) in tile_handles {
-				builder.add_tile(tile_handle, group_id, &server)?;
+				builder.add_tile(tile_handle, group_id, &store)?;
 			}
 
+			// === Finish Tileset === //
 			let name = config
 				.name
 				.unwrap_or_else(|| Uuid::new_v4().to_hyphenated().to_string());
-			let tileset = builder.build(name, config.id, &mut server)?;
+			let tileset = builder.build(name, config.id, &mut store)?;
 
 			load_context.set_default_asset(LoadedAsset::new(tileset));
 
@@ -147,6 +144,7 @@ impl AssetLoader for TilesetAssetLoader {
 	}
 }
 
+/// Get a `Vec` of ([`TileGroupId`], [`TileHandle`]) tuples
 async fn get_tile_handles<'x, 'y>(
 	loader: &'x TilesetTextureLoader<'x, 'y>,
 	tile_paths: &BTreeMap<TileGroupId, String>,
@@ -154,7 +152,7 @@ async fn get_tile_handles<'x, 'y>(
 	let tile_defs = futures::future::join_all(
 		tile_paths
 			.iter()
-			.map(|(.., tile_path)| load_tile(&loader.context, tile_path)),
+			.map(|(.., tile_path)| load_tile(&loader.load_context, tile_path)),
 	)
 	.await
 	.into_iter()
@@ -170,6 +168,9 @@ async fn get_tile_handles<'x, 'y>(
 		.collect())
 }
 
+/// Load the tile definition at the given path and return its corresponding [TileDef]
+///
+/// The path is always relative to the tileset's configuration file path
 async fn load_tile(context: &LoadContext<'_>, path: &str) -> Result<TileDef, TilesetError> {
 	let path = if let Some(parent) = context.path().parent() {
 		parent.join(path)
@@ -183,4 +184,21 @@ async fn load_tile(context: &LoadContext<'_>, path: &str) -> Result<TileDef, Til
 	let def = ron::de::from_bytes::<TileDef>(&bytes)
 		.map_err(|err| TilesetError::InvalidDefinition(err))?;
 	Ok(def)
+}
+
+/// Load an image at the given path
+async fn load_image(
+	context: &LoadContext<'_>,
+	id: HandleId,
+	path: PathBuf,
+) -> Result<(HandleId, Texture), TilesetError> {
+	let bytes = context
+		.read_asset_bytes(path.clone())
+		.await
+		.map_err(|err| TilesetError::AssetIO(err))?;
+	let path = path.as_path();
+	let ext = path.extension().unwrap().to_str().unwrap();
+	let img = Texture::from_buffer(&bytes, ImageType::Extension(ext))
+		.map_err(|err| TilesetError::ImageLoad(err))?;
+	Ok((id, img))
 }
