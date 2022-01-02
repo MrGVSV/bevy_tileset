@@ -15,7 +15,8 @@ pub enum TilesetLabel {
 }
 
 /// Plugin for setting up tilesets
-pub struct TilesetPlugin;
+#[derive(Default)]
+pub struct TilesetPlugin {}
 
 impl Plugin for TilesetPlugin {
 	fn build(&self, app: &mut AppBuilder) {
@@ -46,6 +47,7 @@ impl Plugin for TilesetPlugin {
 	}
 }
 
+/// System that registers/deregisters tilesets as they are loaded and unloaded
 fn tileset_event_sys(
 	mut event_reader: EventReader<AssetEvent<Tileset>>,
 	mut map: ResMut<TilesetMap>,
@@ -55,11 +57,11 @@ fn tileset_event_sys(
 		match event {
 			AssetEvent::<Tileset>::Created { handle } => {
 				if let Some(tileset) = tilesets.get(handle.id) {
-					map.add_tileset(tileset, &handle);
+					map.register_tileset(tileset, &handle);
 				}
 			}
 			AssetEvent::<Tileset>::Removed { handle } => {
-				map.remove_tileset(&handle);
+				map.deregister_tileset(&handle);
 			}
 			_ => {}
 		}

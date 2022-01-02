@@ -28,11 +28,25 @@ impl<'a> Deref for Tilesets<'a> {
 }
 
 impl<'a> Tilesets<'a> {
+	/// Get a tileset by its ID.
+	///
+	/// # Arguments
+	///
+	/// * `id`: The tileset ID
+	///
+	/// returns: Option<&Tileset>
 	pub fn get_by_id(&self, id: &TilesetId) -> Option<&Tileset> {
 		let handle = self.tileset_map.id_to_handle.get(id)?;
 		self.get(handle)
 	}
 
+	/// Get a tileset by its name
+	///
+	/// # Arguments
+	///
+	/// * `name`: The name of the tileset
+	///
+	/// returns: Option<&Tileset>
 	pub fn get_by_name(&self, name: &str) -> Option<&Tileset> {
 		let id = self.tileset_map.name_to_id.get(name)?;
 		self.get_by_id(id)
@@ -40,7 +54,15 @@ impl<'a> Tilesets<'a> {
 }
 
 impl TilesetMap {
-	pub fn add_tileset(&mut self, tileset: &Tileset, handle: &Handle<Tileset>) {
+	/// Register a tileset for easy lookup in the [Tilesets] system param.
+	///
+	/// # Arguments
+	///
+	/// * `tileset`: The tileset to register
+	/// * `handle`: The handle to the tileset
+	///
+	/// returns: ()
+	pub(crate) fn register_tileset(&mut self, tileset: &Tileset, handle: &Handle<Tileset>) {
 		self.handle_to_id.insert(handle.clone_weak(), *tileset.id());
 		self.id_to_name
 			.insert(*tileset.id(), tileset.name().to_string());
@@ -49,7 +71,14 @@ impl TilesetMap {
 		self.id_to_handle.insert(*tileset.id(), handle.clone_weak());
 	}
 
-	pub fn remove_tileset(&mut self, handle: &Handle<Tileset>) {
+	/// Deregisters a tileset so it is no longer tracked
+	///
+	/// # Arguments
+	///
+	/// * `handle`: The handle to the tileset
+	///
+	/// returns: ()
+	pub(crate) fn deregister_tileset(&mut self, handle: &Handle<Tileset>) {
 		if let Some(ref id) = self.handle_to_id.remove(handle) {
 			if let Some(ref name) = self.id_to_name.remove(id) {
 				self.name_to_id.remove(name);

@@ -20,7 +20,7 @@ fn main() {
 	App::build()
 		// === Required === //
 		.add_plugins(DefaultPlugins)
-		.add_plugin(TilesetPlugin)
+		.add_plugin(TilesetPlugin::default())
 		// /== Required === //
 		// === Exmaple-Specific === //
 		.init_resource::<MyTileset>()
@@ -59,6 +59,7 @@ fn main() {
 
 #[derive(Default)]
 struct MyTileset {
+	/// This stores the handle to our tileset so it doesn't get unloaded
 	handle: Option<Handle<Tileset>>,
 }
 
@@ -86,6 +87,10 @@ fn build_map(
 		return;
 	}
 
+	// We can get our tileset by name or ID. We could also use the handle we stored in `MyTileset` by calling:
+	// ```
+	// if let Some(tileset) = tilesets.get(&my_tileset.handle.unwrap()) {
+	// ```
 	if let Some(tileset) = tilesets.get_by_name(MY_TILESET) {
 		println!("{:#?}", tileset);
 
