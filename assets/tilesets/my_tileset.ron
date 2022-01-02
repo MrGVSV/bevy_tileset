@@ -1,0 +1,11 @@
+(
+    name: "My Awesome Tileset",
+    id: 0,
+    tiles: {
+        0: "../tiles/empty.ron",
+        1: "../tiles/dirt.ron",
+        2: "../tiles/glass.ron",
+        3: "../tiles/grass.ron",
+        4: "../tiles/wall.ron",
+    }
+)

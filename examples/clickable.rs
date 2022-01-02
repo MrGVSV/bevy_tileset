@@ -8,13 +8,13 @@ mod helpers;
 use bevy::prelude::*;
 
 use bevy_ecs_tilemap::{GPUAnimated, MapQuery, Tile};
-use bevy_ecs_tilemap_tileset::debug::DebugTilesetPlugin;
-use bevy_ecs_tilemap_tileset::prelude::*;
+use bevy_ecs_tileset::debug::DebugTilesetPlugin;
+use bevy_ecs_tileset::prelude::*;
 
 /// The name of the tileset we'll be loading in this example
 ///
 /// This could be any string and doesn't need to be a constant or static.
-const MY_TILESET: &str = "My Tileset";
+const MY_TILESET: &str = "My Awesome Tileset";
 
 fn main() {
 	App::build()
@@ -23,6 +23,7 @@ fn main() {
 		.add_plugin(TilesetPlugin)
 		// /== Required === //
 		// === Exmaple-Specific === //
+		.init_resource::<MyTileset>()
 		// This is the debug plugin. It basically just spawns our tileset in as a sprite
 		.add_plugin(DebugTilesetPlugin::single_with_position(
 			MY_TILESET,
@@ -56,9 +57,14 @@ fn main() {
 		.run();
 }
 
+#[derive(Default)]
+struct MyTileset {
+	handle: Option<Handle<Tileset>>,
+}
+
 /// Starts the tileset loading process
-fn load_tiles(mut writer: EventWriter<TilesetLoadEvent>) {
-	writer.send(TilesetLoadRequest::named(MY_TILESET, vec![TilesetDirs::from_dir("tiles")]).into());
+fn load_tiles(mut my_tileset: ResMut<MyTileset>, asset_server: Res<AssetServer>) {
+	my_tileset.handle = Some(asset_server.load("tilesets/my_tileset.ron"));
 }
 
 /// A local state noting if the map has been built or not
@@ -69,7 +75,7 @@ struct BuildMapState {
 
 /// A system used to build the tilemap
 fn build_map(
-	tilesets: Res<Tilesets>,
+	tilesets: Tilesets,
 	mut commands: Commands,
 	mut materials: ResMut<Assets<ColorMaterial>>,
 	mut map_query: MapQuery,
@@ -124,7 +130,7 @@ struct BuildMode {
 /// 2. We must send a [`RemoveAutoTileEvent`] whenever we remove an auto tile
 ///
 fn on_tile_click(
-	tilesets: Res<Tilesets>,
+	tilesets: Tilesets,
 	build_mode: Res<BuildMode>,
 	query: Query<(&Tile, Option<&AutoTile>, Option<&GPUAnimated>)>,
 	mut event_writer: EventWriter<RemoveAutoTileEvent>,
@@ -147,7 +153,9 @@ fn on_tile_click(
 					if Some(tile_name) == name {
 						// Tiles match --> Remove
 						should_place = false;
-						map_query.despawn_tile(&mut commands, pos, 0, layer_id);
+						map_query
+							.despawn_tile(&mut commands, pos, 0, layer_id)
+							.unwrap();
 						// Make sure to notify the chunk!
 						map_query.notify_chunk_for_tile(pos, 0, layer_id);
 					}
@@ -219,7 +227,7 @@ fn on_keypress(keys: Res<Input<KeyCode>>, mut build_mode: ResMut<BuildMode>) {
 struct HudText;
 fn update_text(
 	mut query: Query<&mut Text, With<HudText>>,
-	tilesets: Res<Tilesets>,
+	tilesets: Tilesets,
 	build_mode: Res<BuildMode>,
 ) {
 	for mut text in query.iter_mut() {

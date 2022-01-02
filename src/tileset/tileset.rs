@@ -1,39 +1,41 @@
 //! Contains tileset-related things
 
-use bevy::math::Vec2;
-
 use std::collections::HashMap;
 
-use bevy::prelude::{Assets, Commands, Entity, Handle, Texture, UVec2};
-
+use bevy::prelude::{Commands, Entity, Handle, Texture, UVec2, Vec2};
+use bevy::reflect::TypeUuid;
 use bevy::sprite::TextureAtlas;
 use bevy_ecs_tilemap::{GPUAnimated, LayerBuilder, MapQuery, Tile, TileBundle};
-use bevy_tile_atlas::{TileAtlasBuilder, TileAtlasBuilderError};
-use rand::distributions::{Distribution, WeightedIndex};
-use rand::thread_rng;
+use bevy_ecs_tileset_tiles::prelude::*;
+use bevy_tile_atlas::{TextureStore, TileAtlasBuilder, TileAtlasBuilderError};
+#[cfg(feature = "variants")]
+use rand::{
+	distributions::{Distribution, WeightedIndex},
+	thread_rng,
+};
 
-use crate::handles::{TileHandle, TileHandleBase, TilesetHandles};
-use crate::prelude::internal::TryIntoTileData;
-use crate::tiles::{AutoTile, AutoTileData, AutoTileRule, TileData, TileType, VariantTileData};
-use crate::{TileId, TileIndex, TilesetId};
+use crate::prelude::*;
+use crate::tileset::error::TilesetError;
+use crate::PartialTileId;
 
 /// A structure containing the registered tiles as well as their generated [`TextureAtlas`]
-#[derive(Debug)]
+#[derive(Debug, TypeUuid)]
+#[uuid = "4a176882-d7b2-429d-af5c-be418ccc3c52"]
 pub struct Tileset {
 	/// The ID of this tileset
 	id: TilesetId,
 	/// The name of this tileset
 	name: String,
 	/// The registered tiles mapped by their ID
-	tiles: HashMap<TileId, TileData>,
+	tiles: HashMap<TileGroupId, TileData>,
 	/// The atlas for all registered tiles
 	atlas: TextureAtlas,
 	/// The size of the tiles in this tileset
 	tile_size: Vec2,
-	/// The tile IDs mapped by their name
-	tile_ids: HashMap<String, TileId>,
+	/// The tile group IDs mapped by their name
+	tile_ids: HashMap<String, TileGroupId>,
 	/// The tile names mapped by their ID
-	tile_names: HashMap<TileId, String>,
+	tile_names: HashMap<TileGroupId, String>,
 	/// The tile handles mapped by their index in the atlas
 	tile_handles: HashMap<usize, Handle<Texture>>,
 	/// The tile IDs mapped by their index in the atlas
@@ -44,19 +46,21 @@ pub struct Tileset {
 #[derive(Default)]
 pub struct TilesetBuilder {
 	/// The registered tiles mapped by their ID
-	tiles: HashMap<TileId, TileData>,
+	tiles: HashMap<TileGroupId, TileData>,
 	/// The builder used to construct the final [`TextureAtlas`]
 	atlas_builder: TileAtlasBuilder,
 	/// The tile IDs mapped by their name
-	tile_ids: HashMap<String, TileId>,
+	tile_ids: HashMap<String, TileGroupId>,
 	/// The tile names mapped by their ID
-	tile_names: HashMap<TileId, String>,
+	tile_names: HashMap<TileGroupId, String>,
 	/// The tile handles mapped by their index in the atlas
 	tile_handles: HashMap<usize, Handle<Texture>>,
 	/// The tile IDs mapped by their index in the atlas
-	tile_indices: HashMap<usize, TileId>,
+	tile_indices: HashMap<usize, PartialTileId>,
 	/// The tile ID counter
-	tile_counter: TileId,
+	current_tile: TileCellId,
+	/// The current tile group ID being processed
+	current_group: TileGroupId,
 }
 
 impl Tileset {
@@ -93,8 +97,8 @@ impl Tileset {
 	///
 	/// returns: Option<&String>
 	///
-	pub fn get_tile_name(&self, id: &TileId) -> Option<&String> {
-		self.tile_names.get(id)
+	pub fn get_tile_name(&self, group_id: &TileGroupId) -> Option<&String> {
+		self.tile_names.get(&group_id)
 	}
 
 	/// Get the base tile name for the given index
@@ -106,11 +110,11 @@ impl Tileset {
 	/// returns: Option<&String>
 	///
 	pub fn get_tile_name_by_index(&self, index: &usize) -> Option<&String> {
-		let id = self.tile_indices.get(index)?;
-		self.get_tile_name(id)
+		let TileId { group_id, .. } = self.tile_indices.get(index)?;
+		self.get_tile_name(group_id)
 	}
 
-	/// Get the ID of a tile by its name
+	/// Get the group ID of a tile by its name
 	///
 	/// # Arguments
 	///
@@ -118,7 +122,7 @@ impl Tileset {
 	///
 	/// returns: Option<&u32>
 	///
-	pub fn get_tile_id(&self, name: &str) -> Option<&TileId> {
+	pub fn get_tile_group_id(&self, name: &str) -> Option<&TileGroupId> {
 		self.tile_ids.get(name)
 	}
 
@@ -130,7 +134,7 @@ impl Tileset {
 	///
 	/// returns: Option<&u32>
 	///
-	pub fn get_tile_id_by_index(&self, index: &usize) -> Option<&TileId> {
+	pub fn get_tile_id(&self, index: &usize) -> Option<&TileId> {
 		self.tile_indices.get(index)
 	}
 
@@ -164,7 +168,8 @@ impl Tileset {
 	/// # Examples
 	///
 	/// ```
-	/// use bevy_ecs_tilemap_tileset::TileIndex;
+	/// # use bevy_ecs_tileset::TileIndex;
+	///
 	/// let index: TileIndex = tileset.get_tile_index("My Tile").unwrap();
 	/// ```
 	pub fn get_tile_index(&self, name: &str) -> Option<TileIndex> {
@@ -223,8 +228,9 @@ impl Tileset {
 	/// # Examples
 	///
 	/// ```
-	/// use bevy::prelude::{Commands, Res};
-	/// use bevy_ecs_tilemap::prelude::*;
+	/// # use bevy::prelude::{Commands, Res};
+	/// # use bevy_ecs_tilemap::MapQuery;
+	/// # use bevy_ecs_tileset::prelude::*;
 	///
 	/// fn place_tile(tileset: Res<Tileset>, mut commands: Commands, mut map_query: MapQuery) {
 	/// 	// Matches:
@@ -242,8 +248,9 @@ impl Tileset {
 	/// 	let index = tileset.get_auto_tile_index("My Auto Tile", rule);
 	/// }
 	/// ```
+	#[cfg(feature = "auto-tile")]
 	pub fn get_auto_tile_index(&self, name: &str, rule: AutoTileRule) -> Option<TileIndex> {
-		let id = self.get_tile_id(name)?;
+		let id = self.get_tile_group_id(name)?;
 		let data = self.tiles.get(id)?;
 
 		match data.tile() {
@@ -318,8 +325,9 @@ impl Tileset {
 			}
 		};
 
-		if let TileType::Auto(_) = tile_data.tile() {
-			if let Some(tile_id) = self.get_tile_id(name) {
+		#[cfg(feature = "auto-tile")]
+		if let TileType::Auto(..) = tile_data.tile() {
+			if let Some(tile_id) = self.get_tile_group_id(name) {
 				commands
 					.entity(tile_entity)
 					.insert(AutoTile::new(*tile_id, self.id));
@@ -350,9 +358,9 @@ impl Tileset {
 	/// # Examples
 	///
 	/// ```
-	/// use bevy::prelude::{Commands, Res};
-	/// use bevy_ecs_tilemap::prelude::MapQuery;
-	/// use bevy_ecs_tilemap_tileset::Tileset;
+	/// # use bevy::prelude::{Commands, Res};
+	/// # use bevy_ecs_tilemap::prelude::MapQuery;
+	/// # use bevy_ecs_tileset::prelude::Tileset;
 	///
 	/// fn place_tile(tileset: Res<Tileset>, mut commands: Commands, mut map_query: MapQuery) {
 	///    	tileset.place_tile(
@@ -413,13 +421,16 @@ impl Tileset {
 			}
 		};
 
-		let mut cmds = commands.entity(entity);
-		if let TileType::Auto(_) = tile_data.tile() {
-			if let Some(tile_id) = self.get_tile_id(name) {
-				cmds.insert(AutoTile::new(*tile_id, self.id));
+		#[cfg(feature = "auto-tile")]
+		{
+			let mut cmds = commands.entity(entity);
+			if let TileType::Auto(_) = tile_data.tile() {
+				if let Some(tile_id) = self.get_tile_group_id(name) {
+					cmds.insert(AutoTile::new(*tile_id, self.id));
+				}
+			} else {
+				cmds.remove::<AutoTile>();
 			}
-		} else {
-			cmds.remove::<AutoTile>();
 		}
 
 		map_query.notify_chunk_for_tile(position, map_id, layer_id);
@@ -466,8 +477,9 @@ impl Tileset {
 			}
 		}
 
+		#[cfg(feature = "auto-tile")]
 		if let TileType::Auto(_) = tile_data.tile() {
-			if let Some(tile_id) = self.get_tile_id(name) {
+			if let Some(tile_id) = self.get_tile_group_id(name) {
 				commands
 					.entity(entity)
 					.insert(AutoTile::new(*tile_id, self.id));
@@ -487,6 +499,7 @@ impl Tileset {
 	///
 	/// returns: Option<&VariantTileData>
 	///
+	#[cfg(feature = "variants")]
 	pub fn select_variant(variants: &[VariantTileData]) -> Option<&VariantTileData> {
 		let mut rng = thread_rng();
 		let weights: Vec<f32> = variants.iter().map(|variant| variant.weight()).collect();
@@ -512,7 +525,7 @@ impl Tileset {
 	/// * `rule`: The rule that is a superset over the auto tile to match
 	///
 	/// returns: bool
-	///
+	#[cfg(feature = "auto-tile")]
 	pub fn is_auto_variant(&self, name: &str, index: &usize, rule: &AutoTileRule) -> bool {
 		if let Some(data) = self.get_tile_data(name) {
 			match data.tile() {
@@ -533,6 +546,7 @@ impl Tileset {
 		}
 	}
 
+	#[cfg(feature = "auto-tile")]
 	fn auto_index(auto_tiles: &[AutoTileData], rule: AutoTileRule) -> Option<TileIndex> {
 		let tile = match auto_tiles
 			.iter()
@@ -548,7 +562,7 @@ impl Tileset {
 	}
 
 	fn get_tile_index_and_data(&self, name: &str) -> Option<(TileIndex, &TileData)> {
-		let id = self.get_tile_id(name)?;
+		let id = self.get_tile_group_id(name)?;
 		let data = self.tiles.get(id)?;
 
 		Some((
@@ -557,11 +571,12 @@ impl Tileset {
 				TileType::Animated(anim) => {
 					TileIndex::Animated(anim.start(), anim.end(), anim.speed())
 				}
-
+				#[cfg(feature = "variants")]
 				TileType::Variant(variants) => {
 					let variant = Self::select_variant(variants)?;
 					variant.tile().into()
 				}
+				#[cfg(feature = "auto-tile")]
 				TileType::Auto(autos) => Self::auto_index(autos, AutoTileRule::default())?,
 			},
 			data,
@@ -577,10 +592,13 @@ impl Tileset {
 
 impl TilesetBuilder {
 	pub fn new(max_columns: Option<usize>) -> Self {
+		let mut atlas_builder = TileAtlasBuilder::default();
+		atlas_builder.max_columns(max_columns);
 		Self {
-			atlas_builder: TileAtlasBuilder::default().max_columns(max_columns),
+			atlas_builder,
 			tile_ids: Default::default(),
-			tile_counter: Default::default(),
+			current_group: Default::default(),
+			current_tile: Default::default(),
 			tile_indices: Default::default(),
 			tile_names: Default::default(),
 			tiles: Default::default(),
@@ -596,18 +614,22 @@ impl TilesetBuilder {
 	///
 	/// returns: Result<Tileset, TextureAtlasBuilderError>
 	///
-	pub fn build(
+	pub fn build<TStore: TextureStore>(
 		self,
 		name: String,
 		id: TilesetId,
-		texture_store: &mut Assets<Texture>,
+		texture_store: &mut TStore,
 	) -> Result<Tileset, TileAtlasBuilderError> {
 		Ok(Tileset {
 			name,
 			id,
 			tiles: self.tiles,
 			tile_ids: self.tile_ids,
-			tile_indices: self.tile_indices,
+			tile_indices: self
+				.tile_indices
+				.into_iter()
+				.map(|(key, value)| (key, value.extend(id)))
+				.collect(),
 			tile_names: self.tile_names,
 			tile_handles: self.tile_handles,
 			tile_size: self.atlas_builder.get_tile_size().unwrap_or_default(),
@@ -615,84 +637,153 @@ impl TilesetBuilder {
 		})
 	}
 
-	pub(crate) fn add_handles(
+	pub fn add_tile<TStore: TextureStore>(
 		&mut self,
-		handles: &TilesetHandles,
-		texture_store: &Assets<Texture>,
-	) {
-		for handle in handles.tiles.clone().into_iter() {
-			self.add_handle(handle, texture_store);
+		tile_handle: TileHandle,
+		group_id: TileGroupId,
+		texture_store: &TStore,
+	) -> Result<Option<TileData>, TilesetError> {
+		let name = tile_handle.name.clone();
+
+		self.current_group = group_id;
+		self.current_tile = 0;
+
+		let tile = TileData::new(
+			tile_handle.name,
+			self.get_tile_type(tile_handle.tile, texture_store)?,
+		);
+
+		self.tile_ids.insert(name.clone(), group_id);
+		self.tile_names.insert(group_id, name);
+		Ok(self.tiles.insert(group_id, tile))
+	}
+
+	fn get_tile_type<TStore: TextureStore>(
+		&mut self,
+		tile: TileHandleType,
+		texture_store: &TStore,
+	) -> Result<TileType, TilesetError> {
+		Ok(match tile {
+			TileHandleType::Standard(handle) => {
+				TileType::Standard(self.insert_handle(&handle, texture_store)?)
+			}
+			TileHandleType::Animated(anim) => {
+				TileType::Animated(self.create_animated(anim, texture_store)?)
+			}
+			#[cfg(feature = "variants")]
+			TileHandleType::Variant(variants) => {
+				TileType::Variant(self.create_variants(variants, texture_store)?)
+			}
+			#[cfg(feature = "auto-tile")]
+			TileHandleType::Auto(autos) => TileType::Auto(self.create_autos(autos, texture_store)?),
+		})
+	}
+
+	#[cfg(feature = "auto-tile")]
+	fn create_autos<TStore: TextureStore>(
+		&mut self,
+		autos: Vec<AutoTileHandle>,
+		texture_store: &TStore,
+	) -> Result<Vec<AutoTileData>, TilesetError> {
+		Ok(autos
+			.into_iter()
+			.map(|auto| -> Result<AutoTileData, TilesetError> {
+				Ok(AutoTileData::new(
+					auto.rule,
+					self.create_variants(auto.variants, texture_store)?,
+				))
+			})
+			.flat_map(|x| x.ok())
+			.collect())
+	}
+
+	#[cfg(feature = "variants")]
+	fn create_variants<TStore: TextureStore>(
+		&mut self,
+		variants: Vec<VariantTileHandle>,
+		texture_store: &TStore,
+	) -> Result<Vec<VariantTileData>, TilesetError> {
+		Ok(variants
+			.into_iter()
+			.map(|variant| -> Result<VariantTileData, TilesetError> {
+				Ok(VariantTileData::new(
+					variant.weight,
+					match variant.tile {
+						SimpleTileHandle::Standard(handle) => {
+							SimpleTileType::Standard(self.insert_handle(&handle, texture_store)?)
+						}
+						SimpleTileHandle::Animated(anim) => {
+							SimpleTileType::Animated(self.create_animated(anim, texture_store)?)
+						}
+					},
+				))
+			})
+			.filter_map(|x| x.ok())
+			.collect())
+	}
+
+	fn create_animated<TStore: TextureStore>(
+		&mut self,
+		anim: AnimatedTileHandle,
+		texture_store: &TStore,
+	) -> Result<AnimatedTileData, TilesetError> {
+		let (mut start, mut end) = (-1, -1);
+		for frame in &anim.frames {
+			let index = self.insert_handle(frame, texture_store)?;
+			if start == -1 {
+				start = index as i32;
+			} else {
+				end = index as i32;
+			}
+		}
+
+		if start < 0 || end < 0 {
+			return Err(TilesetError::InvalidData {
+				expected: String::from("At least one animation frame"),
+				found: String::from("Zero animation frames"),
+			});
+		}
+
+		Ok(AnimatedTileData::new(
+			anim.speed,
+			start as usize,
+			end as usize,
+		))
+	}
+
+	fn insert_handle<TStore: TextureStore>(
+		&mut self,
+		handle: &Handle<Texture>,
+		textures: &TStore,
+	) -> Result<usize, TilesetError> {
+		if let Some(texture) = textures.get(handle) {
+			self.add_texture(handle, texture)
+		} else {
+			Err(TilesetError::ImageNotFound)
 		}
 	}
 
-	/// Add a tile to the tileset
-	///
-	/// # Arguments
-	///
-	/// * `tile`: The tile to add
-	/// * `texture_store`: The texture assets
-	///
-	/// returns: Option<TileData>
-	///
-	pub(crate) fn add_handle(
-		&mut self,
-		tile_handle: TileHandleBase,
-		texture_store: &Assets<Texture>,
-	) -> Option<TileData> {
-		let name = tile_handle.name.clone();
-
-		let id = self.tile_counter;
-		let tile = TileData::new(
-			name.clone(),
-			self.try_convert_handle(tile_handle, texture_store)?,
-		);
-		self.tile_counter += 1u32;
-
-		self.tile_ids.insert(name.clone(), id);
-		self.tile_names.insert(id, name);
-		self.tiles.insert(id, tile)
-	}
-
-	pub(crate) fn insert_handle(
+	pub fn add_texture(
 		&mut self,
 		handle: &Handle<Texture>,
-		textures: &Assets<Texture>,
-	) -> Option<usize> {
-		let texture = textures.get(handle)?;
+		texture: &Texture,
+	) -> Result<usize, TilesetError> {
 		let index = self
 			.atlas_builder
 			.add_texture(handle.clone_weak(), texture)
-			.ok()?;
+			.map_err(|err| TilesetError::Atlas(err))?;
 
-		let id = self.tile_counter;
-		self.tile_indices.insert(index, id);
+		self.tile_indices.insert(
+			index,
+			PartialTileId {
+				group_id: self.current_group,
+				cell_id: self.current_tile,
+			},
+		);
 		self.tile_handles.insert(index, handle.clone_weak());
 
-		Some(index)
-	}
+		self.current_tile += 1;
 
-	fn try_convert_handle(
-		&mut self,
-		tile: TileHandleBase,
-		texture_store: &Assets<Texture>,
-	) -> Option<TileType> {
-		Some(match tile.tile {
-			TileHandle::Standard(handle) => {
-				let index = handle.try_into_tile_data(self, texture_store)?;
-				TileType::Standard(index)
-			}
-			TileHandle::Animated(anim) => {
-				let anim = anim.try_into_tile_data(self, texture_store)?;
-				TileType::Animated(anim)
-			}
-			TileHandle::Variant(variants) => {
-				let variants = variants.try_into_tile_data(self, texture_store)?;
-				TileType::Variant(variants)
-			}
-			TileHandle::Auto(autos) => {
-				let autos = autos.try_into_tile_data(self, texture_store)?;
-				TileType::Auto(autos)
-			}
-		})
+		Ok(index)
 	}
 }

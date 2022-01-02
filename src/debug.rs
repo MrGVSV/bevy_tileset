@@ -1,11 +1,9 @@
 //! Used for debugging tilesets
 
-use crate::{Tileset, Tilesets};
+use crate::prelude::{Tileset, Tilesets};
 use bevy::app::AppBuilder;
 use bevy::math::Vec3;
-use bevy::prelude::{
-	Assets, Commands, IntoSystem, Local, Plugin, Res, ResMut, SpriteBundle, Transform,
-};
+use bevy::prelude::{Assets, Commands, IntoSystem, Local, Plugin, ResMut, SpriteBundle, Transform};
 use bevy::sprite::ColorMaterial;
 
 /// A component attached to the debug atlas sprite(s)
@@ -95,7 +93,7 @@ struct DebugState {
 
 fn display_tilesets(
 	mut state: Local<DebugState>,
-	tilesets: Res<Tilesets>,
+	tilesets: Tilesets,
 	mut commands: Commands,
 	mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
@@ -127,7 +125,7 @@ fn display_tilesets(
 		}
 	} else {
 		// No specified tileset --> display all
-		for tileset in tilesets.iter() {
+		for (.., tileset) in tilesets.iter() {
 			spawner(tileset);
 		}
 	}

@@ -1,6 +1,6 @@
 [package]
-name = "bevy_ecs_tilemap_tileset"
-version = "0.1.0"
+name = "bevy_ecs_tileset"
+version = "0.2.0"
 edition = "2021"
 authors = ["Gino Valente <gino.valente.code@gmail.com>"]
 description = "An extension to the bevy_ecs_tilemap, allowing for configurable tilesets, auto tiling, and more"
@@ -15,13 +15,24 @@ exclude = ["assets/**/*", ".github/**/*"]
 maintenance = { status = "experimental" }
 
 [dependencies]
+bevy_ecs_tileset_tiles = { path = "./bevy_ecs_tileset_tiles" }
 bevy = "0.5"
 bevy_ecs_tilemap = "0.4.0"
-bevy_tile_atlas = "0.1.1"
+bevy_tile_atlas = "0.1.3"
 ron = "0.7.0"
 serde = "1.0.130"
 rand = "0.8"
+anyhow = "1.0.52"
+thiserror = "1.0.30"
+downcast-rs = "1.2.0"
+futures = "0.3.19"
+
+[features]
+default = ["variants"]
+variants = ["bevy_ecs_tileset_tiles/variants"]
+auto-tile = ["variants", "bevy_ecs_tileset_tiles/auto-tile"]
 
 [[example]]
 name = "clickable"
 path = "examples/clickable.rs"
+required-features = ["auto-tile"]

@@ -13,7 +13,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-horizontal.png")
+                    tile: Standard("tiles/walls/wall-horizontal.png")
                 )
             ]
         ),
@@ -27,7 +27,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-vertical.png")
+                    tile: Standard("tiles/walls/wall-vertical.png")
                 )
             ]
         ),
@@ -41,7 +41,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-n-cap.png")
+                    tile: Standard("tiles/walls/wall-n-cap.png")
                 )
             ]
         ),
@@ -55,7 +55,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-s-cap.png")
+                    tile: Standard("tiles/walls/wall-s-cap.png")
                 )
             ]
         ),
@@ -69,7 +69,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-e-cap.png")
+                    tile: Standard("tiles/walls/wall-e-cap.png")
                 )
             ]
         ),
@@ -83,7 +83,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-w-cap.png")
+                    tile: Standard("tiles/walls/wall-w-cap.png")
                 )
             ]
         ),
@@ -101,7 +101,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-single.png")
+                    tile: Standard("tiles/walls/wall-single.png")
                 )
             ]
         ),
@@ -116,7 +116,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-nw-corner.png")
+                    tile: Standard("tiles/walls/wall-nw-corner.png")
                 )
             ]
         ),
@@ -131,7 +131,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-ne-corner.png")
+                    tile: Standard("tiles/walls/wall-ne-corner.png")
                 )
             ]
         ),
@@ -146,7 +146,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-sw-corner.png")
+                    tile: Standard("tiles/walls/wall-sw-corner.png")
                 )
             ]
         ),
@@ -161,7 +161,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-se-corner.png")
+                    tile: Standard("tiles/walls/wall-se-corner.png")
                 )
             ]
         ),
@@ -175,7 +175,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall.png")
+                    tile: Standard("tiles/walls/wall.png")
                     // tile: Animated((
                     //     speed: 1.0,
                     //     frames: [
@@ -197,7 +197,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-nw.png")
+                    tile: Standard("tiles/walls/wall-nw.png")
                 )
             ]
         ),
@@ -211,7 +211,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-ne.png")
+                    tile: Standard("tiles/walls/wall-ne.png")
                 )
             ]
         ),
@@ -225,7 +225,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-sw.png")
+                    tile: Standard("tiles/walls/wall-sw.png")
                 )
             ]
         ),
@@ -239,7 +239,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-se.png")
+                    tile: Standard("tiles/walls/wall-se.png")
                 )
             ]
         ),
@@ -253,7 +253,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-n.png")
+                    tile: Standard("tiles/walls/wall-n.png")
                 )
             ]
         ),
@@ -267,7 +267,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-s.png")
+                    tile: Standard("tiles/walls/wall-s.png")
                 )
             ]
         ),
@@ -281,7 +281,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-w.png")
+                    tile: Standard("tiles/walls/wall-w.png")
                 )
             ]
         ),
@@ -295,7 +295,7 @@
             ),
             variants: [
                 (
-                    tile: Standard("walls/wall-e.png")
+                    tile: Standard("tiles/walls/wall-e.png")
                 )
             ]
         ),
@@ -303,7 +303,7 @@
             // Default
             variants: [
                 (
-                    tile: Standard("walls/wall-single.png")
+                    tile: Standard("tiles/walls/wall-single.png")
                 )
             ]
         )

@@ -1,0 +1,22 @@
+[package]
+name = "bevy_ecs_tileset_tiles"
+version = "0.2.0"
+edition = "2021"
+authors = ["Gino Valente <gino.valente.code@gmail.com>"]
+description = "Tile definitions used by bevy_ecs_tileset"
+repository = "https://github.com/MrGVSV/bevy_ecs_tilemap_tileset"
+license = "MIT OR Apache-2.0"
+keywords = ["bevy", "tileset", "auto", "variant", "tile"]
+categories = ["game-development"]
+readme = "README.md"
+exclude = ["assets/**/*", ".github/**/*"]
+
+[dependencies]
+bevy_render = "0.5.0"
+bevy_asset = "0.5.1"
+serde = "1.0.130"
+
+[features]
+default = ["variants"]
+variants = []
+auto-tile = ["variants"]
