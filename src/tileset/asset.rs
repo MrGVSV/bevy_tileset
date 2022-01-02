@@ -6,6 +6,7 @@ use bevy::asset::{
 	Asset, AssetLoader, AssetPath, BoxedFuture, Handle, HandleId, LoadContext, LoadedAsset,
 };
 use bevy::render::texture::{ImageType, Texture};
+use bevy::utils::Uuid;
 use bevy_ecs_tileset_tiles::prelude::{TileDef, TileHandle};
 use bevy_tile_atlas::TextureStore;
 use serde::{Deserialize, Serialize};
@@ -20,8 +21,12 @@ pub struct TilesetAssetLoader;
 
 #[derive(Default, Deserialize, Serialize)]
 pub struct TilesetDef {
-	pub name: String,
+	/// The optional name of the tileset (defaults to a random UUID string)
+	pub name: Option<String>,
+	/// The ID of the tileset
 	pub id: TilesetId,
+	/// The tiles in this tileset as a mapping of their group ID to the relative path to
+	/// their definition file
 	pub tiles: BTreeMap<TileGroupId, String>,
 }
 
@@ -126,7 +131,10 @@ impl AssetLoader for TilesetAssetLoader {
 				builder.add_tile(tile_handle, group_id, &server)?;
 			}
 
-			let tileset = builder.build(config.name, config.id, &mut server)?;
+			let name = config
+				.name
+				.unwrap_or_else(|| Uuid::new_v4().to_hyphenated().to_string());
+			let tileset = builder.build(name, config.id, &mut server)?;
 
 			load_context.set_default_asset(LoadedAsset::new(tileset));
 
