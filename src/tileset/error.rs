@@ -1,3 +1,4 @@
+use crate::prelude::TileGroupId;
 use bevy::asset::AssetIoError;
 use bevy::render::texture::TextureError;
 use bevy_tile_atlas::TileAtlasBuilderError;
@@ -17,4 +18,6 @@ pub enum TilesetError {
 	InvalidData { expected: String, found: String },
 	#[error("could not read tile definition file: {0:?}")]
 	InvalidDefinition(ron::Error),
+	#[error("tile with group ID {0:?} already exists in the tileset")]
+	TileAlreadyExists(TileGroupId),
 }

@@ -124,7 +124,7 @@ fn apply_requests(
 					}
 
 					// --- Apply Rule --- //
-					if let Some(index) = tileset.get_auto_tile_index(tile_name, *rule) {
+					if let Some(index) = tileset.get_auto_index(tile_name, *rule) {
 						match index {
 							TileIndex::Standard(idx) => {
 								tile.texture_index = idx as u16;

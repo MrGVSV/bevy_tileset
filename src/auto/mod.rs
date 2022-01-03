@@ -1,4 +1,4 @@
-use crate::{TileGroupId, TilesetId};
+use crate::prelude::{TileGroupId, TilesetId};
 
 mod auto_tiler;
 mod systems;

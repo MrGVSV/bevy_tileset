@@ -11,10 +11,8 @@ use bevy_ecs_tileset_tiles::prelude::{TileDef, TileHandle};
 use bevy_tile_atlas::TextureStore;
 use serde::{Deserialize, Serialize};
 
-use crate::prelude::error::TilesetError;
-use crate::prelude::TilesetBuilder;
+use crate::prelude::{TileGroupId, TilesetBuilder, TilesetError, TilesetId};
 use crate::tileset::load::{load_tile_handles, TextureLoader};
-use crate::{TileGroupId, TilesetId};
 
 #[derive(Default)]
 pub struct TilesetAssetLoader;
