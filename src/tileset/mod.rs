@@ -14,6 +14,8 @@ pub(crate) use param::TilesetMap;
 pub use param::Tilesets;
 pub use tile_index::TileIndex;
 
+pub use serialization::{load_map_dto, save_map_dto, TileLocation};
+
 use crate::prelude::*;
 
 mod asset;
@@ -22,6 +24,7 @@ pub mod error;
 mod impls;
 mod load;
 mod param;
+mod serialization;
 mod tile_index;
 
 /// A structure containing the registered tiles as well as their generated [`TextureAtlas`]
@@ -47,3 +50,6 @@ pub struct Tileset {
 	/// The tile IDs mapped by their index in the atlas
 	tile_indices: HashMap<usize, TileId>,
 }
+
+/// A component used to pair a tile entity with the tileset it comes from
+pub struct TilesetParent(pub TilesetId);

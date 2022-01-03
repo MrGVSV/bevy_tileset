@@ -22,6 +22,12 @@ pub struct TilesetBuilder {
 	tile_indices: HashMap<usize, PartialTileId>,
 	/// The current tile group ID being processed
 	current_group: TileGroupId,
+	/// The current variant index being processed
+	#[cfg(feature = "variants")]
+	current_variant: Option<usize>,
+	/// The current auto tile index being processed
+	#[cfg(feature = "auto-tile")]
+	current_auto: Option<usize>,
 }
 
 impl TilesetBuilder {
@@ -36,6 +42,10 @@ impl TilesetBuilder {
 			tile_names: Default::default(),
 			tiles: Default::default(),
 			tile_handles: Default::default(),
+			#[cfg(feature = "variants")]
+			current_variant: None,
+			#[cfg(feature = "auto-tile")]
+			current_auto: None,
 		}
 	}
 
@@ -145,16 +155,21 @@ impl TilesetBuilder {
 		autos: Vec<AutoTileHandle>,
 		texture_store: &TStore,
 	) -> Result<Vec<AutoTileData>, TilesetError> {
-		Ok(autos
+		self.current_auto = Some(0);
+		let autos = autos
 			.into_iter()
 			.map(|auto| -> Result<AutoTileData, TilesetError> {
-				Ok(AutoTileData::new(
+				let auto = AutoTileData::new(
 					auto.rule,
 					self.create_variants(auto.variants, texture_store)?,
-				))
+				);
+				self.current_auto = Some(1 + self.current_auto.unwrap_or(0));
+				Ok(auto)
 			})
 			.flat_map(|x| x.ok())
-			.collect())
+			.collect();
+		self.current_auto = None;
+		Ok(autos)
 	}
 
 	#[cfg(feature = "variants")]
@@ -163,10 +178,11 @@ impl TilesetBuilder {
 		variants: Vec<VariantTileHandle>,
 		texture_store: &TStore,
 	) -> Result<Vec<VariantTileData>, TilesetError> {
-		Ok(variants
+		self.current_variant = Some(0);
+		let variants = variants
 			.into_iter()
 			.map(|variant| -> Result<VariantTileData, TilesetError> {
-				Ok(VariantTileData::new(
+				let variant = VariantTileData::new(
 					variant.weight,
 					match variant.tile {
 						SimpleTileHandle::Standard(handle) => {
@@ -176,10 +192,14 @@ impl TilesetBuilder {
 							SimpleTileType::Animated(self.create_animated(anim, texture_store)?)
 						}
 					},
-				))
+				);
+				self.current_variant = Some(1 + self.current_variant.unwrap_or(0));
+				Ok(variant)
 			})
 			.filter_map(|x| x.ok())
-			.collect())
+			.collect();
+		self.current_variant = None;
+		Ok(variants)
 	}
 
 	fn create_animated<TStore: TextureStore>(
@@ -233,7 +253,13 @@ impl TilesetBuilder {
 			.add_texture(handle.clone_weak(), texture)
 			.map_err(|err| TilesetError::Atlas(err))?;
 
-		let id = PartialTileId::new(self.current_group);
+		let id = PartialTileId {
+			group_id: self.current_group,
+			#[cfg(feature = "variants")]
+			variant_index: self.current_variant,
+			#[cfg(feature = "auto-tile")]
+			auto_index: self.current_auto,
+		};
 		self.tile_indices.insert(index, id);
 		self.tile_handles.insert(index, handle.clone_weak());
 

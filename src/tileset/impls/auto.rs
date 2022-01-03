@@ -140,6 +140,7 @@ impl Tileset {
 		};
 
 		let variant = if let Some(idx) = id.variant_index {
+			println!("{}/{}", idx, tile.variants().len());
 			tile.variants().get(idx)?
 		} else {
 			Self::select_variant(tile.variants())?

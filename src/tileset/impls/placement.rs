@@ -34,9 +34,21 @@ impl Tileset {
 		commands: &mut Commands,
 		layer_builder: &mut LayerBuilder<TileBundle>,
 	) -> Option<Entity> {
-		let (tile_index, tile_data) = self.get_tile_tuple_by_name(name)?;
+		let id = self.get_tile_group_id(name)?;
+		self.init_tile_by_id(id, position, commands, layer_builder)
+	}
 
-		let tile_entity = match tile_index {
+	pub fn init_tile_by_id<TId: Into<PartialTileId>>(
+		&self,
+		id: TId,
+		position: UVec2,
+		commands: &mut Commands,
+		layer_builder: &mut LayerBuilder<TileBundle>,
+	) -> Option<Entity> {
+		let id = id.into();
+		let (tile_index, tile_data) = self.get_tile_tuple_by_id(id)?;
+
+		let entity = match tile_index {
 			TileIndex::Standard(index) => {
 				layer_builder
 					.set_tile(
@@ -69,16 +81,12 @@ impl Tileset {
 			}
 		};
 
-		#[cfg(feature = "auto-tile")]
-		if let TileType::Auto(..) = tile_data.tile() {
-			if let Some(tile_id) = self.get_tile_group_id(name) {
-				commands
-					.entity(tile_entity)
-					.insert(AutoTile::new(*tile_id, self.id));
-			}
-		}
+		commands.entity(entity).insert(TilesetParent(self.id));
 
-		Some(tile_entity)
+		#[cfg(feature = "auto-tile")]
+		self.apply_auto_tile(id, commands, tile_data, entity);
+
+		Some(entity)
 	}
 
 	/// Adds or sets a tile from the tileset
@@ -126,8 +134,23 @@ impl Tileset {
 		commands: &mut Commands,
 		map_query: &mut MapQuery,
 	) -> Option<(Option<Entity>, Entity)> {
+		let id = self.get_tile_group_id(name)?;
+		self.place_tile_by_id(id, position, map_id, layer_id, commands, map_query)
+	}
+
+	pub fn place_tile_by_id<TId: Into<PartialTileId>>(
+		&self,
+		id: TId,
+		position: UVec2,
+		map_id: u16,
+		layer_id: u16,
+		commands: &mut Commands,
+		map_query: &mut MapQuery,
+	) -> Option<(Option<Entity>, Entity)> {
+		let id = id.into();
 		let old = map_query.get_tile_entity(position, map_id, layer_id).ok();
-		let (tile_index, tile_data) = self.get_tile_tuple_by_name(name)?;
+		let (tile_index, tile_data) = self.get_tile_tuple_by_id(id)?;
+		println!("Placing {:?} - {:?}", id, tile_data);
 
 		let entity = match tile_index {
 			TileIndex::Standard(index) => {
@@ -165,17 +188,10 @@ impl Tileset {
 			}
 		};
 
+		commands.entity(entity).insert(TilesetParent(self.id));
+
 		#[cfg(feature = "auto-tile")]
-		{
-			let mut cmds = commands.entity(entity);
-			if let TileType::Auto(_) = tile_data.tile() {
-				if let Some(tile_id) = self.get_tile_group_id(name) {
-					cmds.insert(AutoTile::new(*tile_id, self.id));
-				}
-			} else {
-				cmds.remove::<AutoTile>();
-			}
-		}
+		self.apply_auto_tile(id, commands, tile_data, entity);
 
 		map_query.notify_chunk_for_tile(position, map_id, layer_id);
 
@@ -198,7 +214,18 @@ impl Tileset {
 		entity: Entity,
 		commands: &mut Commands,
 	) -> Option<Entity> {
-		let (tile_index, tile_data) = self.get_tile_tuple_by_name(name)?;
+		let id = self.get_tile_group_id(name)?;
+		self.update_tile_by_id(id, entity, commands)
+	}
+
+	pub fn update_tile_by_id<TId: Into<PartialTileId>>(
+		&self,
+		id: TId,
+		entity: Entity,
+		commands: &mut Commands,
+	) -> Option<Entity> {
+		let id = id.into();
+		let (tile_index, tile_data) = self.get_tile_tuple_by_id(id)?;
 
 		match tile_index {
 			TileIndex::Standard(index) => {
@@ -221,16 +248,10 @@ impl Tileset {
 			}
 		}
 
+		commands.entity(entity).insert(TilesetParent(self.id));
+
 		#[cfg(feature = "auto-tile")]
-		if let TileType::Auto(_) = tile_data.tile() {
-			if let Some(tile_id) = self.get_tile_group_id(name) {
-				commands
-					.entity(entity)
-					.insert(AutoTile::new(*tile_id, self.id));
-			}
-		} else {
-			commands.entity(entity).remove::<AutoTile>();
-		}
+		self.apply_auto_tile(id, commands, tile_data, entity);
 
 		Some(entity)
 	}
@@ -323,5 +344,21 @@ impl Tileset {
 			},
 			data,
 		))
+	}
+
+	#[cfg(feature = "auto-tile")]
+	fn apply_auto_tile<TId: Into<PartialTileId>>(
+		&self,
+		id: TId,
+		commands: &mut Commands,
+		tile_data: &TileData,
+		entity: Entity,
+	) {
+		let mut cmds = commands.entity(entity);
+		if let TileType::Auto(..) = tile_data.tile() {
+			cmds.insert(AutoTile::new(id.into().group_id, self.id));
+		} else {
+			cmds.remove::<AutoTile>();
+		}
 	}
 }
