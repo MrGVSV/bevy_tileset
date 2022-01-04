@@ -2,7 +2,9 @@
 
 Simple, configurable tilesets in Bevy using RON.
 
-![Smart tile placement](./screenshots/tile_placement_demo.gif)
+<p align="center">
+	<img alt="Smart tile placement" src="./screenshots/tile_placement_demo.gif" />
+</p>
 
 > All GIFs generated with the [`bevy_ecs_tilemap_tileset`](bevy_ecs_tilemap_tileset/) sub-crate
 
