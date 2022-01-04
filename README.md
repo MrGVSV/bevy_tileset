@@ -43,8 +43,8 @@ Simply **define** your tiles and tilesets in config files:
   name: Some("My Awesome Tileset"),
   id: 0,
   tiles: {
-		0: "../tiles/my_tile.ron",
-  	// ...
+    0: "../tiles/my_tile.ron",
+    // ...
   }
 )
 ```
@@ -56,7 +56,7 @@ use bevy::prelude::*;
 use bevy_tileset::prelude::*;
 
 fn load_tiles(asset_server: Res<AssetServer>) {
-	let handle: Handle<Tileset> = asset_server.load("my_tileset.ron");
+  let handle: Handle<Tileset> = asset_server.load("my_tileset.ron");
   // Store handle...
 }
 ```
@@ -67,7 +67,7 @@ Then **access** the generated tileset from anywhere:
 fn my_system(tilesets: Tilesets, /* other system params */) {
   
   let tileset = tilesets.get_by_name("My Awesome Tileset").unwrap();
-	let tile_index = tileset.get_tile_index("My Tile").unwrap();
+  let tile_index = tileset.get_tile_index("My Tile").unwrap();
   
   match tile_index {
     TileIndex::Standard(texture_index) => { /* Do something */ },
