@@ -199,7 +199,7 @@ Defines a tile that automatically chooses its active tile based on its neighbors
 
 ![Auto tiling](./screenshots/auto_tiling_demo.gif)
 
-## Examples
+## 🎓 Examples
 
 * [tileset](examples/tileset.rs) - Simply load and display the tileset
 * [dynamic](examples/dynamic.rs) - Dynamically create a tileset at runtime
