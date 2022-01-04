@@ -4,7 +4,7 @@ use bevy::math::IVec2;
 use bevy::prelude::{Entity, Query, UVec2, With};
 use bevy::utils::{HashMap, HashSet};
 use bevy_ecs_tilemap::{MapQuery, Tile, TileParent};
-use bevy_ecs_tileset_tiles::prelude::AutoTileRule;
+use bevy_tileset::prelude::AutoTileRule;
 
 /// The corrdinates of the tile, including the `map_id` and `layer_id`
 #[derive(Copy, Clone, Debug, Default, Hash, Eq, PartialEq)]

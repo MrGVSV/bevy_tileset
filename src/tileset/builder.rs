@@ -94,8 +94,8 @@ impl TilesetBuilder {
 	///
 	/// ```
 	/// # use bevy::prelude::*;
-	/// # use bevy_ecs_tileset::prelude::*;
-	/// # use bevy_ecs_tileset::tiles::*;
+	/// # use bevy_tileset::prelude::*;
+	/// # use bevy_tileset::tiles::*;
 	///
 	/// fn tileset_creator(textures: Res<Assets<Texture>>) {
 	/// 	let mut builder = TilesetBuilder::default();

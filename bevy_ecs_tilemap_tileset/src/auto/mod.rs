@@ -1,4 +1,4 @@
-use crate::prelude::{TileGroupId, TilesetId};
+use bevy_tileset::prelude::{TileGroupId, TilesetId};
 
 mod auto_tiler;
 mod systems;

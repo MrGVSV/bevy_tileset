@@ -14,8 +14,6 @@ pub(crate) use param::TilesetMap;
 pub use param::Tilesets;
 pub use tile_index::TileIndex;
 
-pub use serialization::{load_map_dto, save_map_dto, TileLocation};
-
 use crate::prelude::*;
 
 mod asset;
@@ -24,7 +22,6 @@ pub mod error;
 mod impls;
 mod load;
 mod param;
-mod serialization;
 mod tile_index;
 
 /// A structure containing the registered tiles as well as their generated [`TextureAtlas`]

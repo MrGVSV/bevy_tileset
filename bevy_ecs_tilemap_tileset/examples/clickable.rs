@@ -7,9 +7,9 @@ mod helpers;
 
 use bevy::prelude::*;
 
-use bevy_ecs_tilemap::{GPUAnimated, MapQuery, Tile};
-use bevy_ecs_tileset::debug::DebugTilesetPlugin;
-use bevy_ecs_tileset::prelude::*;
+use bevy_ecs_tilemap::{GPUAnimated, MapQuery, Tile, TilemapPlugin};
+use bevy_ecs_tilemap_tileset::prelude::*;
+use bevy_ecs_tilemap_tileset::tileset::debug::DebugTilesetPlugin;
 
 /// The name of the tileset we'll be loading in this example
 ///
@@ -20,7 +20,8 @@ fn main() {
 	App::build()
 		// === Required === //
 		.add_plugins(DefaultPlugins)
-		.add_plugin(TilesetPlugin::default())
+		.add_plugin(TilemapPlugin)
+		.add_plugin(TilesetPlugin)
 		// /== Required === //
 		// === Exmaple-Specific === //
 		.init_resource::<MyTileset>()
@@ -183,8 +184,9 @@ fn on_tile_click(
 
 				// The `tileset.place_tile()` method also internally notifies the chunk,
 				// so no need to handle that manually!
-				tileset.place_tile(
+				place_tile(
 					tile_name,
+					tileset,
 					pos,
 					0u16,
 					layer_id,

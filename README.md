@@ -1,27 +1,47 @@
-# bevy_ecs_tilemap_tileset
+# bevy_tileset
 
-> A mouthful, I know. Working on a better name.
-
-An extension to the wonderful [`bevy_ecs_tilemap`](https://github.com/StarArawn/bevy_ecs_tilemap) crate for Bevy, allowing for configurable tilesets and basic auto tiling capabilities.
+Simple, configurable tilesets in Bevy using RON.
 
 ![Smart tile placement](./screenshots/tile_placement_demo.gif)
 
+> All GIFs generated with the [`bevy_ecs_tilemap_tileset`](bevy_ecs_tilemap_tileset/) crate (an implementation of this one)
+
 ## 📋 Features
 
-* Configure tiles via [RON](https://github.com/ron-rs/ron) files
-* Generate tilesets that readily work with `bevy_ecs_tilemap`
-* Basic auto tiling
-* Tile variants
-* Smart tile spawning— automatically inserts the necessary components based on the tile config
+* Define tilesets and tiles via [RON](https://github.com/ron-rs/ron) files
+* Load a tileset directly as a Bevy asset
+* Define Standard, Animated, Variant, and Auto tiles
+
+## 📲 Installation
+
+Add the following to your `Cargo.toml`:
+
+```toml
+[dependencies]
+bevy_tileset = "0.2"
+```
 
 ## ✨ Usage
 
-Simply **define** your tiles in a config file:
+Simply **define** your tiles and tilesets in config files:
 
 ```rust
+// assets/tiles/my_tile.ron
 (
   name: "My Tile",
   tile: Standard("textures/my_tile.png")
+)
+```
+
+```rust
+// assets/my_tileset.ron
+(
+  name: Some("My Awesome Tileset"),
+  id: 0,
+  tiles: {
+		0: "../tiles/my_tile.ron",
+  	// ...
+  }
 )
 ```
 
@@ -29,39 +49,26 @@ And **load** it in via a system:
 
 ```rust
 use bevy::prelude::*;
-use bevy_ecs_tilemap_tileset::prelude::*;
+use bevy_tileset::prelude::*;
 
-fn load_tiles(mut writer: EventWriter<TilesetLoadEvent>) {
-	writer.send(
-    TilesetLoadRequest::named(
-    	"My Awesome Tileset", 
-    	vec![TilesetDirs::from_dir("tiles")],
-  	)
-    .into()
-  );
+fn load_tiles(asset_server: Res<AssetServer>) {
+	let handle: Handle<Tileset> = asset_server.load("my_tileset.ron");
+  // Store handle...
 }
 ```
 
 Then **access** the generated tileset from anywhere:
 
 ```rust
-fn my_system(tilesets: Res<Tilesets>, /* other system params */) {
+fn my_system(tilesets: Tilesets, /* other system params */) {
   
-  // ...
+  let tileset = tilesets.get_by_name("My Awesome Tileset").unwrap();
+	let tile_index = tileset.get_tile_index("My Tile").unwrap();
   
-  if let Some(tileset) = tilesets.get_by_name("My Awesome Tileset") {
-    tileset.place_tile(
-      "My Tile",
-      position,
-      map_id,
-      layer_id,
-      &mut commands,
-      &mut map_query,
-		);
+  match tile_index {
+    TileIndex::Standard(texture_index) => { /* Do something */ },
+    TileIndex::Animated(start, end, speed) => { /* Do something */ },
   }
-  
-  // ...
-  
 }
 ```
 
@@ -74,7 +81,7 @@ Currently there are four main tile types:
 Defines a basic tile.
 
 ```rust
-// my-tile.ron
+// assets/tiles/my-tile.ron
 
 (
   name: "My Tile",
@@ -87,7 +94,7 @@ Defines a basic tile.
 Defines an animated tile that can be generated with the `GPUAnimated` component from `bevy_ecs_tilemap`.
 
 ```rust
-// my-animated-tile.ron
+// assets/tiles/my-animated-tile.ron
 
 (
   name: "My Animated Tile",
@@ -107,7 +114,7 @@ Defines an animated tile that can be generated with the `GPUAnimated` component 
 Defines a tile that has a set of possible variants. A random variant is chosen at random when placed. These variants can either be Standard or Animated.
 
 ```rust
-// my-variant-tile.ron
+// assets/tiles/my-variant-tile.ron
 
 (
   name: "My Crazy Random Tile",
@@ -140,7 +147,7 @@ Defines a tile that has a set of possible variants. A random variant is chosen a
 Defines a tile that automatically chooses its active tile based on its neighbors. This behavior can be controlled with rules. These sub-tiles are themselves Variant tiles.
 
 ```rust
-// my-auto-tile.ron
+// assets/tiles/my-auto-tile.ron
 
 #![enable(implicit_some)]
 
@@ -184,51 +191,25 @@ Defines a tile that automatically chooses its active tile based on its neighbors
 
 ![Auto tiling](./screenshots/auto_tiling_demo.gif)
 
+## Examples
+
+* [clickable](bevy_ecs_tilemap_tileset/examples/clickable.rs) - Add and remove tiles using `bevy_ecs_tilemap`
+
+For examples on how to define a tile or tileset, checkout the [assets](bevy_ecs_tilemap_tileset/assets/) folder in `bevy_ecs_tilemap_tileset`
+
 ## 🌱 Areas of Growth
 
 There are some things this crate could do better in. Here's a list of potential areas to grow:
 
-- [ ] Tileset
-  - [ ] Config files ★
+- [x] Tileset
+  - [x] Config files ★
 - [ ] Auto Tile
   - [ ] Mirror/Rotation (designate a rule to be mirrored or rotated)
-- [ ] Loading
-  - [ ] Load configs as assets (to allow for *semi*-hot reloading)
+- [x] Loading
+  - [x] Load configs as assets
 
 As well as just an overall improved and cleaner API.
 
-## ℹ️ About
+## 🎵 Important Note
 
-This crate was made to serve my purposes for my own tile-based games. I really liked `bevy_ecs_tilemap` but wanted to extend it in a way that might not be a good fit for that crate internally (i.e. muddy their API and create bloat). This is not a perfect library by any means but it gets the job done as best it can— at least for my purposes.
-
-### Publishing
-
-As for publishing, I'm hesitant to publish this as its own crate for a few reasons:
-
-* The idea of this being an extension to an extension of Bevy sounds messy
-  * It may cause confusion in the community for those using `bevy_ecs_tilemap`
-  * It limits users to this crate's version of `bevy_ecs_tilemap` (more-or-less)
-* The API needs a lot of improvement
-  * Requesting and listening for the load to complete feels a bit clunky (this should be less of a hassle when tilset config files are added)
-  * Removing auto tiles requires placing the logic in a specific `SystemStage` and sending out the `RemoveAutoTileEvent` event (I really hate this but I'm not sure how to resolve it)
-* Auto tiling itself can be slow for large amounts of tiles
-  * In release, placing a single tile takes around 25–85µs (depending on the number of neighbors)
-  * But updating a large amount can take much longer:
-    * 100x100 : ~42ms
-    * 500x500 : ~1.15s
-    * 1000x1000 : ~4.9s
-* I can't think of a good name for it :(
-
-
-
-However, I'm open to publishing this if people think it's a good idea to do so. **If you think it should be published, feel free to open an issue regarding this!**
-
-## 📲 Installation
-
-While I decide on publishing this crate or not, you can still install it to use or try out via git:
-
-```toml
-[dependencies]
-bevy_ecs_tilemap_tileset = { git = "https://github.com/MrGVSV/bevy_ecs_tilemap_tileset", tag = "v0.1.0"}
-```
-
+These tiles are defined with the [`bevy_ecs_tilemap`](https://github.com/StarArawn/bevy_ecs_tilemap) crate in mind. Therefore, it's meant to work with an index-based tile system (where a tile's texture is defined as an index into a texture atlas). Other solutions may need to be adapted in order to work with this crate.

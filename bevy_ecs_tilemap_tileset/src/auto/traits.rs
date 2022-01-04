@@ -1,5 +1,5 @@
 use crate::auto::auto_tiler::TileObject;
-use crate::prelude::AutoTile;
+use crate::auto::AutoTile;
 use bevy::prelude::{Entity, Query, UVec2, With};
 use bevy_ecs_tilemap::{Tile, TileParent};
 

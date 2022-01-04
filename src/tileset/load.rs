@@ -1,6 +1,6 @@
 use bevy::asset::{Asset, AssetPath, AssetServer, Handle};
 use bevy::prelude::Texture;
-use bevy_ecs_tileset_tiles::prelude::*;
+use bevy_tileset_tiles::prelude::*;
 
 pub trait TextureLoader {
 	fn load<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture>;

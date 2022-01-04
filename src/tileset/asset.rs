@@ -7,8 +7,8 @@ use bevy::asset::{
 };
 use bevy::render::texture::{ImageType, Texture};
 use bevy::utils::Uuid;
-use bevy_ecs_tileset_tiles::prelude::{TileDef, TileHandle};
 use bevy_tile_atlas::TextureStore;
+use bevy_tileset_tiles::prelude::{TileDef, TileHandle};
 use serde::{Deserialize, Serialize};
 
 use crate::prelude::{TileGroupId, TilesetBuilder, TilesetError, TilesetId};

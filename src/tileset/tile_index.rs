@@ -1,4 +1,4 @@
-use bevy_ecs_tileset_tiles::prelude::*;
+use bevy_tileset_tiles::prelude::*;
 
 /// A structure defining the index or indexes into the texture atlas
 #[derive(Debug, Copy, Clone)]

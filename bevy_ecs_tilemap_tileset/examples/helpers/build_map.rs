@@ -1,7 +1,7 @@
 use crate::helpers::WorldCamera;
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
-use bevy_ecs_tileset::prelude::*;
+use bevy_ecs_tilemap_tileset::prelude::*;
 
 pub fn build_map(
 	tileset: &Tileset,

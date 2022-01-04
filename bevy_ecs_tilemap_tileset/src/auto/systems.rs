@@ -1,8 +1,8 @@
 use crate::auto::auto_tiler::{AutoTiler, TileUpdateRequest};
 use crate::auto::AutoTile;
-use crate::prelude::{TileIndex, Tilesets};
 use bevy::prelude::{Changed, Commands, Entity, EventReader, Query, QuerySet, UVec2, With};
 use bevy_ecs_tilemap::{GPUAnimated, MapQuery, Tile, TileParent};
+use bevy_tileset::prelude::{TileIndex, Tilesets};
 
 /// An event used to notify the system of a removed/replaced auto tile
 pub struct RemoveAutoTileEvent(pub Entity);

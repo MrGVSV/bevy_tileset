@@ -20,7 +20,7 @@ impl Tileset {
 	/// ```
 	/// # use bevy::prelude::{Commands, Res};
 	/// # use bevy_ecs_tilemap::MapQuery;
-	/// # use bevy_ecs_tileset::prelude::*;
+	/// # use bevy_tileset::prelude::*;
 	///
 	/// fn place_tile(tileset: Res<Tileset>, mut commands: Commands, mut map_query: MapQuery) {
 	/// 	// Matches:
@@ -60,7 +60,7 @@ impl Tileset {
 	/// # Examples
 	///
 	/// ```
-	/// # use bevy_ecs_tileset::prelude::*;
+	/// # use bevy_tileset::prelude::*;
 	/// fn get_index(tileset: &Tileset) {
 	/// 	let index = tileset.get_auto_index_by_id(PartialTileId {
 	/// 		group_id: 123,
