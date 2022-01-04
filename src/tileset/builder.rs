@@ -57,14 +57,14 @@ impl TilesetBuilder {
 	///
 	/// returns: Result<Tileset, TextureAtlasBuilderError>
 	///
-	pub fn build<TStore: TextureStore>(
+	pub fn build<TName: Into<String>, TStore: TextureStore>(
 		self,
-		name: String,
+		name: TName,
 		id: TilesetId,
 		texture_store: &mut TStore,
 	) -> Result<Tileset, TileAtlasBuilderError> {
 		Ok(Tileset {
-			name,
+			name: name.into(),
 			id,
 			tiles: self.tiles,
 			tile_ids: self.tile_ids,

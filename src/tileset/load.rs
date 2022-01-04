@@ -1,13 +1,19 @@
 use bevy::asset::{Asset, AssetPath, AssetServer, Handle};
-use bevy::prelude::Texture;
+use bevy::prelude::{Res, Texture};
 use bevy_tileset_tiles::prelude::*;
 
 pub trait TextureLoader {
-	fn load<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture>;
+	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture>;
 }
 
 impl TextureLoader for AssetServer {
-	fn load<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture> {
+	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture> {
+		self.load(path)
+	}
+}
+
+impl<'w> TextureLoader for Res<'w, AssetServer> {
+	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture> {
 		self.load(path)
 	}
 }
@@ -21,9 +27,9 @@ pub fn load_tile_handles<TTiles: IntoIterator<Item = TileDef>, TLoader: TextureL
 		.map(|tile_def| TileHandle {
 			name: tile_def.name.clone(),
 			tile: match &tile_def.tile {
-				TileDefType::Standard(path) => {
-					TileHandleType::Standard(asset_loader.load::<Texture, &str>(path.as_str()))
-				}
+				TileDefType::Standard(path) => TileHandleType::Standard(
+					asset_loader.load_texture::<Texture, &str>(path.as_str()),
+				),
 				TileDefType::Animated(anim) => {
 					TileHandleType::Animated(load_animated(anim, asset_loader))
 				}
@@ -55,7 +61,7 @@ fn load_animated<TLoader: TextureLoader>(
 		frames: def
 			.frames
 			.iter()
-			.map(|frame| asset_loader.load::<Texture, &str>(frame.as_str()))
+			.map(|frame| asset_loader.load_texture::<Texture, &str>(frame.as_str()))
 			.collect(),
 	}
 }
@@ -68,9 +74,9 @@ fn load_variant<TLoader: TextureLoader>(
 	VariantTileHandle {
 		weight: def.weight,
 		tile: match &def.tile {
-			SimpleTileDefType::Standard(path) => {
-				SimpleTileHandle::Standard(asset_loader.load::<Texture, &str>(path.as_str()))
-			}
+			SimpleTileDefType::Standard(path) => SimpleTileHandle::Standard(
+				asset_loader.load_texture::<Texture, &str>(path.as_str()),
+			),
 			SimpleTileDefType::Animated(anim) => {
 				SimpleTileHandle::Animated(load_animated(anim, asset_loader))
 			}

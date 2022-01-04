@@ -45,7 +45,7 @@ struct TilesetTextureStore<'x, 'y> {
 }
 
 impl<'x, 'y> TextureLoader for TilesetTextureLoader<'x, 'y> {
-	fn load<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture> {
+	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture> {
 		let asset_path = path.into().clone();
 		let handle: Handle<Texture> = self.load_context.get_handle(asset_path.clone());
 		let path = asset_path.path().to_path_buf();

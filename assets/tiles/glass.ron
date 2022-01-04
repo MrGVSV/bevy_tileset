@@ -1,0 +1,16 @@
+(
+    name: "Glass",
+    tile: Animated((
+        speed: 1.5,
+        frames: [
+            "tiles/glass/glass-001.png",
+            "tiles/glass/glass-002.png",
+            "tiles/glass/glass-003.png",
+            "tiles/glass/glass-004.png",
+            "tiles/glass/glass-005.png",
+            "tiles/glass/glass-006.png",
+            "tiles/glass/glass-007.png",
+            "tiles/glass/glass-008.png",
+        ],
+    )),
+)

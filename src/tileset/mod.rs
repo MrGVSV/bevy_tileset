@@ -10,6 +10,7 @@ pub use asset::TilesetDef;
 pub use builder::TilesetBuilder;
 pub use error::TilesetError;
 pub use impls::*;
+pub use load::load_tile_handles;
 pub(crate) use param::TilesetMap;
 pub use param::Tilesets;
 pub use tile_index::TileIndex;

@@ -2,8 +2,8 @@ pub use bevy_tileset_tiles as tiles;
 
 pub mod debug;
 mod ids;
-pub mod plugin;
-pub mod tileset;
+mod plugin;
+mod tileset;
 
 /// A collection of commonly used modules (import via `bevy_tileset::prelude::*`)
 pub mod prelude {

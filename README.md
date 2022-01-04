@@ -4,7 +4,7 @@ Simple, configurable tilesets in Bevy using RON.
 
 ![Smart tile placement](./screenshots/tile_placement_demo.gif)
 
-> All GIFs generated with the [`bevy_ecs_tilemap_tileset`](bevy_ecs_tilemap_tileset/) crate (an implementation of this one)
+> All GIFs generated with the [`bevy_ecs_tilemap_tileset`](bevy_ecs_tilemap_tileset/) sub-crate
 
 ## 📋 Features
 
@@ -14,11 +14,13 @@ Simple, configurable tilesets in Bevy using RON.
 
 ## 📲 Installation
 
-Add the following to your `Cargo.toml`:
+Add one of the following lines to your `Cargo.toml`.
 
 ```toml
 [dependencies]
-bevy_tileset = "0.2"
+bevy_tileset_tiles = "0.2" # For the base tile definitions
+bevy_tileset = "0.2" # For general tileset usage (includes above)
+bevy_ecs_tilemap_tileset = "0.2" # For usage with bevy_ecs_tilemap (includes above)
 ```
 
 ## ✨ Usage
@@ -111,6 +113,8 @@ Defines an animated tile that can be generated with the `GPUAnimated` component 
 
 ### 🎲 Variant
 
+> With the `variants` feature enabled
+
 Defines a tile that has a set of possible variants. A random variant is chosen at random when placed. These variants can either be Standard or Animated.
 
 ```rust
@@ -143,6 +147,8 @@ Defines a tile that has a set of possible variants. A random variant is chosen a
 ```
 
 ### 🧠 Auto
+
+> With the `auto-tile` feature enabled
 
 Defines a tile that automatically chooses its active tile based on its neighbors. This behavior can be controlled with rules. These sub-tiles are themselves Variant tiles.
 
@@ -193,9 +199,11 @@ Defines a tile that automatically chooses its active tile based on its neighbors
 
 ## Examples
 
-* [clickable](bevy_ecs_tilemap_tileset/examples/clickable.rs) - Add and remove tiles using `bevy_ecs_tilemap`
+* [tileset](examples/tileset.rs) - Simply load and display the tileset
+* [dynamic](examples/dynamic.rs) - Dynamically create a tileset at runtime
+* [clickable](bevy_ecs_tilemap_tileset/examples/clickable.rs) - Add and remove tiles using `bevy_ecs_tilemap` and `bevy_ecs_tilemap_tileset`
 
-For examples on how to define a tile or tileset, checkout the [assets](bevy_ecs_tilemap_tileset/assets/) folder in `bevy_ecs_tilemap_tileset`
+Also, be sure to check out  the [assets](bevy_ecs_tilemap_tileset/assets/) folder for how to define a tile or tileset.
 
 ## 🌱 Areas of Growth
 
