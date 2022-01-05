@@ -1,6 +1,6 @@
 [package]
 name = "bevy_tileset"
-version = "0.2.0"
+version = "0.1.0"
 edition = "2021"
 authors = ["Gino Valente <gino.valente.code@gmail.com>"]
 description = "Simple, configurable tilesets in Bevy using RON"
@@ -18,7 +18,7 @@ members = ["bevy_tileset_tiles", "bevy_ecs_tilemap_tileset"]
 maintenance = { status = "experimental" }
 
 [dependencies]
-bevy_tileset_tiles = { path = "./bevy_tileset_tiles" }
+bevy_tileset_tiles = { path = "./bevy_tileset_tiles", version = "0.1" }
 bevy = "0.5"
 bevy_tile_atlas = "0.1.3"
 ron = "0.7.0"

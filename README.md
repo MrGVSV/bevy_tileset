@@ -20,9 +20,9 @@ Add one of the following lines to your `Cargo.toml`.
 
 ```toml
 [dependencies]
-bevy_tileset_tiles = "0.2" # For the base tile definitions
-bevy_tileset = "0.2" # For general tileset usage (includes above)
-bevy_ecs_tilemap_tileset = "0.2" # For usage with bevy_ecs_tilemap (includes above)
+bevy_tileset_tiles = "0.1" # For the base tile definitions
+bevy_tileset = "0.1" # For general tileset usage (includes above)
+bevy_ecs_tilemap_tileset = "0.1" # For usage with bevy_ecs_tilemap (includes above)
 ```
 
 ## ✨ Usage
