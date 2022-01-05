@@ -127,10 +127,17 @@ fn show_tileset(
 	});
 
 	// === Display Tile === //
-	if let Some((ref tile_index, ..)) = tileset.select_tile("Grass") {
+	if let Some((ref tile_index, ..)) = tileset.select_tile("Dynamic Grass") {
 		match tile_index {
 			TileIndex::Standard(index) => {
 				// Do something standard
+				if let Some(handle) = tileset.get_tile_handle(index) {
+					commands.spawn_bundle(SpriteBundle {
+						material: materials.add(handle.clone().into()),
+						transform: Transform::from_xyz(0.0, 48.0, 0.0),
+						..Default::default()
+					});
+				}
 			}
 			TileIndex::Animated(start, end, speed) => {
 				// Do something  ✨ animated ✨

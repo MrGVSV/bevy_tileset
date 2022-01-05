@@ -213,7 +213,7 @@ There are some things this crate could do better in. Here's a list of potential 
 
 - [x] Tileset
   - [x] Config files ★
-- [ ] Auto Tile
+- [ ] Improved Auto Tiles
   - [ ] Mirror/Rotation (designate a rule to be mirrored or rotated)
 - [x] Loading
   - [x] Load configs as assets
