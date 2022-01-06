@@ -6,7 +6,7 @@
 Simple, configurable tilesets in Bevy using RON.
 
 <p align="center">
-	<img alt="Smart tile placement" src="./screenshots/tile_placement_demo.gif" />
+	<img alt="Smart tile placement" src="https://github.com/MrGVSV/bevy_tileset/blob/b81d2d7483785e5aa58ef0b449482d9d57bca3be/screenshots/tile_placement_demo.gif" />
 </p>
 
 > All GIFs generated with the [`bevy_ecs_tilemap_tileset`](bevy_ecs_tilemap_tileset/) sub-crate
@@ -202,8 +202,9 @@ Defines a tile that automatically chooses its active tile based on its neighbors
   ])
 )
 ```
-
-![Auto tiling](./screenshots/auto_tiling_demo.gif)
+<p align="center">
+	<img alt="Auto tiling" src="https://github.com/MrGVSV/bevy_tileset/blob/b81d2d7483785e5aa58ef0b449482d9d57bca3be/screenshots/auto_tiling_demo.gif" />
+</p>
 
 ## 🎓 Examples
 
