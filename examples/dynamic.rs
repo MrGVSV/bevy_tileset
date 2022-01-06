@@ -119,9 +119,6 @@ fn check_loaded(
 }
 
 /// Shows the tileset
-///
-/// This uses the `Tilesets` system parameter. Internally it gets the `Res<Assets<Tileset>>`, but also provides
-/// additional niceties (specifically fetching a tileset by name or ID).
 fn show_tileset(
 	mut commands: Commands,
 	my_tileset: Res<MyTileset>,
