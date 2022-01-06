@@ -1,5 +1,9 @@
 # bevy_tileset
 
+[![crates.io](https://img.shields.io/crates/v/bevy_tileset?style=flat-square)](https://crates.io/crates/bevy_tileset)
+
+[![docs.rs](https://docs.rs/bevy_tileset/badge.svg)](https://docs.rs/bevy_tileset)
+
 Simple, configurable tilesets in Bevy using RON.
 
 <p align="center">
@@ -22,7 +26,10 @@ Add one of the following lines to your `Cargo.toml`.
 [dependencies]
 bevy_tileset_tiles = "0.1" # For the base tile definitions
 bevy_tileset = "0.1" # For general tileset usage (includes above)
-bevy_ecs_tilemap_tileset = "0.1" # For usage with bevy_ecs_tilemap (includes above)
+
+# The bevy_ecs_tilemap integration crate has not yet been published
+# So the you will need to get it from the git
+bevy_ecs_tilemap_tileset = { git = "https://github.com/MrGVSV/bevy_tileset", version = "0.1" }
 ```
 
 ## ✨ Usage
@@ -223,3 +230,10 @@ As well as just an overall improved and cleaner API.
 ## 🎵 Important Note
 
 These tiles are defined with the [`bevy_ecs_tilemap`](https://github.com/StarArawn/bevy_ecs_tilemap) crate in mind. Therefore, it's meant to work with an index-based tile system (where a tile's texture is defined as an index into a texture atlas). Other solutions may need to be adapted in order to work with this crate.
+
+## 🕊 Bevy Compatibility
+
+| bevy | bevy_tileset |
+| ---- | ------------ |
+| 0.5  | 0.1          |
+
