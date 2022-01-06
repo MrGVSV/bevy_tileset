@@ -27,7 +27,7 @@ bevy_tileset_tiles = "0.2" # For the base tile definitions
 bevy_tileset = "0.2" # For general tileset usage (includes above)
 
 # The bevy_ecs_tilemap integration crate has not yet been published
-# So the you will need to get it from the git
+# So you will need to get it from git
 bevy_ecs_tilemap_tileset = { git = "https://github.com/MrGVSV/bevy_tileset", version = "0.2" }
 ```
 
