@@ -1,7 +1,7 @@
 //! Implementation details for Auto Tiles
 
 use crate::prelude::{PartialTileId, RawTileset, TileIndex, Tileset};
-use crate::tiles::prelude::*;
+use bevy_tileset_tiles::prelude::*;
 
 macro_rules! impl_tileset {
 	($name: ident) => {
@@ -24,7 +24,7 @@ macro_rules! impl_tileset {
 			/// ```
 			/// # use bevy::prelude::{Commands, Res};
 			/// # use bevy_ecs_tilemap::MapQuery;
-			/// # use bevy_tileset::prelude::*;
+			/// # use bevy_tileset_core::prelude::*;
 			///
 			/// fn place_tile(tileset: Res<Tileset>, mut commands: Commands, mut map_query: MapQuery) {
 			/// 	// Matches:
@@ -64,7 +64,7 @@ macro_rules! impl_tileset {
 			/// # Examples
 			///
 			/// ```
-			/// # use bevy_tileset::prelude::*;
+			/// # use bevy_tileset_core::prelude::*;
 			/// fn get_index(tileset: &Tileset) {
 			/// 	let index = tileset.get_auto_index_by_id(PartialTileId {
 			/// 		group_id: 123,

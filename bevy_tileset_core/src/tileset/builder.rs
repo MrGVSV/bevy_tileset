@@ -1,8 +1,8 @@
 use crate::ids::PartialTileId;
 use crate::prelude::*;
-use crate::tiles::prelude::*;
 use bevy::prelude::{Handle, Texture};
 use bevy_tile_atlas::{TextureStore, TileAtlasBuilder, TileAtlasBuilderError};
+use bevy_tileset_tiles::prelude::*;
 use std::collections::HashMap;
 
 /// A builder for constructing a [`Tileset`]
@@ -98,8 +98,8 @@ impl TilesetBuilder {
 	///
 	/// ```
 	/// # use bevy::prelude::*;
-	/// # use bevy_tileset::prelude::*;
-	/// # use bevy_tileset::tiles::*;
+	/// # use bevy_tileset_core::prelude::*;
+	/// # use bevy_tileset_core::tiles::*;
 	///
 	/// fn tileset_creator(textures: Res<Assets<Texture>>) {
 	/// 	let mut builder = TilesetBuilder::default();

@@ -8,6 +8,7 @@ pub use auto::*;
 pub use variants::*;
 
 use crate::prelude::*;
+use bevy_tileset_tiles::prelude::*;
 
 #[cfg(feature = "auto-tile")]
 mod auto;
@@ -129,7 +130,7 @@ macro_rules! impl_tileset {
 			/// # Examples
 			///
 			/// ```
-			/// # use bevy_tileset::prelude::*;
+			/// # use bevy_tileset_core::prelude::*;
 			///
 			/// let index: TileIndex = tileset.get_tile_index("My Tile").unwrap();
 			/// ```

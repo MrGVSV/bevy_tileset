@@ -1,9 +1,9 @@
 [package]
-name = "bevy_ecs_tilemap_tileset"
+name = "bevy_tileset_core"
 version = "0.1.0"
 edition = "2021"
 authors = ["Gino Valente <gino.valente.code@gmail.com>"]
-description = "An extension to the bevy_ecs_tilemap, allowing for configurable tilesets, auto tiling, and more"
+description = "Core of bevy_tileset"
 repository = "https://github.com/MrGVSV/bevy_tileset"
 license = "MIT OR Apache-2.0"
 keywords = ["bevy", "tileset", "auto", "variant", "tile"]
@@ -12,17 +12,17 @@ readme = "../README.md"
 exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 
 [dependencies]
-bevy_tileset = { path = "..", version = "0.1" }
+bevy_tileset_tiles = { path = "../bevy_tileset_tiles", version = "0.1" }
 bevy = "0.5"
-bevy_ecs_tilemap = "0.4"
+bevy_tile_atlas = "0.1"
+ron = "0.7.0"
 serde = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+futures = "0.3"
+rand = { version = "0.8", optional = true }
 
 [features]
 default = ["variants"]
-variants = ["bevy_tileset/variants"]
-auto-tile = ["variants", "bevy_tileset/auto-tile"]
-
-[[example]]
-name = "clickable"
-path = "examples/clickable.rs"
-required-features = ["auto-tile"]
+variants = ["rand", "bevy_tileset_tiles/variants"]
+auto-tile = ["variants", "bevy_tileset_tiles/auto-tile"]

@@ -1,7 +1,7 @@
 //! Implementation details for Variant Tiles
 
 use crate::prelude::{RawTileset, Tileset};
-use crate::tiles::prelude::*;
+use bevy_tileset_tiles::prelude::*;
 use rand::distributions::{Distribution, WeightedIndex};
 use rand::thread_rng;
 

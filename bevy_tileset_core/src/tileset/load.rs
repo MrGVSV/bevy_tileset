@@ -32,7 +32,7 @@ impl<'w> TextureLoader for Res<'w, AssetServer> {
 /// # Examples
 ///
 /// ```
-/// # use bevy_tileset::prelude::*;
+/// # use bevy_tileset_core::prelude::*;
 /// # use bevy::prelude::*;
 ///
 /// fn create_handles(tiles: Vec<TileDef>, asset_server: &AssetServer) -> Vec<TileHandle> {

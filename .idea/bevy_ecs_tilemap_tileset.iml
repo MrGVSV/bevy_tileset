@@ -53,6 +53,8 @@
       <sourceFolder url="file://$MODULE_DIR$/bevy_ecs_tilemap_tileset/examples" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/bevy_tileset_tiles/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/bevy_tileset_core/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/bevy_tileset_core/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/bevy_ecs_tileset_tiles/target" />
       <excludeFolder url="file://$MODULE_DIR$/bevy_ecs_tilemap_tileset/target" />

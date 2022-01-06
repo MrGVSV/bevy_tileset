@@ -16,6 +16,7 @@ pub use param::Tilesets;
 pub use tile_index::TileIndex;
 
 use crate::prelude::*;
+use bevy_tileset_tiles::prelude::*;
 
 mod asset;
 mod builder;

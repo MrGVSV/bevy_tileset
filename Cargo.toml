@@ -12,23 +12,20 @@ readme = "README.md"
 exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 
 [workspace]
-members = ["bevy_tileset_tiles", "bevy_ecs_tilemap_tileset"]
+members = ["bevy_tileset_core", "bevy_tileset_tiles", "bevy_ecs_tilemap_tileset"]
 
 [badges]
 maintenance = { status = "experimental" }
 
 [dependencies]
 bevy_tileset_tiles = { path = "./bevy_tileset_tiles", version = "0.1" }
+bevy_tileset_core = { path = "./bevy_tileset_core", version = "0.1" }
+
+[dev-dependencies]
 bevy = "0.5"
-bevy_tile_atlas = "0.1"
-ron = "0.7.0"
-serde = "1.0.130"
-anyhow = "1.0.52"
-thiserror = "1.0.30"
-futures = "0.3.19"
-rand = { version = "0.8", optional = true }
+ron = "0.7"
 
 [features]
 default = ["variants"]
-variants = ["rand", "bevy_tileset_tiles/variants"]
-auto-tile = ["variants", "bevy_tileset_tiles/auto-tile"]
+variants = ["bevy_tileset_core/variants"]
+auto-tile = ["variants", "bevy_tileset_core/auto-tile"]

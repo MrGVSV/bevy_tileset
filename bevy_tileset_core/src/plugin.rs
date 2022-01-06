@@ -1,6 +1,6 @@
 use crate::tileset::{Tileset, TilesetAssetLoader, TilesetMap};
-use bevy::app::AppBuilder;
 use bevy::prelude::*;
+
 /// Plugin for setting up tilesets
 #[derive(Default)]
 pub struct TilesetPlugin {}
