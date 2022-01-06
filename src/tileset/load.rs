@@ -18,6 +18,31 @@ impl<'w> TextureLoader for Res<'w, AssetServer> {
 	}
 }
 
+/// Load the intermediate tile handles from a set of tile definitions
+///
+/// This can then be used to generate a new [`RawTileset`](crate::tileset::RawTileset)
+///
+/// # Arguments
+///
+/// * `tiles`: The collection of tile definitions (in their intended order)
+/// * `asset_loader`: The `AssetServer` or other loader for loading the textures
+///
+/// returns: Vec<TileHandle, Global>
+///
+/// # Examples
+///
+/// ```
+/// # use bevy_tileset::prelude::*;
+/// # use bevy::prelude::*;
+///
+/// fn create_handles(tiles: Vec<TileDef>, asset_server: &AssetServer) -> Vec<TileHandle> {
+/// 	load_tile_handles(tiles, asset_server)
+/// }
+///
+/// fn is_ready(tiles: &Vec<TileHandle>, asset_server: &AssetServer) -> bool {
+/// 	tiles.iter().all(|tile| tile.is_loaded(asset_server) )
+/// }
+/// ```
 pub fn load_tile_handles<TTiles: IntoIterator<Item = TileDef>, TLoader: TextureLoader>(
 	tiles: TTiles,
 	asset_loader: &TLoader,

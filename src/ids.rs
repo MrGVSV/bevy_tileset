@@ -4,13 +4,8 @@ use serde::{Deserialize, Serialize};
 pub type TilesetId = u8;
 /// An ID used to identify a tile in a [`Tileset`]
 pub type TileGroupId = u32;
-// /// An ID used to identify a variant in a variant tile
-// #[cfg(feature = "variants")]
-// pub type TileVariantId = u16;
-// /// An ID used to identify a ruling in an auto tile
-// #[cfg(feature = "auto-tile")]
-// pub type TileAutoId = u16;
 
+/// A struct used to identify a tile in a particular [`Tileset`]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Deserialize, Serialize)]
 pub struct TileId {
 	/// The specific index of a ruling in the list of rules for this auto tile
@@ -23,10 +18,13 @@ pub struct TileId {
 	/// Only useful for Variant tiles (and, by extension, Auto tiles)
 	#[cfg(feature = "variants")]
 	pub variant_index: Option<usize>,
+	/// The tile group this tile belongs to
 	pub group_id: TileGroupId,
+	/// The ID of the containing [`Tileset`]
 	pub tileset_id: TilesetId,
 }
 
+/// This struct is used to identify a tile when the particular [`Tileset`] is already known or unneeded
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub struct PartialTileId {
 	/// The specific index of a ruling in the list of rules for this auto tile
@@ -39,10 +37,12 @@ pub struct PartialTileId {
 	/// Only useful for Variant tiles (and, by extension, Auto tiles)
 	#[cfg(feature = "variants")]
 	pub variant_index: Option<usize>,
+	/// The tile group this tile belongs to
 	pub group_id: TileGroupId,
 }
 
 impl TileId {
+	/// Create a new basic tile ID
 	pub fn new(group_id: TileGroupId, tileset_id: TilesetId) -> Self {
 		Self {
 			#[cfg(feature = "auto-tile")]
@@ -54,27 +54,30 @@ impl TileId {
 		}
 	}
 
+	/// Returns true if two tiles are of the same variant, auto tile, group, and tileset
 	#[cfg(feature = "variants")]
 	pub fn eq_variant(&self, other: &TileId) -> bool {
-		self.variant_index == other.variant_index
-			&& self.eq_tile_group(other)
-			&& self.eq_tileset(other)
+		self.eq(other)
 	}
 
+	/// Returns true if two tiles are of the same auto tile, group, and tileset
 	#[cfg(feature = "auto-tile")]
 	pub fn eq_auto(&self, other: &TileId) -> bool {
-		self.auto_index == other.auto_index && self.eq_tile_group(other) && self.eq_tileset(other)
+		self.auto_index == other.auto_index && self.eq_tile_group(other)
 	}
 
+	/// Returns true if the two tiles are of the same group and tileset
 	pub fn eq_tile_group(&self, other: &TileId) -> bool {
 		self.group_id == other.group_id && self.eq_tileset(other)
 	}
+
+	/// Returns true if the two tiles are of the same tileset
 	pub fn eq_tileset(&self, other: &TileId) -> bool {
 		self.tileset_id == other.tileset_id
 	}
 
-	#[allow(dead_code)]
-	pub(crate) fn partial(self) -> PartialTileId {
+	/// Creates a [`PartialTileId`] from this one
+	pub fn partial(self) -> PartialTileId {
 		PartialTileId {
 			#[cfg(feature = "auto-tile")]
 			auto_index: self.auto_index,
@@ -96,6 +99,7 @@ impl PartialTileId {
 		}
 	}
 
+	/// Extends this [`PartialTileId`] into a full [`TileId`]
 	pub fn extend(self, tileset_id: TilesetId) -> TileId {
 		TileId {
 			#[cfg(feature = "auto-tile")]
@@ -120,11 +124,8 @@ impl From<TileGroupId> for PartialTileId {
 	}
 }
 
-impl<T: Copy> From<&T> for PartialTileId
-where
-	PartialTileId: From<T>,
-{
+impl<T: Copy + Into<PartialTileId>> From<&T> for PartialTileId {
 	fn from(item: &T) -> Self {
-		Self::from(*item)
+		(*item).into()
 	}
 }

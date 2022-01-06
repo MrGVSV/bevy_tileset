@@ -255,7 +255,7 @@ impl TilesetBuilder {
 		let index = self
 			.atlas_builder
 			.add_texture(handle.clone_weak(), texture)
-			.map_err(|err| TilesetError::Atlas(err))?;
+			.map_err(|err| TilesetError::AtlasError(err))?;
 
 		let id = PartialTileId {
 			group_id: self.current_group,

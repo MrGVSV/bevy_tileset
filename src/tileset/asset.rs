@@ -196,7 +196,7 @@ async fn load_tile(context: &LoadContext<'_>, path: &str) -> Result<TileDef, Til
 	let bytes = context
 		.read_asset_bytes(&path)
 		.await
-		.map_err(|err| TilesetError::AssetIO(err))?;
+		.map_err(|err| TilesetError::AssetIoError(err))?;
 	let def = ron::de::from_bytes::<TileDef>(&bytes)
 		.map_err(|err| TilesetError::InvalidDefinition(err))?;
 	Ok(def)
@@ -211,10 +211,10 @@ async fn load_image(
 	let bytes = context
 		.read_asset_bytes(path.clone())
 		.await
-		.map_err(|err| TilesetError::AssetIO(err))?;
+		.map_err(|err| TilesetError::AssetIoError(err))?;
 	let path = path.as_path();
 	let ext = path.extension().unwrap().to_str().unwrap();
 	let img = Texture::from_buffer(&bytes, ImageType::Extension(ext))
-		.map_err(|err| TilesetError::ImageLoad(err))?;
+		.map_err(|err| TilesetError::ImageError(err))?;
 	Ok((id, img))
 }

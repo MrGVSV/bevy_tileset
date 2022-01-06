@@ -1,3 +1,5 @@
+//! Implementation details for Auto Tiles
+
 use crate::prelude::{PartialTileId, RawTileset, TileIndex, Tileset};
 use crate::tiles::prelude::*;
 

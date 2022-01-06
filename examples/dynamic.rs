@@ -14,7 +14,6 @@
 use bevy::asset::FileAssetIo;
 use bevy::prelude::*;
 use bevy_tileset::prelude::*;
-use bevy_tileset::tiles::prelude::*;
 
 fn main() {
 	App::build()

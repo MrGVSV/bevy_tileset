@@ -1,6 +1,6 @@
 use bevy_tileset_tiles::prelude::*;
 
-/// A structure defining the index or indexes into the texture atlas
+/// A structure defining the index or indexes into the `TextureAtlas`
 #[derive(Debug, Copy, Clone)]
 pub enum TileIndex {
 	/// Index for a standard tile

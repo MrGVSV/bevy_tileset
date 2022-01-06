@@ -1,3 +1,5 @@
+//! Implementation details for [`Tileset`] and [`RawTileset`]
+
 use bevy::prelude::{Handle, Texture, TextureAtlas, Vec2};
 
 #[cfg(feature = "auto-tile")]

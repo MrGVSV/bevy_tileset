@@ -1,3 +1,5 @@
+//! Implementation details for Variant Tiles
+
 use crate::prelude::{RawTileset, Tileset};
 use crate::tiles::prelude::*;
 use rand::distributions::{Distribution, WeightedIndex};

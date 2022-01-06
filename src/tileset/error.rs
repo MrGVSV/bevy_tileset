@@ -9,11 +9,11 @@ pub enum TilesetError {
 	#[error("image could not be found")]
 	ImageNotFound,
 	#[error("could not load asset: {0:?}")]
-	AssetIO(AssetIoError),
+	AssetIoError(AssetIoError),
 	#[error("could not read image: {0:?}")]
-	ImageLoad(TextureError),
+	ImageError(TextureError),
 	#[error("could not add tile to atlas: {0:?}")]
-	Atlas(TileAtlasBuilderError),
+	AtlasError(TileAtlasBuilderError),
 	#[error("invalid tile data (expected {expected:?}, found {found:?})")]
 	InvalidData { expected: String, found: String },
 	#[error("could not read tile definition file: {0:?}")]
