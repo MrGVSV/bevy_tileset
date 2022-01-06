@@ -26,6 +26,6 @@ bevy = "0.5"
 ron = "0.7"
 
 [features]
-default = ["variants"]
+default = []
 variants = ["bevy_tileset_core/variants"]
 auto-tile = ["variants", "bevy_tileset_core/auto-tile"]

@@ -23,6 +23,6 @@ futures = "0.3"
 rand = { version = "0.8", optional = true }
 
 [features]
-default = ["variants"]
+default = []
 variants = ["rand", "bevy_tileset_tiles/variants"]
 auto-tile = ["variants", "bevy_tileset_tiles/auto-tile"]
