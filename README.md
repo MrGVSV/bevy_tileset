@@ -1,7 +1,7 @@
 # bevy_tileset
 
 [![crates.io](https://img.shields.io/crates/v/bevy_tileset?style=flat-square)](https://crates.io/crates/bevy_tileset)
-[![docs.rs](https://docs.rs/bevy_tileset/badge.svg)](https://docs.rs/bevy_tileset)
+[![docs.rs](https://img.shields.io/docsrs/bevy_tileset?style=flat-square)](https://docs.rs/bevy_tileset)
 
 Simple, configurable tilesets in Bevy using RON.
 
