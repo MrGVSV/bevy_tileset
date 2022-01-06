@@ -51,6 +51,38 @@ impl<'a> Tilesets<'a> {
 		let id = self.tileset_map.name_to_id.get(name)?;
 		self.get_by_id(id)
 	}
+
+	/// Checks if a tileset with the given ID exists
+	///
+	/// # Arguments
+	///
+	/// * `id`: The tileset ID
+	///
+	/// returns: bool
+	pub fn contains_id(&self, id: &TilesetId) -> bool {
+		if let Some(handle) = self.tileset_map.id_to_handle.get(id) {
+			// Check underlying asset to ensure the correct response is given
+			self.contains(handle)
+		} else {
+			false
+		}
+	}
+
+	/// Checks if a tileset with the given name exists
+	///
+	/// # Arguments
+	///
+	/// * `name`: The name of the tileset
+	///
+	/// returns: bool
+	pub fn contains_name(&self, name: &str) -> bool {
+		if let Some(id) = self.tileset_map.name_to_id.get(name) {
+			// Check underlying asset to ensure the correct response is given
+			self.contains_id(id)
+		} else {
+			false
+		}
+	}
 }
 
 impl TilesetMap {

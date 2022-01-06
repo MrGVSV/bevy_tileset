@@ -43,13 +43,12 @@ fn show_tileset(
 	mut materials: ResMut<Assets<ColorMaterial>>,
 	mut has_ran: Local<bool>,
 ) {
-	if my_tileset.handle.is_none() || *has_ran {
+	if my_tileset.handle.is_none() || *has_ran || !tilesets.contains_name("My Awesome Tileset") {
 		return;
 	}
 
 	let handle = my_tileset.handle.as_ref().unwrap();
 	if let Some(_) = tilesets.get(handle) {
-		// This can actually run twice since `Tilesets` takes one frame to update
 		println!("Got tileset by handle! ({:?})", my_tileset.handle);
 	}
 	if let Some(tileset) = tilesets.get_by_id(&0) {

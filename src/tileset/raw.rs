@@ -1,6 +1,5 @@
 use crate::prelude::{RawTileset, Tileset};
-use bevy::asset::{LoadContext, LoadedAsset};
-use bevy::prelude::{Assets, Handle, ResMut, Texture};
+use bevy::prelude::Assets;
 use bevy::sprite::TextureAtlas;
 
 impl RawTileset {
