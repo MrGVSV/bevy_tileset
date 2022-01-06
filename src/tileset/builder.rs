@@ -49,24 +49,21 @@ impl TilesetBuilder {
 		}
 	}
 
-	/// Build the raw tileset
+	/// Build the tileset
 	///
 	/// # Arguments
 	///
 	/// * `texture_store`: The store of textures
 	///
-	/// returns: Result<RawTileset, TextureAtlasBuilderError>
+	/// returns: Result<Tileset, TextureAtlasBuilderError>
 	///
 	pub fn build<TName: Into<String>, TStore: TextureStore>(
 		self,
 		name: TName,
 		id: TilesetId,
 		texture_store: &mut TStore,
-	) -> Result<RawTileset, TileAtlasBuilderError> {
-		let tile_size = self.atlas_builder.get_tile_size().unwrap_or_default();
-		let atlas = self.atlas_builder.finish(texture_store)?;
-		let size = atlas.size;
-		Ok(RawTileset {
+	) -> Result<Tileset, TileAtlasBuilderError> {
+		Ok(Tileset {
 			name: name.into(),
 			id,
 			tiles: self.tiles,
@@ -78,9 +75,8 @@ impl TilesetBuilder {
 				.collect(),
 			tile_names: self.tile_names,
 			tile_handles: self.tile_handles,
-			tile_size,
-			atlas,
-			size,
+			tile_size: self.atlas_builder.get_tile_size().unwrap_or_default(),
+			atlas: self.atlas_builder.finish(texture_store)?,
 		})
 	}
 

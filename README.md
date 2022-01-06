@@ -201,7 +201,7 @@ Defines a tile that automatically chooses its active tile based on its neighbors
 
 ## 🎓 Examples
 
-* [tileset](examples/tileset.rs) - Simply load and display a tileset
+* [tileset](examples/tileset.rs) - Simply load and display the tileset
 * [dynamic](examples/dynamic.rs) - Dynamically create a tileset at runtime
 * [clickable](bevy_ecs_tilemap_tileset/examples/clickable.rs) - Add and remove tiles using `bevy_ecs_tilemap` and `bevy_ecs_tilemap_tileset`
 

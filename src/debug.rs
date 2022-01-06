@@ -108,13 +108,13 @@ fn display_tilesets(
 	let mut spawner = |tileset: &Tileset| {
 		commands
 			.spawn_bundle(SpriteBundle {
-				material: materials.add(tileset.texture().clone().into()),
+				material: materials.add(tileset.atlas().texture.clone().into()),
 				transform: Transform::from_translation(state.position + offset),
 				..Default::default()
 			})
 			.insert(DebugTilesetSprite);
 
-		offset.y -= tileset.size().y + PADDING;
+		offset.y -= tileset.atlas().size.y + PADDING;
 		loaded = true;
 	};
 

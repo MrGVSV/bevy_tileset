@@ -19,9 +19,8 @@ fn main() {
 struct MyTileset {
 	/// This stores the handle to our tileset so it doesn't get unloaded
 	tiles: Option<Vec<TileHandle>>,
-	/// This is the raw tileset (a tileset that was generated manually)
-	raw_tileset: Option<RawTileset>,
 	is_loaded: bool,
+	tileset: Option<Tileset>,
 }
 
 impl Default for MyTileset {
@@ -29,7 +28,7 @@ impl Default for MyTileset {
 		Self {
 			tiles: None,
 			is_loaded: false,
-			raw_tileset: None,
+			tileset: None,
 		}
 	}
 }
@@ -88,19 +87,14 @@ fn check_loaded(
 			.unwrap();
 	}
 
-	let raw_tileset = builder
+	let tileset = builder
 		.build("My Dynamic Tileset", 123, &mut textures)
 		.unwrap();
 
 	// We could also choose to add it to the `Assets<Tileset>` resource so we could use `Tilesets`, but we'll
 	// just hold onto it manually for now.
-	// If you did want to do that, you would simply generate the `Tileset` and add it to the `Assets<Tileset>` resource:
-	// ```
-	// let tileset = raw_tileset.into_asset(atlases_asset); // Where `atlases_asset` is a `Assets<TextureAtlas>` resource
-	// let tileset_handle = tileset_assets.add(tileset);
-	// ```
 
-	my_tileset.raw_tileset = Some(raw_tileset);
+	my_tileset.tileset = Some(tileset);
 	my_tileset.tiles = None;
 	my_tileset.is_loaded = true;
 }
@@ -115,16 +109,16 @@ fn show_tileset(
 	mut materials: ResMut<Assets<ColorMaterial>>,
 	mut has_ran: Local<bool>,
 ) {
-	if my_tileset.raw_tileset.is_none() || *has_ran {
+	if my_tileset.tileset.is_none() || *has_ran {
 		return;
 	}
 
-	let raw_tileset = my_tileset.raw_tileset.as_ref().unwrap();
-	println!("{:#?}", raw_tileset);
+	let tileset = my_tileset.tileset.as_ref().unwrap();
+	println!("{:#?}", tileset);
 
 	// === Display Tileset === //
-	let atlas = raw_tileset.atlas();
-	let texture = raw_tileset.texture().clone();
+	let atlas = tileset.atlas();
+	let texture = atlas.texture.clone();
 	commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 	commands.spawn_bundle(SpriteBundle {
 		material: materials.add(texture.into()),
@@ -133,11 +127,11 @@ fn show_tileset(
 	});
 
 	// === Display Tile === //
-	if let Some((ref tile_index, ..)) = raw_tileset.select_tile("Dynamic Grass") {
+	if let Some((ref tile_index, ..)) = tileset.select_tile("Dynamic Grass") {
 		match tile_index {
 			TileIndex::Standard(index) => {
 				// Do something standard
-				if let Some(handle) = raw_tileset.get_tile_handle(index) {
+				if let Some(handle) = tileset.get_tile_handle(index) {
 					commands.spawn_bundle(SpriteBundle {
 						material: materials.add(handle.clone().into()),
 						transform: Transform::from_xyz(0.0, 48.0, 0.0),

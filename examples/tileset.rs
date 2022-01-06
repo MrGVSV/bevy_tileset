@@ -32,7 +32,6 @@ fn show_tileset(
 	tilesets: Tilesets,
 	mut commands: Commands,
 	my_tileset: Res<MyTileset>,
-	atlases: Res<Assets<TextureAtlas>>,
 	mut materials: ResMut<Assets<ColorMaterial>>,
 	mut has_ran: Local<bool>,
 ) {
@@ -51,16 +50,9 @@ fn show_tileset(
 		println!("Got tileset by name! ({})", tileset.name());
 		println!("{:#?}", tileset);
 
-		for (h, t) in tilesets.iter() {
-			println!("Got Tileset: {:?} -> {:?}", h, t);
-		}
-		for (h, t) in atlases.iter() {
-			println!("Got Atlas: {:?} -> {:#?}", h, t);
-		}
-
 		// === Display Tileset === //
 		let atlas = tileset.atlas();
-		let texture = tileset.texture().clone();
+		let texture = atlas.texture.clone();
 		commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 		commands.spawn_bundle(SpriteBundle {
 			material: materials.add(texture.into()),
@@ -73,15 +65,6 @@ fn show_tileset(
 			match tile_index {
 				TileIndex::Standard(index) => {
 					// Do something standard
-					commands.spawn_bundle(SpriteSheetBundle {
-						transform: Transform {
-							translation: Vec3::new(08.0, -48.0, 0.0),
-							..Default::default()
-						},
-						sprite: TextureAtlasSprite::new(*index as u32),
-						texture_atlas: atlas.clone(),
-						..Default::default()
-					});
 				}
 				TileIndex::Animated(start, end, speed) => {
 					// Do something  ✨ animated ✨
