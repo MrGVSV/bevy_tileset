@@ -11,7 +11,7 @@ use bevy_tile_atlas::TextureStore;
 use bevy_tileset_tiles::prelude::{TileDef, TileHandle};
 use serde::{Deserialize, Serialize};
 
-use crate::prelude::{TileGroupId, TilesetBuilder, TilesetError, TilesetId};
+use crate::prelude::{TileGroupId, Tileset, TilesetBuilder, TilesetError, TilesetId};
 use crate::tileset::load::{load_tile_handles, TextureLoader};
 
 #[derive(Default)]
@@ -125,11 +125,29 @@ impl AssetLoader for TilesetAssetLoader {
 				builder.add_tile(tile_handle, group_id, &store)?;
 			}
 
-			// === Finish Tileset === //
+			// === Create Raw Tileset === //
 			let name = config
 				.name
 				.unwrap_or_else(|| Uuid::new_v4().to_hyphenated().to_string());
-			let tileset = builder.build(name, config.id, &mut store)?;
+			let raw_tileset = builder.build(name, config.id, &mut store)?;
+
+			// === Finalize Tileset === //
+			let texture = raw_tileset.atlas().texture.clone();
+			let atlas_asset = LoadedAsset::new(raw_tileset.atlas);
+			let atlas = load_context.set_labeled_asset("atlas", atlas_asset);
+			let tileset = Tileset {
+				id: raw_tileset.id,
+				name: raw_tileset.name,
+				tiles: raw_tileset.tiles,
+				size: raw_tileset.size,
+				tile_size: raw_tileset.tile_size,
+				tile_ids: raw_tileset.tile_ids,
+				tile_names: raw_tileset.tile_names,
+				tile_handles: raw_tileset.tile_handles,
+				tile_indices: raw_tileset.tile_indices,
+				atlas,
+				texture,
+			};
 
 			load_context.set_default_asset(LoadedAsset::new(tileset));
 
