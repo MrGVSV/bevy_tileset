@@ -1,3 +1,16 @@
+//! This example showcases how to create a dynamic tileset
+//!
+//! Tilesets can be created at runtime as opposed to being pre-defined in a config file.
+//! This allows for greater control over which tiles get added to the tileset and which don't.
+//!
+//! One important note is the difference between a `Tileset` and a `RawTileset`. A `Tileset` is
+//! generally your pre-defined tilesets. They're stored in an `Assets` resource and only contain
+//! a handle to the internal `TextureAtlas`. On the other hand, a `RawTileset` is the dynamically
+//! created one and provides immediate access to the internal `TextureAtlas`. This is useful for
+//! using it directly, but doesn't work well for cases where a handle to that `TextureAtlas` is
+//! needed. Luckily, you can convert it to a `Tileset` and add it to the `Assets<Tileset>` resource
+//! any time.
+
 use bevy::asset::FileAssetIo;
 use bevy::prelude::*;
 use bevy_tileset::prelude::*;
@@ -123,7 +136,6 @@ fn show_tileset(
 	println!("{:#?}", raw_tileset);
 
 	// === Display Tileset === //
-	let atlas = raw_tileset.atlas();
 	let texture = raw_tileset.texture().clone();
 	commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 	commands.spawn_bundle(SpriteBundle {

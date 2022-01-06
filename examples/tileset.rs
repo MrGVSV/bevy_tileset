@@ -1,4 +1,12 @@
+//! This example demonstrates the most basic setup for loading a tileset
+//!
+//! Essentially, all we need to do is load the config file via the `AssetServer` and keep
+//! a handle to the asset. That's it! From there, you can use the `Tilesets` system parameter
+//! (or simply `Res<Assets<Tileset>>` if you prefer) to access the stored tile and texture atlas
+//! data.
+
 use bevy::prelude::*;
+
 use bevy_tileset::prelude::*;
 
 fn main() {
@@ -32,7 +40,6 @@ fn show_tileset(
 	tilesets: Tilesets,
 	mut commands: Commands,
 	my_tileset: Res<MyTileset>,
-	atlases: Res<Assets<TextureAtlas>>,
 	mut materials: ResMut<Assets<ColorMaterial>>,
 	mut has_ran: Local<bool>,
 ) {
@@ -42,6 +49,7 @@ fn show_tileset(
 
 	let handle = my_tileset.handle.as_ref().unwrap();
 	if let Some(_) = tilesets.get(handle) {
+		// This can actually run twice since `Tilesets` takes one frame to update
 		println!("Got tileset by handle! ({:?})", my_tileset.handle);
 	}
 	if let Some(tileset) = tilesets.get_by_id(&0) {
@@ -50,13 +58,6 @@ fn show_tileset(
 	if let Some(tileset) = tilesets.get_by_name("My Awesome Tileset") {
 		println!("Got tileset by name! ({})", tileset.name());
 		println!("{:#?}", tileset);
-
-		for (h, t) in tilesets.iter() {
-			println!("Got Tileset: {:?} -> {:?}", h, t);
-		}
-		for (h, t) in atlases.iter() {
-			println!("Got Atlas: {:?} -> {:#?}", h, t);
-		}
 
 		// === Display Tileset === //
 		let atlas = tileset.atlas();
