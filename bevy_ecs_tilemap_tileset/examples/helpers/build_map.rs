@@ -13,7 +13,7 @@ pub fn build_map(
 	commands: &mut Commands,
 	map_query: &mut MapQuery,
 ) -> Entity {
-	let tileset_handle = tileset.atlas().texture.clone();
+	let tileset_handle = tileset.texture().clone();
 	let tileset_material_handle = materials.add(tileset_handle.into());
 
 	let map_entity = commands.spawn().id();
@@ -63,12 +63,7 @@ pub fn build_layers(
 	commands: &mut Commands,
 	map_query: &mut MapQuery,
 ) -> Vec<Entity> {
-	let settings = LayerSettings::new(
-		map_size,
-		chunk_size,
-		tileset.tile_size(),
-		tileset.atlas().size,
-	);
+	let settings = LayerSettings::new(map_size, chunk_size, tileset.tile_size(), tileset.size());
 
 	let mut layers = Vec::with_capacity(layer_count as usize);
 	for layer_id in 0..layer_count {
