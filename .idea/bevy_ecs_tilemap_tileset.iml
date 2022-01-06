@@ -2,6 +2,7 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/bevy_ecs_tileset_tiles/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/ahash-ddd7a393952bd5aa/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/anyhow-e192999b8cfcaaa0/out" isTestSource="false" />
@@ -48,8 +49,16 @@
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/spirv_cross-3ea9fbca00a5c47a/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/syn-d24964da4a552da2/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/wgpu-core-9e7dcfd45269de6e/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/bevy_ecs_tilemap_tileset/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/bevy_ecs_tilemap_tileset/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/bevy_tileset_tiles/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/bevy_tileset_core/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/bevy_tileset_core/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/bevy_ecs_tileset_tiles/target" />
+      <excludeFolder url="file://$MODULE_DIR$/bevy_ecs_tilemap_tileset/target" />
+      <excludeFolder url="file://$MODULE_DIR$/bevy_tileset_tiles/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

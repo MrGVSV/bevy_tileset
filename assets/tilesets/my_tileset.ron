@@ -1,0 +1,25 @@
+(
+    // The name of the tileset. This is useful for accessing the tileset in a human-readable way.
+    name: Some("My Awesome Tileset"),
+    // The ID of the tileset. This is used as a unique identifier for the tileset, allowing for
+    // an easier time implementing serialization/deserialization.
+    id: 0,
+    // The tiles contained within this tileset.
+    // Each tile is listed as a key-value pair, where the key is the Tile Group ID of that tile,
+    // and each value is the relative path to the tile definition file.
+    // By doing it this way, we ensure consistent ordering for loading/unloading the tile data,
+    // as well as allowing tiles to be removed or added without causing catastrophe when trying
+    // to re-build a map using a collection of Tile Group IDs.
+    tiles: {
+        0: "../tiles/empty.ron",
+        1: "../tiles/dirt.ron",
+        2: "../tiles/glass.ron",
+        3: "../tiles/grass.ron",
+
+        // This tile uses Auto tiles and will only be process if the `auto-tile` feature is enabled
+        4: "../tiles/wall.ron",
+    }
+)
+
+// As an aside: keep in mind that, while here, the tiles are defined using a relative path, the tiles
+// themselves are defined using an absolute path from the asset root.

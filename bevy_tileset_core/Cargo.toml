@@ -1,0 +1,28 @@
+[package]
+name = "bevy_tileset_core"
+version = "0.1.0"
+edition = "2021"
+authors = ["Gino Valente <gino.valente.code@gmail.com>"]
+description = "Core of bevy_tileset"
+repository = "https://github.com/MrGVSV/bevy_tileset"
+license = "MIT OR Apache-2.0"
+keywords = ["bevy", "tileset", "auto", "variant", "tile"]
+categories = ["game-development"]
+readme = "../README.md"
+exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
+
+[dependencies]
+bevy_tileset_tiles = { path = "../bevy_tileset_tiles", version = "0.1" }
+bevy = "0.5"
+bevy_tile_atlas = "0.1"
+ron = "0.7.0"
+serde = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+futures = "0.3"
+rand = { version = "0.8", optional = true }
+
+[features]
+default = []
+variants = ["rand", "bevy_tileset_tiles/variants"]
+auto-tile = ["variants", "bevy_tileset_tiles/auto-tile"]
