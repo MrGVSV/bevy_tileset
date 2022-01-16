@@ -1,14 +1,18 @@
 use crate::prelude::{Tileset, TilesetId};
 use bevy::asset::{Assets, Handle};
 use bevy::ecs::system::SystemParam;
-use bevy::prelude::{Res, ResMut};
+use bevy::prelude::{Query, Res, ResMut};
 use std::collections::HashMap;
 use std::ops::Deref;
 
 #[derive(SystemParam)]
-pub struct Tilesets<'a> {
-	tileset_map: ResMut<'a, TilesetMap>,
-	tilesets: Res<'a, Assets<Tileset>>,
+pub struct Tilesets<'w, 's> {
+	tileset_map: ResMut<'w, TilesetMap>,
+	tilesets: Res<'w, Assets<Tileset>>,
+
+	/// This field only exists so we can add the `'s` lifetime without Rust freaking out
+	#[allow(dead_code)]
+	phantom_query: Query<'w, 's, ()>,
 }
 
 #[derive(Default)]
@@ -19,15 +23,15 @@ pub struct TilesetMap {
 	id_to_name: HashMap<TilesetId, String>,
 }
 
-impl<'a> Deref for Tilesets<'a> {
-	type Target = Res<'a, Assets<Tileset>>;
+impl<'w, 's> Deref for Tilesets<'w, 's> {
+	type Target = Res<'w, Assets<Tileset>>;
 
 	fn deref(&self) -> &Self::Target {
 		&self.tilesets
 	}
 }
 
-impl<'a> Tilesets<'a> {
+impl<'w, 's> Tilesets<'w, 's> {
 	/// Get a tileset by its ID.
 	///
 	/// # Arguments

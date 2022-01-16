@@ -10,14 +10,14 @@ use bevy::prelude::*;
 use bevy_tileset::prelude::*;
 
 fn main() {
-	App::build()
+	App::new()
 		// === Required === //
 		.add_plugins(DefaultPlugins)
 		.add_plugin(TilesetPlugin::default())
 		// /== Required === //
 		.init_resource::<MyTileset>()
-		.add_startup_system(load_tileset.system())
-		.add_system(show_tileset.system())
+		.add_startup_system(load_tileset)
+		.add_system(show_tileset)
 		.run();
 }
 
@@ -40,7 +40,6 @@ fn show_tileset(
 	tilesets: Tilesets,
 	mut commands: Commands,
 	my_tileset: Res<MyTileset>,
-	mut materials: ResMut<Assets<ColorMaterial>>,
 	mut has_ran: Local<bool>,
 ) {
 	if my_tileset.handle.is_none() || *has_ran || !tilesets.contains_name("My Awesome Tileset") {
@@ -63,7 +62,7 @@ fn show_tileset(
 		let texture = tileset.texture().clone();
 		commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 		commands.spawn_bundle(SpriteBundle {
-			material: materials.add(texture.into()),
+			texture,
 			transform: Transform::from_xyz(0.0, 0.0, 0.0),
 			..Default::default()
 		});
@@ -78,7 +77,7 @@ fn show_tileset(
 							translation: Vec3::new(08.0, -48.0, 0.0),
 							..Default::default()
 						},
-						sprite: TextureAtlasSprite::new(*index as u32),
+						sprite: TextureAtlasSprite::new(*index),
 						texture_atlas: atlas.clone(),
 						..Default::default()
 					});

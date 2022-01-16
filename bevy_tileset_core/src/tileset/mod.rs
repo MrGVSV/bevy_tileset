@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use bevy::prelude::{Handle, Texture, TextureAtlas, Vec2};
+use bevy::prelude::{Component, Handle, Image, TextureAtlas, Vec2};
 use bevy::reflect::TypeUuid;
 
 pub(crate) use asset::TilesetAssetLoader;
@@ -46,7 +46,7 @@ macro_rules! define_tileset {
 			/// The tile names mapped by their ID
 			tile_names: HashMap<TileGroupId, String>,
 			/// The tile handles mapped by their index in the atlas
-			tile_handles: HashMap<usize, Handle<Texture>>,
+			tile_handles: HashMap<usize, Handle<Image>>,
 			/// The tile IDs mapped by their index in the atlas
 			tile_indices: HashMap<usize, TileId>,
 			$(
@@ -77,9 +77,10 @@ define_tileset!(
 		/// A handle to the generated texture atlas
 		atlas: Handle<TextureAtlas>,
 		/// A handle to the generated texture atlas's texture
-		texture: Handle<Texture>
+		texture: Handle<Image>
 	}
 );
 
 /// A component used to pair a tile entity with the tileset it comes from
+#[derive(Component)]
 pub struct TilesetParent(pub TilesetId);

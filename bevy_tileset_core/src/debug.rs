@@ -1,14 +1,17 @@
 //! Used for debugging tilesets
 
-use crate::prelude::{Tileset, Tilesets};
-use bevy::app::AppBuilder;
+use bevy::app::App;
 use bevy::math::Vec3;
-use bevy::prelude::{Assets, Commands, IntoSystem, Local, Plugin, ResMut, SpriteBundle, Transform};
-use bevy::sprite::ColorMaterial;
+use bevy::prelude::{
+	Commands, Component, ConfigurableSystem, Local, Plugin, SpriteBundle, Transform,
+};
+
+use crate::prelude::{Tileset, Tilesets};
 
 /// A component attached to the debug atlas sprite(s)
 ///
 /// This can be used to query for the sprite(s) in other systems
+#[derive(Component)]
 pub struct DebugTilesetSprite;
 
 /// A plugin used to debug tilesets, displaying them as sprites
@@ -25,8 +28,8 @@ pub struct DebugTilesetPlugin {
 }
 
 impl Plugin for DebugTilesetPlugin {
-	fn build(&self, app: &mut AppBuilder) {
-		app.add_system(display_tilesets.system().config(|params| {
+	fn build(&self, app: &mut App) {
+		app.add_system(display_tilesets.config(|params| {
 			params.0 = Some(DebugState {
 				loaded: false,
 				name: self.tileset_name.clone(),
@@ -91,12 +94,7 @@ struct DebugState {
 	position: Vec3,
 }
 
-fn display_tilesets(
-	mut state: Local<DebugState>,
-	tilesets: Tilesets,
-	mut commands: Commands,
-	mut materials: ResMut<Assets<ColorMaterial>>,
-) {
+fn display_tilesets(mut state: Local<DebugState>, tilesets: Tilesets, mut commands: Commands) {
 	if state.loaded {
 		return;
 	}
@@ -108,7 +106,7 @@ fn display_tilesets(
 	let mut spawner = |tileset: &Tileset| {
 		commands
 			.spawn_bundle(SpriteBundle {
-				material: materials.add(tileset.texture().clone().into()),
+				texture: tileset.texture().clone(),
 				transform: Transform::from_translation(state.position + offset),
 				..Default::default()
 			})

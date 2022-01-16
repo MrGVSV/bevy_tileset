@@ -1,19 +1,19 @@
 use bevy::asset::{Asset, AssetPath, AssetServer, Handle};
-use bevy::prelude::{Res, Texture};
+use bevy::prelude::{Image, Res};
 use bevy_tileset_tiles::prelude::*;
 
 pub trait TextureLoader {
-	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture>;
+	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Image>;
 }
 
 impl TextureLoader for AssetServer {
-	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture> {
+	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Image> {
 		self.load(path)
 	}
 }
 
 impl<'w> TextureLoader for Res<'w, AssetServer> {
-	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture> {
+	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Image> {
 		self.load(path)
 	}
 }
@@ -33,6 +33,7 @@ impl<'w> TextureLoader for Res<'w, AssetServer> {
 ///
 /// ```
 /// # use bevy_tileset_core::prelude::*;
+/// # use bevy_tileset_tiles::prelude::*;
 /// # use bevy::prelude::*;
 ///
 /// fn create_handles(tiles: Vec<TileDef>, asset_server: &AssetServer) -> Vec<TileHandle> {
@@ -53,7 +54,7 @@ pub fn load_tile_handles<TTiles: IntoIterator<Item = TileDef>, TLoader: TextureL
 			name: tile_def.name.clone(),
 			tile: match &tile_def.tile {
 				TileDefType::Standard(path) => TileHandleType::Standard(
-					asset_loader.load_texture::<Texture, &str>(path.as_str()),
+					asset_loader.load_texture::<Image, &str>(path.as_str()),
 				),
 				TileDefType::Animated(anim) => {
 					TileHandleType::Animated(load_animated(anim, asset_loader))
@@ -86,7 +87,7 @@ fn load_animated<TLoader: TextureLoader>(
 		frames: def
 			.frames
 			.iter()
-			.map(|frame| asset_loader.load_texture::<Texture, &str>(frame.as_str()))
+			.map(|frame| asset_loader.load_texture::<Image, &str>(frame.as_str()))
 			.collect(),
 	}
 }
@@ -99,9 +100,9 @@ fn load_variant<TLoader: TextureLoader>(
 	VariantTileHandle {
 		weight: def.weight,
 		tile: match &def.tile {
-			SimpleTileDefType::Standard(path) => SimpleTileHandle::Standard(
-				asset_loader.load_texture::<Texture, &str>(path.as_str()),
-			),
+			SimpleTileDefType::Standard(path) => {
+				SimpleTileHandle::Standard(asset_loader.load_texture::<Image, &str>(path.as_str()))
+			}
 			SimpleTileDefType::Animated(anim) => {
 				SimpleTileHandle::Animated(load_animated(anim, asset_loader))
 			}

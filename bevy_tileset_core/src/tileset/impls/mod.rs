@@ -1,6 +1,6 @@
 //! Implementation details for [`Tileset`] and [`RawTileset`]
 
-use bevy::prelude::{Handle, Texture, TextureAtlas, Vec2};
+use bevy::prelude::{Handle, Image, TextureAtlas, Vec2};
 
 #[cfg(feature = "auto-tile")]
 pub use auto::*;
@@ -93,9 +93,9 @@ macro_rules! impl_tileset {
 			///
 			/// * `index`: The tile's index
 			///
-			/// returns: Option<&Handle<Texture>>
+			/// returns: Option<&Handle<Image>>
 			///
-			pub fn get_tile_handle(&self, index: &usize) -> Option<&Handle<Texture>> {
+			pub fn get_tile_handle(&self, index: &usize) -> Option<&Handle<Image>> {
 				self.tile_handles.get(index)
 			}
 
@@ -244,7 +244,7 @@ impl RawTileset {
 	}
 
 	/// Gets the handle to the `TextureAtlas`'s texture
-	pub fn texture(&self) -> &Handle<Texture> {
+	pub fn texture(&self) -> &Handle<Image> {
 		&self.atlas.texture
 	}
 }
@@ -256,7 +256,7 @@ impl Tileset {
 	}
 
 	/// Gets the handle to the `TextureAtlas`'s texture
-	pub fn texture(&self) -> &Handle<Texture> {
+	pub fn texture(&self) -> &Handle<Image> {
 		&self.texture
 	}
 }

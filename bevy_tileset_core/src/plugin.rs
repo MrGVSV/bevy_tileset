@@ -6,11 +6,11 @@ use bevy::prelude::*;
 pub struct TilesetPlugin {}
 
 impl Plugin for TilesetPlugin {
-	fn build(&self, app: &mut AppBuilder) {
+	fn build(&self, app: &mut App) {
 		app.add_asset::<Tileset>()
 			.init_asset_loader::<TilesetAssetLoader>()
 			.init_resource::<TilesetMap>()
-			.add_system(tileset_event_sys.system());
+			.add_system(tileset_event_sys);
 	}
 }
 
