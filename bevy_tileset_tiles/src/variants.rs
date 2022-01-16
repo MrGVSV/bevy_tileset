@@ -1,6 +1,6 @@
 use crate::prelude::{AnimatedTileData, AnimatedTileDef, AnimatedTileHandle};
 use bevy_asset::Handle;
-use bevy_render::texture::Texture;
+use bevy_render::texture::Image;
 use serde::{Deserialize, Serialize};
 
 /// A structure defining a _variant_ tile
@@ -37,7 +37,7 @@ pub struct VariantTileHandle {
 /// An enum defining "simple" tile types
 #[derive(Debug, Clone)]
 pub enum SimpleTileHandle {
-	Standard(Handle<Texture>),
+	Standard(Handle<Image>),
 	Animated(AnimatedTileHandle),
 }
 
