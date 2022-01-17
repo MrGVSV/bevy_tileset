@@ -1,4 +1,5 @@
-use crate::auto::traits::{AutoTile, AutoTileRequest, AutoTilemap, TileCoords};
+use crate::auto::traits::{AutoTile, AutoTileRequest, AutoTilemap};
+use crate::coords::TileCoords;
 use bevy::math::IVec2;
 use bevy::utils::{HashMap, HashSet};
 use bevy_tileset_tiles::auto::AutoTileRule;

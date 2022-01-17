@@ -2,6 +2,7 @@
 //! * Auto tiling
 //! * Tileset loading
 //! * Smart tile placement
+//! * Some serialization/deserialization
 
 mod helpers;
 
@@ -26,6 +27,7 @@ fn main() {
 		// /== Required === //
 		// === Exmaple-Specific === //
 		.init_resource::<MyTileset>()
+		.init_resource::<SavedMap>()
 		// This is the debug plugin. It basically just spawns our tileset in as a sprite
 		.add_plugin(DebugTilesetPlugin::single_with_position(
 			MY_TILESET,
@@ -64,6 +66,12 @@ fn main() {
 struct MyTileset {
 	/// This stores the handle to our tileset so it doesn't get unloaded
 	handle: Option<Handle<Tileset>>,
+}
+
+#[derive(Default)]
+struct SavedMap {
+	/// The currently saved tilemap
+	map: Option<SerializableTilemap>,
 }
 
 /// Starts the tileset loading process
@@ -199,7 +207,12 @@ fn on_tile_click(
 }
 
 /// System controlling the "Build Mode"
-fn on_keypress(keys: Res<Input<KeyCode>>, mut build_mode: ResMut<BuildMode>) {
+fn on_keypress(
+	keys: Res<Input<KeyCode>>,
+	mut build_mode: ResMut<BuildMode>,
+	mut serializer: TilemapSerializer,
+	mut saved: ResMut<SavedMap>,
+) {
 	if keys.just_pressed(KeyCode::W) {
 		build_mode.tile_name = String::from("Wall");
 	} else if keys.just_pressed(KeyCode::G) {
@@ -216,6 +229,16 @@ fn on_keypress(keys: Res<Input<KeyCode>>, mut build_mode: ResMut<BuildMode>) {
 		build_mode.active_layer = 1u16;
 	} else if keys.just_pressed(KeyCode::Key3) {
 		build_mode.active_layer = 2u16;
+	} else if keys.just_pressed(KeyCode::Comma) {
+		saved.map = serializer.save_maps();
+		println!(
+			"{}",
+			serde_json::to_string(&saved.map.as_ref().unwrap()).unwrap()
+		);
+	} else if keys.just_pressed(KeyCode::Period) {
+		if let Some(map) = &saved.map {
+			serializer.load_maps(map);
+		}
 	}
 }
 
@@ -236,12 +259,18 @@ fn update_text(
 	mut query: Query<&mut Text, With<HudText>>,
 	tilesets: Tilesets,
 	build_mode: Res<BuildMode>,
+	saved: Res<SavedMap>,
 ) {
 	for mut text in query.iter_mut() {
 		text.sections[1].value = format!("{}", tilesets.get_by_name(MY_TILESET).is_some());
 		text.sections[4].value = build_mode.tile_name.to_string();
 		text.sections[7].value = format!("{}", build_mode.active_layer + 1);
 		text.sections[9].value = String::from("3");
+		text.sections[20].style.color = if saved.map.is_some() {
+			Color::rgba(0.75, 0.75, 0.75, 0.65)
+		} else {
+			Color::rgba(0.65, 0.65, 0.65, 0.25)
+		};
 	}
 }
 
@@ -355,6 +384,14 @@ fn setup_hud(mut commands: Commands, asset_server: Res<AssetServer>) {
 					},
 					TextSection {
 						value: "  ( e ) Set tile to 'Empty'\n".to_string(),
+						style: style_small.clone(),
+					},
+					TextSection {
+						value: "  ( , ) Save current tilemap\n".to_string(),
+						style: style_small.clone(),
+					},
+					TextSection {
+						value: "  ( . ) Load saved tilemap\n".to_string(),
 						style: style_small,
 					},
 					TextSection {
