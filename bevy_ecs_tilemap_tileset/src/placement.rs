@@ -1,4 +1,3 @@
-use crate::prelude::*;
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 use bevy_tileset::prelude::*;
@@ -30,7 +29,7 @@ use bevy_tileset::prelude::*;
 pub fn init_tile(
 	name: &str,
 	tileset: &Tileset,
-	position: UVec2,
+	position: TilePos,
 	commands: &mut Commands,
 	layer_builder: &mut LayerBuilder<TileBundle>,
 ) -> Option<Entity> {
@@ -41,7 +40,7 @@ pub fn init_tile(
 pub fn init_tile_by_id<TId: Into<PartialTileId>>(
 	id: TId,
 	tileset: &Tileset,
-	position: UVec2,
+	position: TilePos,
 	commands: &mut Commands,
 	layer_builder: &mut LayerBuilder<TileBundle>,
 ) -> Option<Entity> {
@@ -60,7 +59,7 @@ pub fn init_tile_by_id<TId: Into<PartialTileId>>(
 					.into(),
 				)
 				.ok();
-			layer_builder.get_tile_entity(position).ok()?
+			layer_builder.get_tile_entity(commands, position).ok()?
 		}
 		TileIndex::Animated(start, end, speed) => {
 			layer_builder
@@ -73,7 +72,7 @@ pub fn init_tile_by_id<TId: Into<PartialTileId>>(
 					.into(),
 				)
 				.ok();
-			let entity = layer_builder.get_tile_entity(position).ok()?;
+			let entity = layer_builder.get_tile_entity(commands, position).ok()?;
 			commands
 				.entity(entity)
 				.insert(GPUAnimated::new(start as u32, end as u32, speed));
@@ -128,7 +127,7 @@ pub fn init_tile_by_id<TId: Into<PartialTileId>>(
 pub fn place_tile(
 	name: &str,
 	tileset: &Tileset,
-	position: UVec2,
+	position: TilePos,
 	map_id: u16,
 	layer_id: u16,
 	commands: &mut Commands,
@@ -141,7 +140,7 @@ pub fn place_tile(
 pub fn place_tile_by_id<TId: Into<PartialTileId>>(
 	id: TId,
 	tileset: &Tileset,
-	position: UVec2,
+	position: TilePos,
 	map_id: u16,
 	layer_id: u16,
 	commands: &mut Commands,
@@ -265,8 +264,11 @@ fn apply_auto_tile<TId: Into<PartialTileId>>(
 ) {
 	let mut cmds = commands.entity(entity);
 	if let TileType::Auto(..) = tile_data.tile() {
-		cmds.insert(AutoTile::new(id.into().group_id, *tileset.id()));
+		cmds.insert(bevy_tileset::auto::AutoTileId {
+			group_id: id.into().group_id,
+			tileset_id: *tileset.id(),
+		});
 	} else {
-		cmds.remove::<AutoTile>();
+		cmds.remove::<bevy_tileset::auto::AutoTileId>();
 	}
 }

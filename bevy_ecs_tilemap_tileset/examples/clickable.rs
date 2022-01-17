@@ -7,9 +7,10 @@ mod helpers;
 
 use bevy::prelude::*;
 
-use bevy_ecs_tilemap::{GPUAnimated, MapQuery, Tile, TilemapPlugin};
+use bevy_ecs_tilemap::{ChunkSize, GPUAnimated, MapQuery, MapSize, Tile, TilePos, TilemapPlugin};
 use bevy_ecs_tilemap_tileset::prelude::*;
 use bevy_ecs_tilemap_tileset::tileset::debug::DebugTilesetPlugin;
+use bevy_tileset::auto::AutoTileId;
 
 /// The name of the tileset we'll be loading in this example
 ///
@@ -17,7 +18,7 @@ use bevy_ecs_tilemap_tileset::tileset::debug::DebugTilesetPlugin;
 const MY_TILESET: &str = "My Awesome Tileset";
 
 fn main() {
-	App::build()
+	App::new()
 		// === Required === //
 		.add_plugins(DefaultPlugins)
 		.add_plugin(TilemapPlugin)
@@ -35,12 +36,13 @@ fn main() {
 			active_layer: 0u16,
 		})
 		.add_event::<helpers::ClickEvent>()
-		.add_startup_system(load_tiles.system())
-		.add_startup_system(setup_hud.system())
-		.add_system(build_map.system())
-		.add_system(on_keypress.system())
-		.add_system(helpers::on_click.system())
-		.add_system(update_text.system())
+		.add_startup_system(load_tiles)
+		.add_startup_system(setup_hud)
+		.add_system(build_map)
+		.add_system(on_keypress)
+		.add_system(helpers::on_click)
+		.add_system(helpers::set_texture_filters_to_nearest)
+		.add_system(update_text)
 		// ! ---------------------- ! //
 		// ! ⚠️ --- Important --- ⚠️ ! //
 		// ! ---------------------- ! //
@@ -52,7 +54,7 @@ fn main() {
 		// work just fine.
 		.add_system_to_stage(
 			TilesetStage,
-			on_tile_click.system().before(TilesetLabel::RemoveAutoTiles),
+			on_tile_click.before(TilesetLabel::RemoveAutoTiles),
 		)
 		// /== Exmaple-Specific === //
 		.run();
@@ -79,7 +81,6 @@ struct BuildMapState {
 fn build_map(
 	tilesets: Tilesets,
 	mut commands: Commands,
-	mut materials: ResMut<Assets<ColorMaterial>>,
 	mut map_query: MapQuery,
 	mut local_state: Local<BuildMapState>,
 ) {
@@ -96,8 +97,8 @@ fn build_map(
 		println!("{:#?}", tileset);
 
 		// === Settings === //
-		let map_size = UVec2::new(4, 4);
-		let chunk_size = UVec2::new(5, 5);
+		let map_size = MapSize(4, 4);
+		let chunk_size = ChunkSize(5, 5);
 		let layer_count = 3;
 		let default_tile = match tileset.get_tile_index("Empty").unwrap() {
 			TileIndex::Standard(index) => index,
@@ -111,7 +112,6 @@ fn build_map(
 			chunk_size,
 			layer_count,
 			default_tile,
-			&mut materials,
 			&mut commands,
 			&mut map_query,
 		);
@@ -138,7 +138,7 @@ struct BuildMode {
 fn on_tile_click(
 	tilesets: Tilesets,
 	build_mode: Res<BuildMode>,
-	query: Query<(&Tile, Option<&AutoTile>, Option<&GPUAnimated>)>,
+	query: Query<(&Tile, Option<&AutoTileId>, Option<&GPUAnimated>)>,
 	mut event_writer: EventWriter<RemoveAutoTileEvent>,
 	mut event_reader: EventReader<helpers::ClickEvent>,
 	mut map_query: MapQuery,
@@ -149,7 +149,7 @@ fn on_tile_click(
 			let mut should_place = true;
 			let layer_id = build_mode.active_layer;
 			let tile_name = &build_mode.tile_name;
-			let pos = *pos;
+			let pos: TilePos = (*pos).into();
 
 			if let Ok(entity) = map_query.get_tile_entity(pos, 0u16, layer_id) {
 				if let Ok((tile, auto, ..)) = query.get(entity) {
@@ -160,10 +160,10 @@ fn on_tile_click(
 						// Tiles match --> Remove
 						should_place = false;
 						map_query
-							.despawn_tile(&mut commands, pos, 0, layer_id)
+							.despawn_tile(&mut commands, pos, 0u16, layer_id)
 							.unwrap();
 						// Make sure to notify the chunk!
-						map_query.notify_chunk_for_tile(pos, 0, layer_id);
+						map_query.notify_chunk_for_tile(pos, 0u16, layer_id);
 					}
 
 					// Whether removed or replaced -> notify auto tile system
@@ -230,7 +230,7 @@ fn on_keypress(keys: Res<Input<KeyCode>>, mut build_mode: ResMut<BuildMode>) {
 
 // All HUD related things from this point onwards
 // No need to scroll further (unless you want to...)
-
+#[derive(Component)]
 struct HudText;
 fn update_text(
 	mut query: Query<&mut Text, With<HudText>>,
