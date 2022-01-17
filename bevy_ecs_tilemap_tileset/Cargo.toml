@@ -13,8 +13,8 @@ exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 
 [dependencies]
 bevy_tileset = { path = "..", version = "0.2" }
-bevy = { version = "0.5", default-features = false }
-bevy_ecs_tilemap = "0.4"
+bevy = { version = "0.6", default-features = false }
+bevy_ecs_tilemap = "0.5"
 serde = "1.0"
 
 [features]
@@ -25,4 +25,4 @@ auto-tile = ["variants", "bevy_tileset/auto-tile"]
 [[example]]
 name = "clickable"
 path = "examples/clickable.rs"
-required-features = ["auto-tile"]
+required-features = ["auto-tile", "bevy/default"]

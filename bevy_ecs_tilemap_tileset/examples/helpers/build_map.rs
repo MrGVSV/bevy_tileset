@@ -5,16 +5,14 @@ use bevy_ecs_tilemap_tileset::prelude::*;
 
 pub fn build_map(
 	tileset: &Tileset,
-	map_size: UVec2,
-	chunk_size: UVec2,
+	map_size: MapSize,
+	chunk_size: ChunkSize,
 	layer_count: u16,
 	default_tile: u16,
-	materials: &mut ResMut<Assets<ColorMaterial>>,
 	commands: &mut Commands,
 	map_query: &mut MapQuery,
 ) -> Entity {
 	let tileset_handle = tileset.texture().clone();
-	let tileset_material_handle = materials.add(tileset_handle.into());
 
 	let map_entity = commands.spawn().id();
 	let mut map = Map::new(0u16, map_entity);
@@ -25,7 +23,7 @@ pub fn build_map(
 		chunk_size,
 		layer_count,
 		default_tile,
-		&tileset_material_handle,
+		&tileset_handle,
 		commands,
 		map_query,
 	);
@@ -36,7 +34,7 @@ pub fn build_map(
 	}
 
 	let tile_size = tileset.tile_size();
-	let world_size = UVec2::new(map_size.x * chunk_size.x, map_size.y * chunk_size.y).as_f32();
+	let world_size = UVec2::new(map_size.0 * chunk_size.0, map_size.1 * chunk_size.1).as_vec2();
 	let mut offset = Vec2::new(tile_size.x * world_size.x, tile_size.y * world_size.y);
 	offset /= 2.0;
 
@@ -55,15 +53,21 @@ pub fn build_map(
 
 pub fn build_layers(
 	tileset: &Tileset,
-	map_size: UVec2,
-	chunk_size: UVec2,
+	map_size: MapSize,
+	chunk_size: ChunkSize,
 	layer_count: u16,
 	default_tile: u16,
-	material_handle: &Handle<ColorMaterial>,
+	material_handle: &Handle<Image>,
 	commands: &mut Commands,
 	map_query: &mut MapQuery,
 ) -> Vec<Entity> {
-	let settings = LayerSettings::new(map_size, chunk_size, tileset.tile_size(), tileset.size());
+	let texture_size = tileset.size();
+	let settings = LayerSettings::new(
+		map_size,
+		chunk_size,
+		tileset.tile_size().into(),
+		TextureSize(texture_size.x, texture_size.y),
+	);
 
 	let mut layers = Vec::with_capacity(layer_count as usize);
 	for layer_id in 0..layer_count {

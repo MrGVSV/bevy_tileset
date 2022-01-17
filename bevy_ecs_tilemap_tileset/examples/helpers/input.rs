@@ -17,7 +17,7 @@ pub fn on_click(
 
 	let wnd = wnds.get_primary().unwrap();
 	if let Some(pos) = wnd.cursor_position() {
-		let cam = query.single().unwrap();
+		let cam = query.single();
 		let mut pos = window_to_world(&pos, wnd, cam).xy();
 		pos /= Vec2::new(32.0, 32.0);
 
@@ -41,7 +41,7 @@ pub fn click_to_coord(
 
 	let wnd = wnds.get_primary().unwrap();
 	if let Some(pos) = wnd.cursor_position() {
-		let cam = query.single().unwrap();
+		let cam = query.single();
 		let mut pos = window_to_world(&pos, wnd, cam).xy();
 		pos /= Vec2::new(32.0, 32.0);
 
