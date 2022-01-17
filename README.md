@@ -23,12 +23,12 @@ Add one of the following lines to your `Cargo.toml`.
 
 ```toml
 [dependencies]
-bevy_tileset_tiles = "0.2" # For the base tile definitions
-bevy_tileset = "0.2" # For general tileset usage (includes above)
+bevy_tileset_tiles = "0.3" # For the base tile definitions
+bevy_tileset = "0.3" # For general tileset usage (includes above)
 
 # The bevy_ecs_tilemap integration crate has not yet been published
-# So you will need to get it from git
-bevy_ecs_tilemap_tileset = { git = "https://github.com/MrGVSV/bevy_tileset", version = "0.2" }
+# So the you will need to get it from git
+bevy_ecs_tilemap_tileset = { git = "https://github.com/MrGVSV/bevy_tileset", version = "0.3" }
 ```
 
 ## ✨ Usage
@@ -235,5 +235,6 @@ These tiles are defined with the [`bevy_ecs_tilemap`](https://github.com/StarAra
 
 | bevy | bevy_tileset |
 | ---- | ------------ |
+| 0.6  | 0.3          |
 | 0.5  | 0.2          |
 
