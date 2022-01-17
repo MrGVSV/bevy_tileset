@@ -16,15 +16,15 @@ use bevy::prelude::*;
 use bevy_tileset::prelude::*;
 
 fn main() {
-	App::build()
+	App::new()
 		// === Required === //
 		.add_plugins(DefaultPlugins)
 		.add_plugin(TilesetPlugin::default())
 		// /== Required === //
 		.init_resource::<MyTileset>()
-		.add_startup_system(load_tileset.system())
-		.add_system(check_loaded.system())
-		.add_system(show_tileset.system())
+		.add_startup_system(load_tileset)
+		.add_system(check_loaded)
+		.add_system(show_tileset)
 		.run();
 }
 
@@ -63,7 +63,7 @@ fn load_tileset(mut my_tileset: ResMut<MyTileset>, asset_server: Res<AssetServer
 	let mut handles = load_tile_handles(vec![dirt_tile, glass_tile], &asset_server);
 
 	// You can also manually construct the TileHandle yourself
-	let grass_handle: Handle<Texture> = asset_server.load("tiles/grass.png");
+	let grass_handle: Handle<Image> = asset_server.load("tiles/grass.png");
 	let grass_tile = TileHandle::new_standard("Dynamic Grass", grass_handle);
 	handles.push(grass_tile);
 
@@ -73,7 +73,7 @@ fn load_tileset(mut my_tileset: ResMut<MyTileset>, asset_server: Res<AssetServer
 fn check_loaded(
 	mut my_tileset: ResMut<MyTileset>,
 	asset_server: Res<AssetServer>,
-	mut textures: ResMut<Assets<Texture>>,
+	mut textures: ResMut<Assets<Image>>,
 ) {
 	if my_tileset.is_loaded || my_tileset.tiles.is_none() {
 		return;
@@ -121,8 +121,8 @@ fn check_loaded(
 fn show_tileset(
 	mut commands: Commands,
 	my_tileset: Res<MyTileset>,
-	mut materials: ResMut<Assets<ColorMaterial>>,
 	mut has_ran: Local<bool>,
+	mut textures: ResMut<Assets<Image>>,
 ) {
 	if my_tileset.raw_tileset.is_none() || *has_ran {
 		return;
@@ -135,7 +135,7 @@ fn show_tileset(
 	let texture = raw_tileset.texture().clone();
 	commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 	commands.spawn_bundle(SpriteBundle {
-		material: materials.add(texture.into()),
+		texture,
 		transform: Transform::from_xyz(0.0, 0.0, 0.0),
 		..Default::default()
 	});
@@ -146,8 +146,11 @@ fn show_tileset(
 			TileIndex::Standard(index) => {
 				// Do something standard
 				if let Some(handle) = raw_tileset.get_tile_handle(index) {
+					let mut texture = handle.clone();
+					// Handles in the tileset are weak by default so we'll need to make it strong again so the image doesn't unload
+					texture.make_strong(&mut textures);
 					commands.spawn_bundle(SpriteBundle {
-						material: materials.add(handle.clone().into()),
+						texture,
 						transform: Transform::from_xyz(0.0, 48.0, 0.0),
 						..Default::default()
 					});

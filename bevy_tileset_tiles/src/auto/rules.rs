@@ -63,7 +63,7 @@ impl AutoTileRule {
 	/// # Examples
 	///
 	/// ```
-	/// # use tileset_tiles::AutoTileRule;
+	/// # use bevy_tileset_tiles::prelude::AutoTileRule;
 	///
 	/// let a = AutoTileRule { north: Some(true), ..Default::default() };
 	/// let b = AutoTileRule { north: Some(true), east: Some(true), south: Some(false), ..Default::default() };
@@ -123,7 +123,7 @@ impl AutoTileRule {
 
 #[cfg(test)]
 mod tests {
-	use crate::AutoTileRule;
+	use crate::prelude::AutoTileRule;
 
 	#[test]
 	fn should_be_subset() {

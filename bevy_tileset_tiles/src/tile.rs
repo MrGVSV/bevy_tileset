@@ -1,10 +1,10 @@
-use crate::prelude::{AnimatedTileData, AnimatedTileDef, AnimatedTileHandle};
 use bevy_asset::{AssetServer, Handle, LoadState};
-use bevy_render::texture::Texture;
+use bevy_render::texture::Image;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "auto-tile")]
 use crate::auto::*;
+use crate::prelude::{AnimatedTileData, AnimatedTileDef, AnimatedTileHandle};
 #[cfg(feature = "variants")]
 use crate::variants::*;
 
@@ -42,7 +42,7 @@ pub struct TileHandle {
 /// An enum defining the tile's type
 #[derive(Debug, Clone)]
 pub enum TileHandleType {
-	Standard(Handle<Texture>),
+	Standard(Handle<Image>),
 	Animated(AnimatedTileHandle),
 	#[cfg(feature = "variants")]
 	Variant(Vec<VariantTileHandle>),
@@ -159,7 +159,7 @@ impl TileType {
 }
 
 impl TileHandle {
-	pub fn new_standard<TName: Into<String>>(name: TName, handle: Handle<Texture>) -> Self {
+	pub fn new_standard<TName: Into<String>>(name: TName, handle: Handle<Image>) -> Self {
 		Self {
 			name: name.into(),
 			tile: TileHandleType::Standard(handle),
@@ -197,7 +197,7 @@ impl TileHandle {
 		asset_server.get_group_load_state(self.iter_handles().map(|handle| handle.id))
 	}
 
-	pub fn iter_handles(&self) -> Box<dyn Iterator<Item = &Handle<Texture>> + '_> {
+	pub fn iter_handles(&self) -> Box<dyn Iterator<Item = &Handle<Image>> + '_> {
 		match &self.tile {
 			TileHandleType::Standard(handle) => Box::new(std::iter::once(handle)),
 			TileHandleType::Animated(anim) => Box::new(anim.frames.iter()),
@@ -214,10 +214,10 @@ impl TileHandle {
 #[cfg(feature = "variants")]
 fn iter_variant_handles<'a>(
 	variants: impl Iterator<Item = &'a VariantTileHandle>,
-) -> impl Iterator<Item = &'a Handle<Texture>> {
+) -> impl Iterator<Item = &'a Handle<Image>> {
 	variants
 		.map(|variant| {
-			let iter: Box<dyn Iterator<Item = &Handle<Texture>>> = match &variant.tile {
+			let iter: Box<dyn Iterator<Item = &Handle<Image>>> = match &variant.tile {
 				SimpleTileHandle::Standard(handle) => Box::new(std::iter::once(handle)),
 				SimpleTileHandle::Animated(anim) => Box::new(anim.frames.iter()),
 			};
@@ -228,8 +228,9 @@ fn iter_variant_handles<'a>(
 
 #[cfg(test)]
 mod tests {
-	use crate::prelude::*;
 	use bevy_asset::Handle;
+
+	use crate::prelude::*;
 
 	#[test]
 	fn should_iter_standard() {

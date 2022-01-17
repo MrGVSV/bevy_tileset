@@ -5,7 +5,7 @@ use std::sync::{Arc, RwLock};
 use bevy::asset::{
 	Asset, AssetLoader, AssetPath, BoxedFuture, Handle, HandleId, LoadContext, LoadedAsset,
 };
-use bevy::render::texture::{ImageType, Texture};
+use bevy::render::texture::{Image, ImageType};
 use bevy::utils::Uuid;
 use bevy_tile_atlas::TextureStore;
 use bevy_tileset_tiles::prelude::{TileDef, TileHandle};
@@ -41,13 +41,13 @@ struct TilesetTextureLoader<'x, 'y> {
 /// A struct that mimics a Bevy `Assets<Texture>` resource by allowing get/add operations
 struct TilesetTextureStore<'x, 'y> {
 	load_context: &'x mut LoadContext<'y>,
-	images: HashMap<HandleId, Texture>,
+	images: HashMap<HandleId, Image>,
 }
 
 impl<'x, 'y> TextureLoader for TilesetTextureLoader<'x, 'y> {
-	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Texture> {
+	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Image> {
 		let asset_path = path.into().clone();
-		let handle: Handle<Texture> = self.load_context.get_handle(asset_path.clone());
+		let handle: Handle<Image> = self.load_context.get_handle(asset_path.clone());
 		let path = asset_path.path().to_path_buf();
 
 		if let Ok(mut images) = self.bytes.try_write() {
@@ -59,7 +59,7 @@ impl<'x, 'y> TextureLoader for TilesetTextureLoader<'x, 'y> {
 
 impl<'x, 'y> TilesetTextureLoader<'x, 'y> {
 	/// Load the images and collect them into a HashMap
-	fn collect_images(self) -> BoxedFuture<'x, Result<HashMap<HandleId, Texture>, TilesetError>> {
+	fn collect_images(self) -> BoxedFuture<'x, Result<HashMap<HandleId, Image>, TilesetError>> {
 		let images = self.bytes.read().unwrap().clone();
 		Box::pin(async move {
 			let image_map = futures::future::join_all(
@@ -78,7 +78,7 @@ impl<'x, 'y> TilesetTextureLoader<'x, 'y> {
 }
 
 impl<'x, 'y> TextureStore for TilesetTextureStore<'x, 'y> {
-	fn add(&mut self, asset: Texture) -> Handle<Texture> {
+	fn add(&mut self, asset: Image) -> Handle<Image> {
 		//! This should only really be called once: When creating the tile texture atlas
 		//! since we'll need to track that asset as well.
 		let prefix = self
@@ -91,7 +91,7 @@ impl<'x, 'y> TextureStore for TilesetTextureStore<'x, 'y> {
 			.set_labeled_asset(&label, LoadedAsset::new(asset))
 	}
 
-	fn get<H: Into<HandleId>>(&self, handle: H) -> Option<&Texture> {
+	fn get<H: Into<HandleId>>(&self, handle: H) -> Option<&Image> {
 		self.images.get(&handle.into())
 	}
 }
@@ -207,14 +207,14 @@ async fn load_image(
 	context: &LoadContext<'_>,
 	id: HandleId,
 	path: PathBuf,
-) -> Result<(HandleId, Texture), TilesetError> {
+) -> Result<(HandleId, Image), TilesetError> {
 	let bytes = context
 		.read_asset_bytes(path.clone())
 		.await
 		.map_err(|err| TilesetError::AssetIoError(err))?;
 	let path = path.as_path();
 	let ext = path.extension().unwrap().to_str().unwrap();
-	let img = Texture::from_buffer(&bytes, ImageType::Extension(ext))
+	let img = Image::from_buffer(&bytes, ImageType::Extension(ext))
 		.map_err(|err| TilesetError::ImageError(err))?;
 	Ok((id, img))
 }

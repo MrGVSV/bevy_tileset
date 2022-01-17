@@ -1,6 +1,6 @@
 use crate::ids::PartialTileId;
 use crate::prelude::*;
-use bevy::prelude::{Handle, Texture};
+use bevy::prelude::{Handle, Image};
 use bevy_tile_atlas::{TextureStore, TileAtlasBuilder, TileAtlasBuilderError};
 use bevy_tileset_tiles::prelude::*;
 use std::collections::HashMap;
@@ -17,7 +17,7 @@ pub struct TilesetBuilder {
 	/// The tile names mapped by their ID
 	tile_names: HashMap<TileGroupId, String>,
 	/// The tile handles mapped by their index in the atlas
-	tile_handles: HashMap<usize, Handle<Texture>>,
+	tile_handles: HashMap<usize, Handle<Image>>,
 	/// The tile IDs mapped by their index in the atlas
 	tile_indices: HashMap<usize, PartialTileId>,
 	/// The current tile group ID being processed
@@ -101,7 +101,7 @@ impl TilesetBuilder {
 	/// # use bevy_tileset_core::prelude::*;
 	/// # use bevy_tileset_core::tiles::*;
 	///
-	/// fn tileset_creator(textures: Res<Assets<Texture>>) {
+	/// fn tileset_creator(textures: Res<Assets<Image>>) {
 	/// 	let mut builder = TilesetBuilder::default();
 	/// 	let tile = TileHandle::new_standard("My Tile", Handle::default());
 	/// 	builder.add_tile(tile, 123, &textures);
@@ -237,7 +237,7 @@ impl TilesetBuilder {
 
 	fn insert_handle<TStore: TextureStore>(
 		&mut self,
-		handle: &Handle<Texture>,
+		handle: &Handle<Image>,
 		textures: &TStore,
 	) -> Result<usize, TilesetError> {
 		if let Some(texture) = textures.get(handle) {
@@ -249,8 +249,8 @@ impl TilesetBuilder {
 
 	pub fn add_texture(
 		&mut self,
-		handle: &Handle<Texture>,
-		texture: &Texture,
+		handle: &Handle<Image>,
+		texture: &Image,
 	) -> Result<usize, TilesetError> {
 		let index = self
 			.atlas_builder

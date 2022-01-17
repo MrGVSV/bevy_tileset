@@ -25,6 +25,7 @@ macro_rules! impl_tileset {
 			/// # use bevy::prelude::{Commands, Res};
 			/// # use bevy_ecs_tilemap::MapQuery;
 			/// # use bevy_tileset_core::prelude::*;
+			/// # use bevy_tileset_tiles::prelude::AutoTileRule;
 			///
 			/// fn place_tile(tileset: Res<Tileset>, mut commands: Commands, mut map_query: MapQuery) {
 			/// 	// Matches:

@@ -1,5 +1,5 @@
 use bevy_asset::Handle;
-use bevy_render::texture::Texture;
+use bevy_render::texture::Image;
 use serde::{Deserialize, Serialize};
 
 /// A structure defining an animated tile
@@ -23,7 +23,7 @@ pub struct AnimatedTileHandle {
 	/// The frames of the animation
 	///
 	/// Each frame is a registered [`Handle`]
-	pub frames: Vec<Handle<Texture>>,
+	pub frames: Vec<Handle<Image>>,
 }
 
 /// A structure defining an animated tile
