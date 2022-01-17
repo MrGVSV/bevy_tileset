@@ -2,9 +2,8 @@
 
 use bevy::app::App;
 use bevy::math::Vec3;
-use bevy::prelude::{
-	Commands, Component, ConfigurableSystem, Local, Plugin, SpriteBundle, Transform,
-};
+use bevy::prelude::{Commands, Component, ConfigurableSystem, Local, Plugin, Transform};
+use bevy::sprite::SpriteBundle;
 
 use crate::prelude::{Tileset, Tilesets};
 

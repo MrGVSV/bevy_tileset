@@ -13,7 +13,7 @@ exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 
 [dependencies]
 bevy_tileset_tiles = { path = "../bevy_tileset_tiles", version = "0.3" }
-bevy = { version = "0.6", default-features = false }
+bevy = { version = "0.6", default-features = false, features = ["render", "png"] }
 bevy_tile_atlas = "0.2"
 ron = "0.7.0"
 serde = "1.0"
