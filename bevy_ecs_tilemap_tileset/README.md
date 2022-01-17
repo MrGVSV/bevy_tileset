@@ -79,7 +79,7 @@ fn load_maps(mut serializer: TilemapSerializer) {
 }
 ```
 
-To see this in action, check out the [serialization](https://github.com/MrGVSV/bevy_tileset/blob/main/bevy_ecs_tilemap_tileset/examples/serialization.rs) example, Again, as long as you set everything up using tilesets, it should work pretty much as expected.
+Check out the [serialization](https://github.com/MrGVSV/bevy_tileset/blob/main/bevy_ecs_tilemap_tileset/examples/serialization.rs) example to see how we turn some [JSON](https://github.com/MrGVSV/bevy_tileset/tree/main/bevy_ecs_tilemap_tileset/assets/map.json) into a full tilemap. Again, as long as you set everything up using tilesets, it should work pretty much as expected.
 
 ### 🧠 Auto Tiling
 
