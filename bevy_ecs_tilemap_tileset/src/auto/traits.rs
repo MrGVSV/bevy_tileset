@@ -1,5 +1,6 @@
+use crate::TileCoord;
 use bevy::math::IVec2;
-use bevy::prelude::{Entity, Query, UVec2, With};
+use bevy::prelude::{Entity, Query, With};
 use bevy_ecs_tilemap::{MapQuery, Tile, TileParent, TilePos};
 use bevy_tileset::auto::{AutoTile, AutoTileId};
 use std::cell::RefCell;
@@ -25,14 +26,6 @@ impl<'w, 's> TileQuery for Query<'w, 's, (Entity, &TilePos, &TileParent, &AutoTi
 	}
 }
 
-/// The corrdinates of the tile, including the `map_id` and `layer_id`
-#[derive(Copy, Clone, Debug, Default, Hash, Eq, PartialEq)]
-pub(super) struct TileCoord {
-	pub pos: TilePos,
-	pub map_id: u16,
-	pub layer_id: u16,
-}
-
 /// Defines a tile
 #[derive(Copy, Clone, Debug)]
 pub(super) struct TileInfo {
@@ -44,13 +37,6 @@ pub(super) struct TileInfo {
 pub(super) struct TilemapCache<'a, 'w, 's> {
 	pub tiles_query: &'a dyn TileQuery,
 	pub map_query: &'a RefCell<MapQuery<'w, 's>>,
-}
-
-impl bevy_tileset::auto::TileCoords for TileCoord {
-	fn pos(&self) -> IVec2 {
-		let pos: UVec2 = self.pos.into();
-		pos.as_ivec2()
-	}
 }
 
 impl TileInfo {

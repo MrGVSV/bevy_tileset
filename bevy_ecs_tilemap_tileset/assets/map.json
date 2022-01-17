@@ -1,0 +1,730 @@
+{
+  "data": {
+    "0": {
+      "0": [
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 1,
+            "tileset_id": 0
+          },
+          "pos": [
+            9,
+            2
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 1,
+            "tileset_id": 0
+          },
+          "pos": [
+            10,
+            2
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 1,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            2
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 1,
+            "tileset_id": 0
+          },
+          "pos": [
+            12,
+            2
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 1,
+            "tileset_id": 0
+          },
+          "pos": [
+            13,
+            2
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 1,
+            "tileset_id": 0
+          },
+          "pos": [
+            14,
+            2
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 1,
+            "tileset_id": 0
+          },
+          "pos": [
+            8,
+            2
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 9,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            9,
+            3
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 1,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            9,
+            4
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 18,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            9,
+            5
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 1,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            9,
+            6
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 18,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            9,
+            7
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 1,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            9,
+            8
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 18,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 2,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            9,
+            10
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 0,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            12,
+            9
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 2,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            10
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 0,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            10,
+            9
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 11,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            9
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 2,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            13,
+            10
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 19,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            13,
+            9
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 1,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            13,
+            8
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 19,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            13,
+            7
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 1,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            13,
+            6
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 19,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            13,
+            5
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 1,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            13,
+            4
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 10,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            13,
+            3
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 0,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            12,
+            3
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 17,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            3
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 0,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            10,
+            3
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 1,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            4
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 11,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            5
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 0,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            10,
+            5
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 0,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            12,
+            5
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 1,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            6
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 0,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            10,
+            7
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 11,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            7
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 0,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            12,
+            7
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 1,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            8
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 2,
+            "tileset_id": 0
+          },
+          "pos": [
+            10,
+            4
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 2,
+            "tileset_id": 0
+          },
+          "pos": [
+            12,
+            4
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 2,
+            "tileset_id": 0
+          },
+          "pos": [
+            12,
+            6
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 2,
+            "tileset_id": 0
+          },
+          "pos": [
+            10,
+            6
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 2,
+            "tileset_id": 0
+          },
+          "pos": [
+            10,
+            8
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 2,
+            "tileset_id": 0
+          },
+          "pos": [
+            12,
+            8
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 2,
+            "tileset_id": 0
+          },
+          "pos": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": {
+            "auto_index": null,
+            "variant_index": null,
+            "group_id": 2,
+            "tileset_id": 0
+          },
+          "pos": [
+            12,
+            10
+          ]
+        }
+      ],
+      "1": [
+        {
+          "id": {
+            "auto_index": 5,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            8,
+            11
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 17,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            9,
+            11
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 17,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            10,
+            11
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 17,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 17,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            12,
+            11
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 17,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            13,
+            11
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 4,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            14,
+            11
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 12,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            9,
+            12
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 16,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            10,
+            12
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 16,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            12
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 16,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 13,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            13,
+            12
+          ]
+        },
+        {
+          "id": {
+            "auto_index": 6,
+            "variant_index": 0,
+            "group_id": 4,
+            "tileset_id": 0
+          },
+          "pos": [
+            11,
+            3
+          ]
+        }
+      ]
+    }
+  }
+}

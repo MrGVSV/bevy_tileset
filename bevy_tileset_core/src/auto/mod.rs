@@ -3,7 +3,7 @@
 use bevy::prelude::Component;
 
 pub use auto_tiler::AutoTiler;
-pub use traits::{AutoTile, AutoTileRequest, AutoTilemap, TileCoords};
+pub use traits::{AutoTile, AutoTileRequest, AutoTilemap};
 
 use crate::ids::{TileGroupId, TileId, TilesetId};
 

@@ -8,21 +8,30 @@ repository = "https://github.com/MrGVSV/bevy_tileset"
 license = "MIT OR Apache-2.0"
 keywords = ["bevy", "tileset", "auto", "variant", "tile"]
 categories = ["game-development"]
-readme = "../README.md"
+readme = "README.md"
 exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 
 [dependencies]
 bevy_tileset = { path = "..", version = "0.2" }
 bevy = { version = "0.6", default-features = false }
 bevy_ecs_tilemap = "0.5"
-serde = "1.0"
+serde = { version = "1.0", optional = true }
+
+[dev-dependencies]
+serde_json = "1.0"
 
 [features]
 default = []
 variants = ["bevy_tileset/variants"]
 auto-tile = ["variants", "bevy_tileset/auto-tile"]
+serialization = ["serde"]
 
 [[example]]
 name = "clickable"
 path = "examples/clickable.rs"
-required-features = ["auto-tile", "bevy/default"]
+required-features = ["auto-tile", "bevy/default", "serialization"]
+
+[[example]]
+name = "serialization"
+path = "examples/serialization.rs"
+required-features = ["auto-tile", "bevy/default", "serialization"]

@@ -3,8 +3,10 @@ use bevy::math::Vec4Swizzles;
 use bevy::prelude::*;
 use bevy::render::camera::Camera;
 
+#[allow(dead_code)]
 pub struct ClickEvent(pub UVec2);
 
+#[allow(unused)]
 pub fn on_click(
 	query: Query<&Transform, With<WorldCamera>>,
 	wnds: Res<Windows>,
