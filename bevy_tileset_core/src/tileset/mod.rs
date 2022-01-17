@@ -1,4 +1,4 @@
-//! Tileset data and resources that contains, loads, and allows access to individual tiles
+//! Types for generating and managing tilesets
 
 use std::collections::HashMap;
 
