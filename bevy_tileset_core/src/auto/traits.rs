@@ -108,7 +108,7 @@ pub trait AutoTilemap {
 		pos: IVec2,
 		template: &<Self::Tile as AutoTile>::Coords,
 	) -> <Self::Tile as AutoTile>::Coords;
-	/// Get the tile at the given coordinates
+	/// Get the Auto Tile at the given coordinates
 	fn get_tile_at(&self, coords: &<Self::Tile as AutoTile>::Coords) -> Option<Self::Tile>;
 	/// Get the number of Auto Tiles in this tilemap
 	fn len(&self) -> usize;
