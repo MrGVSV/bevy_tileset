@@ -123,7 +123,7 @@ Defines an animated tile that can be generated with the `GPUAnimated` component 
 
 > With the `variants` feature enabled
 
-Defines a tile that has a set of possible variants. A random variant is chosen at random when placed. These variants can either be Standard or Animated.
+Defines a tile that has a set of possible variants. A variant is chosen at random when placed. These variants can either be Standard or Animated.
 
 ```rust
 // assets/tiles/my-variant-tile.ron
