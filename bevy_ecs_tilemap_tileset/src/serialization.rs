@@ -1,14 +1,13 @@
 //! Tools for serializing and deserializing entire tilemaps with one or more tilesets
 
 use bevy::ecs::system::SystemParam;
-use bevy::prelude::{Commands, Query};
+use bevy::prelude::Query;
 use bevy::utils::{AHashExt, HashMap};
-use bevy_ecs_tilemap::{MapQuery, Tile, TileParent, TilePos};
+use bevy_ecs_tilemap::{Tile, TileParent, TilePos};
 use serde::{Deserialize, Serialize};
 
+use crate::prelude::TilePlacer;
 use bevy_tileset::prelude::{TileId, TilesetParent, Tilesets};
-
-use crate::placement::place_tile_by_id;
 
 /// Contains serializable tilemap data
 #[derive(Debug, Copy, Clone, Deserialize, Serialize)]
@@ -37,9 +36,8 @@ pub struct TilemapSerializer<'w, 's> {
 			&'static TilesetParent,
 		),
 	>,
-	commands: Commands<'w, 's>,
-	map_query: MapQuery<'w, 's>,
 	tilesets: Tilesets<'w, 's>,
+	tile_placer: TilePlacer<'w, 's>,
 }
 
 macro_rules! save_tiles {
@@ -101,17 +99,9 @@ impl<'w, 's> TilemapSerializer<'w, 's> {
 		for (map_id, layers) in &tilemap.data {
 			for (layer_id, tiles) in layers.iter() {
 				for tile in tiles {
-					if let Some(tileset) = self.tilesets.get_by_id(&tile.id.tileset_id) {
-						place_tile_by_id(
-							tile.id,
-							tileset,
-							tile.pos,
-							*map_id,
-							*layer_id,
-							&mut self.commands,
-							&mut self.map_query,
-						);
-					}
+					self.tile_placer
+						.place(tile.id, tile.pos, *map_id, *layer_id)
+						.ok();
 				}
 			}
 		}

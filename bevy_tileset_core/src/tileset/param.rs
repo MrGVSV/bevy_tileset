@@ -1,13 +1,13 @@
 use crate::prelude::{Tileset, TilesetId};
 use bevy::asset::{Assets, Handle};
 use bevy::ecs::system::SystemParam;
-use bevy::prelude::{Query, Res, ResMut};
+use bevy::prelude::{Query, Res};
 use std::collections::HashMap;
 use std::ops::Deref;
 
 #[derive(SystemParam)]
 pub struct Tilesets<'w, 's> {
-	tileset_map: ResMut<'w, TilesetMap>,
+	tileset_map: Res<'w, TilesetMap>,
 	tilesets: Res<'w, Assets<Tileset>>,
 
 	/// This field only exists so we can add the `'s` lifetime without Rust freaking out

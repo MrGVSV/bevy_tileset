@@ -8,14 +8,16 @@ mod helpers;
 
 use bevy::prelude::*;
 
-use bevy_ecs_tilemap::{ChunkSize, GPUAnimated, MapQuery, MapSize, Tile, TilePos, TilemapPlugin};
+use bevy_ecs_tilemap::{ChunkSize, MapQuery, MapSize, TilePos, TilemapPlugin};
 use bevy_ecs_tilemap_tileset::prelude::*;
 use bevy_ecs_tilemap_tileset::tileset::debug::DebugTilesetPlugin;
-use bevy_tileset::auto::AutoTileId;
 
 /// The name of the tileset we'll be loading in this example
 ///
 /// This could be any string and doesn't need to be a constant or static.
+///
+/// Additionally, we could just use the handle to the tileset to access it, but we'll
+/// use this because the `DebugTilesetPlugin` expects it
 const MY_TILESET: &str = "My Awesome Tileset";
 
 fn main() {
@@ -45,19 +47,7 @@ fn main() {
 		.add_system(helpers::on_click)
 		.add_system(helpers::set_texture_filters_to_nearest)
 		.add_system(update_text)
-		// ! ---------------------- ! //
-		// ! ⚠️ --- Important --- ⚠️ ! //
-		// ! ---------------------- ! //
-		// Any system that removes an auto tile needs to be placed in the `TilesetStage` stage
-		// AND set to run before `TilesetLabel::RemoveAutoTiles`. Not doing this may leave auto
-		// tiles disjointed and in a visually invalid state.
-		//
-		// This does not need to happen for any other tile type. Removing them as normal shouild
-		// work just fine.
-		.add_system_to_stage(
-			TilesetStage,
-			on_tile_click.before(TilesetLabel::RemoveAutoTiles),
-		)
+		.add_system(on_tile_click)
 		// /== Exmaple-Specific === //
 		.run();
 }
@@ -108,10 +98,6 @@ fn build_map(
 		let map_size = MapSize(4, 4);
 		let chunk_size = ChunkSize(5, 5);
 		let layer_count = 3;
-		let default_tile = match tileset.get_tile_index("Empty").unwrap() {
-			TileIndex::Standard(index) => index,
-			TileIndex::Animated(start, ..) => start,
-		} as u16;
 
 		// === Build === //
 		helpers::build_map(
@@ -119,7 +105,6 @@ fn build_map(
 			map_size,
 			chunk_size,
 			layer_count,
-			default_tile,
 			&mut commands,
 			&mut map_query,
 		);
@@ -135,72 +120,33 @@ struct BuildMode {
 	active_layer: u16,
 }
 
-/// A system that adds/removes tiles when clicked on
-///
-/// __Note:__ This system has the ability to remove auto tiles. Therefore take notice of how we
-/// need to do two things to account for that:
-///
-/// 1. We must run this system in the proper stage and with the proper ordering (see description in [`main`])
-/// 2. We must send a [`RemoveAutoTileEvent`] whenever we remove an auto tile
-///
+/// A system that adds/removes tiles when clicked
 fn on_tile_click(
 	tilesets: Tilesets,
 	build_mode: Res<BuildMode>,
-	query: Query<(&Tile, Option<&AutoTileId>, Option<&GPUAnimated>)>,
-	mut event_writer: EventWriter<RemoveAutoTileEvent>,
 	mut event_reader: EventReader<helpers::ClickEvent>,
-	mut map_query: MapQuery,
-	mut commands: Commands,
+	mut placer: TilePlacer,
 ) {
 	if let Some(tileset) = tilesets.get_by_name(MY_TILESET) {
-		for helpers::ClickEvent(ref pos) in event_reader.iter() {
-			let mut should_place = true;
+		for helpers::ClickEvent(ref pos, pressed) in event_reader.iter() {
+			if !pressed {
+				continue;
+			}
+
+			let tileset_id = tileset.id().clone();
 			let layer_id = build_mode.active_layer;
 			let tile_name = &build_mode.tile_name;
 			let pos: TilePos = (*pos).into();
 
-			if let Ok(entity) = map_query.get_tile_entity(pos, 0u16, layer_id) {
-				if let Ok((tile, auto, ..)) = query.get(entity) {
-					// We can get the name of a tile by its texture index (assuming it was spawned correctly)
-					let name = tileset.get_tile_name_by_index(&(tile.texture_index as usize));
+			if let Some(group_id) = tileset.get_tile_group_id(tile_name) {
+				let tile_id = TileId::new(*group_id, tileset_id);
 
-					if Some(tile_name) == name {
-						// Tiles match --> Remove
-						should_place = false;
-						map_query
-							.despawn_tile(&mut commands, pos, 0u16, layer_id)
-							.unwrap();
-						// Make sure to notify the chunk!
-						map_query.notify_chunk_for_tile(pos, 0u16, layer_id);
-					}
-
-					// Whether removed or replaced -> notify auto tile system
-					if auto.is_some() {
-						// ! --- VERY IMPORTANT --- ! //
-						// In order to notify the auto tile system that an auto tile has been removed,
-						// we MUST send this event along with the removed entity
-						//
-						// It is possible to do this with every removed tile, though, it's not recommended,
-						// since it may impact performance for large quantities of removals
-						event_writer.send(RemoveAutoTileEvent(entity));
-					}
+				// Place the tile!
+				// We're using toggle here but there are other methods for placing
+				if let Err(err) = placer.toggle(tile_id, pos, 0u16, layer_id) {
+					// Just print any errors to the console without panicking
+					eprintln!("Could not place tile: {}", err);
 				}
-			}
-
-			if should_place {
-				// No tile was removed -> Place one
-
-				// The `tileset.place_tile()` method also internally notifies the chunk,
-				// so no need to handle that manually!
-				place_tile(
-					tile_name,
-					tileset,
-					pos,
-					0u16,
-					layer_id,
-					&mut commands,
-					&mut map_query,
-				);
 			}
 		}
 	}

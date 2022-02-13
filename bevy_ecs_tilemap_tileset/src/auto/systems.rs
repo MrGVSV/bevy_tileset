@@ -6,7 +6,12 @@ use bevy_tileset::prelude::{TileIndex, Tilesets};
 use std::cell::RefCell;
 
 /// An event used to notify the system of a removed/replaced auto tile
-pub struct RemoveAutoTileEvent(pub Entity);
+pub struct RemoveAutoTileEvent {
+	pub entity: Entity,
+	pub pos: TilePos,
+	pub parent: TileParent,
+	pub auto_id: AutoTileId,
+}
 
 /// __\[SYSTEM\]__ Handles the creation/modification of an auto tile
 ///
@@ -65,9 +70,7 @@ pub(crate) fn on_change_auto_tile(
 pub(crate) fn on_remove_auto_tile(
 	mut event: EventReader<RemoveAutoTileEvent>,
 	// All tiles (used for the tilemap cache)
-	all_tiles_1: Query<(Entity, &TilePos, &TileParent, &AutoTileId), With<Tile>>,
-	// All tiles (used for iteration)
-	all_tiles_2: Query<(Entity, &TilePos, &TileParent, &AutoTileId), With<Tile>>,
+	all_tiles: Query<(Entity, &TilePos, &TileParent, &AutoTileId), With<Tile>>,
 	mut working_tiles: Query<(
 		Entity,
 		&TilePos,
@@ -82,15 +85,19 @@ pub(crate) fn on_remove_auto_tile(
 ) {
 	let mut map_query_cell = RefCell::new(map_query);
 	let mut cache = TilemapCache {
-		tiles_query: &all_tiles_1,
+		tiles_query: &all_tiles,
 		map_query: &map_query_cell,
 	};
 	let mut tiler = AutoTiler::new(&mut cache);
 
-	for RemoveAutoTileEvent(entity) in event.iter() {
-		if let Ok((entity, pos, parent, auto_tile)) = all_tiles_2.get(*entity) {
-			tiler.add_tile(TileInfo::new(entity, pos, parent, auto_tile), true);
-		}
+	for ref evt in event.iter() {
+		let RemoveAutoTileEvent {
+			entity,
+			pos,
+			parent,
+			auto_id,
+		} = evt;
+		tiler.add_tile(TileInfo::new(*entity, pos, parent, auto_id), true);
 	}
 
 	let requests = tiler.finish();
@@ -143,7 +150,7 @@ fn apply_requests(
 								if anim.is_some() {
 									commands.entity(entity).remove::<GPUAnimated>();
 								}
-							}
+							},
 							TileIndex::Animated(start, end, speed) => {
 								// Even though this texture index isn't seen (due to `GPUAnimated`), we still need to set this
 								// so that the system can maintain the same variant across state changes
@@ -160,7 +167,7 @@ fn apply_requests(
 										speed,
 									));
 								}
-							}
+							},
 						}
 
 						// --- Notify Chunk --- //
