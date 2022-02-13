@@ -35,6 +35,7 @@ pub fn on_click(
 	}
 }
 
+#[allow(dead_code)]
 pub fn get_mouse_pos(
 	query: &Query<&Transform, With<WorldCamera>>,
 	wnds: &Windows,

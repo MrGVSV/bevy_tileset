@@ -91,6 +91,10 @@ tilemap. Again, as long as you set everything up using tilesets, it should work 
 
 ### 🏗 Placement/Removal
 
+<p align="center">
+	<img alt="Tile placement modes" src="https://github.com/MrGVSV/bevy_tileset/main/screenshots/tile_placement_modes.gif" />
+</p>
+
 One of the nice features about this crate is that it provides some built-in tile placement/removal logic so you don't have to! This can easily be accessed using the `TilePlacer` system param.
 
 ```rust

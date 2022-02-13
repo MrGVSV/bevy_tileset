@@ -38,6 +38,7 @@ fn main() {
 		.insert_resource(BuildMode {
 			tile_name: String::from("Wall"),
 			active_layer: 0u16,
+			mode: 0,
 		})
 		.add_event::<helpers::ClickEvent>()
 		.add_startup_system(load_tiles)
@@ -114,10 +115,25 @@ fn build_map(
 }
 
 /// A simple resource to control what layer and tile we're using
+/// as well as the placement mode
 #[derive(Debug)]
 struct BuildMode {
 	tile_name: String,
 	active_layer: u16,
+	mode: usize,
+}
+
+/// A simple enum that controls which placement method we're using
+///
+/// See [`TilePlacer`] for details on each
+#[derive(Debug)]
+enum PlacementMode {
+	Place,
+	TryPlace,
+	Toggle,
+	ToggleMatch,
+	Replace,
+	Remove,
 }
 
 /// A system that adds/removes tiles when clicked
@@ -142,8 +158,19 @@ fn on_tile_click(
 				let tile_id = TileId::new(*group_id, tileset_id);
 
 				// Place the tile!
-				// We're using toggle here but there are other methods for placing
-				if let Err(err) = placer.toggle(tile_id, pos, 0u16, layer_id) {
+				let place_mode = &PLACE_MODES[build_mode.mode];
+				let error = match place_mode {
+					PlacementMode::Place => placer.place(tile_id, pos, 0u16, layer_id).err(),
+					PlacementMode::TryPlace => placer.try_place(tile_id, pos, 0u16, layer_id).err(),
+					PlacementMode::Toggle => placer.toggle(tile_id, pos, 0u16, layer_id).err(),
+					PlacementMode::ToggleMatch => {
+						placer.toggle_matching(tile_id, pos, 0u16, layer_id).err()
+					},
+					PlacementMode::Replace => placer.replace(tile_id, pos, 0u16, layer_id).err(),
+					PlacementMode::Remove => placer.remove(pos, 0u16, layer_id).err(),
+				};
+
+				if let Some(err) = error {
 					// Just print any errors to the console without panicking
 					eprintln!("Could not place tile: {}", err);
 				}
@@ -169,6 +196,14 @@ fn on_keypress(
 		build_mode.tile_name = String::from("Empty");
 	} else if keys.just_pressed(KeyCode::P) {
 		build_mode.tile_name = String::from("Pipe");
+	} else if keys.just_pressed(KeyCode::Up) {
+		build_mode.mode = (build_mode.mode + 1) % PLACE_MODES.len();
+	} else if keys.just_pressed(KeyCode::Down) {
+		build_mode.mode = if build_mode.mode == 0 {
+			PLACE_MODES.len() - 1
+		} else {
+			build_mode.mode - 1
+		};
 	} else if keys.just_pressed(KeyCode::Key1) {
 		build_mode.active_layer = 0u16;
 	} else if keys.just_pressed(KeyCode::Key2) {
@@ -187,6 +222,15 @@ fn on_keypress(
 		}
 	}
 }
+
+const PLACE_MODES: &[PlacementMode] = &[
+	PlacementMode::Place,
+	PlacementMode::TryPlace,
+	PlacementMode::Toggle,
+	PlacementMode::ToggleMatch,
+	PlacementMode::Replace,
+	PlacementMode::Remove,
+];
 
 //    _    _ _    _ _____
 //   | |  | | |  | |  __ \
@@ -212,7 +256,8 @@ fn update_text(
 		text.sections[4].value = build_mode.tile_name.to_string();
 		text.sections[7].value = format!("{}", build_mode.active_layer + 1);
 		text.sections[9].value = String::from("3");
-		text.sections[20].style.color = if saved.map.is_some() {
+		text.sections[12].value = format!("{:?}", PLACE_MODES[build_mode.mode]);
+		text.sections[25].style.color = if saved.map.is_some() {
 			Color::rgba(0.75, 0.75, 0.75, 0.65)
 		} else {
 			Color::rgba(0.65, 0.65, 0.65, 0.25)
@@ -298,7 +343,19 @@ fn setup_hud(mut commands: Commands, asset_server: Res<AssetServer>) {
 					},
 					TextSection {
 						value: "\n".to_string(),
-						style: style_value,
+						style: style_value.clone(),
+					},
+					TextSection {
+						value: "Tool : ".to_string(),
+						style: style_key.clone(),
+					},
+					TextSection {
+						value: "-".to_string(),
+						style: style_value.clone(),
+					},
+					TextSection {
+						value: "\n".to_string(),
+						style: style_value.clone(),
 					},
 					TextSection {
 						value: "Options :\n".to_string(),
@@ -330,6 +387,14 @@ fn setup_hud(mut commands: Commands, asset_server: Res<AssetServer>) {
 					},
 					TextSection {
 						value: "  ( e ) Set tile to 'Empty'\n".to_string(),
+						style: style_small.clone(),
+					},
+					TextSection {
+						value: "  ( Up ) Next Tool\n".to_string(),
+						style: style_small.clone(),
+					},
+					TextSection {
+						value: "  ( Down ) Previous Tool\n".to_string(),
 						style: style_small.clone(),
 					},
 					TextSection {
