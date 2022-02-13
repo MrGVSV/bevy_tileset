@@ -135,6 +135,8 @@ examples.
   and `bevy_ecs_tilemap_tileset`
 * [serialization](https://github.com/MrGVSV/bevy_tileset/blob/main/bevy_ecs_tilemap_tileset/examples/serialization.rs) -
   Load a tilemap from JSON
+* [drag](https://github.com/MrGVSV/bevy_tileset/blob/main/bevy_ecs_tilemap_tileset/examples/drag.rs) -
+  Click and drag to add or remove tiles
 
 ## 🕊 Bevy Compatibility
 

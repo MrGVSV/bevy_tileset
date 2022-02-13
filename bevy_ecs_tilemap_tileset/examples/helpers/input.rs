@@ -1,7 +1,6 @@
 use crate::helpers::WorldCamera;
 use bevy::math::Vec4Swizzles;
 use bevy::prelude::*;
-use bevy::render::camera::Camera;
 
 /// The position of the cursor at the time of this event
 /// and whether it is pressed or not
