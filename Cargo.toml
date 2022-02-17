@@ -13,10 +13,6 @@ exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 
 [workspace]
 members = ["bevy_tileset_core", "bevy_tileset_tiles"]
-exclude = ["bevy_tileset_map"]
-
-[badges]
-maintenance = { status = "experimental" }
 
 [dependencies]
 bevy_tileset_tiles = { path = "./bevy_tileset_tiles", version = "0.3" }
