@@ -49,16 +49,16 @@
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/spirv_cross-3ea9fbca00a5c47a/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/syn-d24964da4a552da2/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/wgpu-core-9e7dcfd45269de6e/out" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/bevy_ecs_tilemap_tileset/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/bevy_ecs_tilemap_tileset/examples" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/bevy_tileset_tiles/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/bevy_tileset_core/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/bevy_tileset_core/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/bevy_tileset_map/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/bevy_tileset_map/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/bevy_ecs_tileset_tiles/target" />
-      <excludeFolder url="file://$MODULE_DIR$/bevy_ecs_tilemap_tileset/target" />
       <excludeFolder url="file://$MODULE_DIR$/bevy_tileset_tiles/target" />
+      <excludeFolder url="file://$MODULE_DIR$/bevy_tileset_map/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

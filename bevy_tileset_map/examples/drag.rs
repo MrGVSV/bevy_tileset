@@ -5,7 +5,7 @@ use bevy::asset::LoadState;
 use bevy::prelude::*;
 use bevy_ecs_tilemap::{ChunkSize, MapQuery, MapSize, TilePos, TilemapPlugin};
 
-use bevy_ecs_tilemap_tileset::prelude::*;
+use bevy_tileset_map::prelude::*;
 
 mod helpers;
 

@@ -1,4 +1,4 @@
-# bevy_ecs_tilemap_tileset
+# bevy_tileset_map
 
 An implementation of  [`bevy_tileset`](https://github.com/MrGVSV/bevy_tileset) for
 the [`bevy_ecs_tilemap`](https://github.com/StarArawn/bevy_ecs_tilemap) crate.
@@ -28,7 +28,7 @@ with `bevy_ecs_tilemap`, but for now you can use it with git:
 
 ```toml
 [dependencies]
-bevy_ecs_tilemap_tileset = { git = "https://github.com/MrGVSV/bevy_tileset", version = "0.3" }
+bevy_tileset_map = { git = "https://github.com/MrGVSV/bevy_tileset", version = "0.3" }
 ```
 
 ## ✨ Usage
@@ -84,9 +84,9 @@ fn load_maps(mut serializer: TilemapSerializer) {
 ```
 
 Check out
-the [serialization](https://github.com/MrGVSV/bevy_tileset/blob/main/bevy_ecs_tilemap_tileset/examples/serialization.rs)
+the [serialization](https://github.com/MrGVSV/bevy_tileset/blob/main/bevy_tileset_map/examples/serialization.rs)
 example to see how we turn
-some [JSON](https://github.com/MrGVSV/bevy_tileset/tree/main/bevy_ecs_tilemap_tileset/assets/map.json) into a full
+some [JSON](https://github.com/MrGVSV/bevy_tileset/tree/main/bevy_tileset_map/assets/map.json) into a full
 tilemap. Again, as long as you set everything up using tilesets, it should work pretty much as expected.
 
 ### 🏗 Placement/Removal
@@ -135,16 +135,16 @@ Just remember that auto tiles can be _slow_, so thousands of them may result in 
 Check out the [examples](https://github.com/MrGVSV/bevy_tileset#-examples) for `bevy_tileset` for tileset-specific
 examples.
 
-* [clickable](bevy_ecs_tilemap_tileset/examples/clickable.rs) - Add and remove tiles using `bevy_ecs_tilemap`
-  and `bevy_ecs_tilemap_tileset`
-* [serialization](https://github.com/MrGVSV/bevy_tileset/blob/main/bevy_ecs_tilemap_tileset/examples/serialization.rs) -
+* [clickable](bevy_tileset_map/examples/clickable.rs) - Add and remove tiles using `bevy_ecs_tilemap`
+  and `bevy_tileset_map`
+* [serialization](https://github.com/MrGVSV/bevy_tileset/blob/main/bevy_tileset_map/examples/serialization.rs) -
   Load a tilemap from JSON
-* [drag](https://github.com/MrGVSV/bevy_tileset/blob/main/bevy_ecs_tilemap_tileset/examples/drag.rs) -
+* [drag](https://github.com/MrGVSV/bevy_tileset/blob/main/bevy_tileset_map/examples/drag.rs) -
   Click and drag to add or remove tiles
 
 ## 🕊 Bevy Compatibility
 
-| bevy | bevy_ecs_tilemap_tileset |
+| bevy | bevy_tileset_map |
 | ---- | ------------------------ |
 | 0.6  | 0.3                      |
 | 0.5  | 0.2                      |

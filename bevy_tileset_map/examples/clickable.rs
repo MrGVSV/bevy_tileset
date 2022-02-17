@@ -9,8 +9,8 @@ mod helpers;
 use bevy::prelude::*;
 
 use bevy_ecs_tilemap::{ChunkSize, MapQuery, MapSize, TilePos, TilemapPlugin};
-use bevy_ecs_tilemap_tileset::prelude::*;
-use bevy_ecs_tilemap_tileset::tileset::debug::DebugTilesetPlugin;
+use bevy_tileset_map::prelude::*;
+use bevy_tileset_map::tileset::debug::DebugTilesetPlugin;
 
 /// The name of the tileset we'll be loading in this example
 ///

@@ -12,7 +12,8 @@ readme = "README.md"
 exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 
 [workspace]
-members = ["bevy_tileset_core", "bevy_tileset_tiles", "bevy_ecs_tilemap_tileset"]
+members = ["bevy_tileset_core", "bevy_tileset_tiles"]
+exclude = ["bevy_tileset_map"]
 
 [badges]
 maintenance = { status = "experimental" }

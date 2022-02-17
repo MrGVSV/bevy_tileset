@@ -1,9 +1,9 @@
 [package]
-name = "bevy_ecs_tilemap_tileset"
+name = "bevy_tileset_map"
 version = "0.3.0"
 edition = "2021"
 authors = ["Gino Valente <gino.valente.code@gmail.com>"]
-description = "An extension to the bevy_ecs_tilemap, allowing for configurable tilesets, auto tiling, and more"
+description = "An extension to bevy_ecs_tilemap, allowing for configurable tilesets, auto tiling, and more"
 repository = "https://github.com/MrGVSV/bevy_tileset"
 license = "MIT OR Apache-2.0"
 keywords = ["bevy", "tileset", "auto", "variant", "tile"]

@@ -78,7 +78,7 @@ pub type TilePlacementResult = Result<PlacedTile, TilePlacementError>;
 /// ```
 /// # use bevy::prelude::Res;
 /// # use bevy_ecs_tilemap::TilePos;
-/// # use bevy_ecs_tilemap_tileset::prelude::{TileId, TilePlacer};
+/// # use bevy_tileset_map::prelude::{TileId, TilePlacer};
 /// struct CurrentTile(TileId);
 ///
 /// fn tile_placement_system(mut placer: TilePlacer, tile: Res<CurrentTile>) {
