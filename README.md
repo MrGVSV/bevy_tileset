@@ -9,7 +9,7 @@ Simple, configurable tilesets in Bevy using RON.
 	<img alt="Smart tile placement" src="https://github.com/MrGVSV/bevy_tileset/blob/b81d2d7483785e5aa58ef0b449482d9d57bca3be/screenshots/tile_placement_demo.gif" />
 </p>
 
-> All GIFs generated with the [`bevy_tileset_map`](bevy_tileset_map/) sub-crate
+> All GIFs generated with the [`bevy_tileset_map`](https://github.com/MrGVSV/bevy_tileset_map) crate
 
 ## 📋 Features
 
@@ -25,10 +25,6 @@ Add one of the following lines to your `Cargo.toml`.
 [dependencies]
 bevy_tileset_tiles = "0.3" # For the base tile definitions
 bevy_tileset = "0.3" # For general tileset usage (includes above)
-
-# The bevy_ecs_tilemap integration crate has not yet been published
-# So the you will need to get it from git
-bevy_tileset_map = { git = "https://github.com/MrGVSV/bevy_tileset", version = "0.3" }
 ```
 
 ## ✨ Usage
@@ -210,9 +206,8 @@ Defines a tile that automatically chooses its active tile based on its neighbors
 
 * [tileset](examples/tileset.rs) - Simply load and display a tileset
 * [dynamic](examples/dynamic.rs) - Dynamically create a tileset at runtime
-* [clickable](bevy_tileset_map/examples/clickable.rs) - Add and remove tiles using `bevy_ecs_tilemap` and `bevy_tileset_map`
 
-Also, be sure to check out  the [assets](bevy_tileset_map/assets/) folder for how to define a tile or tileset.
+Also, be sure to check out  the [assets](/assets/) folder for how to define a tile or tileset.
 
 ## 🌱 Areas of Growth
 
