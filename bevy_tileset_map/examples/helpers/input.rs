@@ -1,10 +1,11 @@
 use crate::helpers::WorldCamera;
 use bevy::math::Vec4Swizzles;
 use bevy::prelude::*;
-use bevy::render::camera::Camera;
 
+/// The position of the cursor at the time of this event
+/// and whether it is pressed or not
 #[allow(dead_code)]
-pub struct ClickEvent(pub UVec2);
+pub struct ClickEvent(pub UVec2, pub bool);
 
 #[allow(unused)]
 pub fn on_click(
@@ -13,7 +14,10 @@ pub fn on_click(
 	buttons: Res<Input<MouseButton>>,
 	mut event_writer: EventWriter<ClickEvent>,
 ) {
-	if !buttons.just_pressed(MouseButton::Left) {
+	let just_pressed = buttons.just_pressed(MouseButton::Left);
+	let just_released = buttons.just_released(MouseButton::Left);
+
+	if !just_pressed && !just_released {
 		return;
 	}
 
@@ -27,20 +31,15 @@ pub fn on_click(
 		let y = pos.y.floor() as u32;
 
 		let pos = UVec2::new(x, y);
-		event_writer.send(ClickEvent(pos));
+		event_writer.send(ClickEvent(pos, just_pressed));
 	}
 }
 
 #[allow(dead_code)]
-pub fn click_to_coord(
-	query: &Query<&Transform, With<Camera>>,
+pub fn get_mouse_pos(
+	query: &Query<&Transform, With<WorldCamera>>,
 	wnds: &Windows,
-	buttons: &Input<MouseButton>,
 ) -> Option<UVec2> {
-	if !buttons.just_pressed(MouseButton::Left) {
-		return None;
-	}
-
 	let wnd = wnds.get_primary().unwrap();
 	if let Some(pos) = wnd.cursor_position() {
 		let cam = query.single();
@@ -54,6 +53,7 @@ pub fn click_to_coord(
 
 		return Some(pos);
 	}
+
 	None
 }
 

@@ -1,14 +1,13 @@
 use crate::helpers::WorldCamera;
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
-use bevy_ecs_tilemap_tileset::prelude::*;
+use bevy_tileset_map::prelude::*;
 
 pub fn build_map(
 	tileset: &Tileset,
 	map_size: MapSize,
 	chunk_size: ChunkSize,
 	layer_count: u16,
-	default_tile: u16,
 	commands: &mut Commands,
 	map_query: &mut MapQuery,
 ) -> Entity {
@@ -22,7 +21,6 @@ pub fn build_map(
 		map_size,
 		chunk_size,
 		layer_count,
-		default_tile,
 		&tileset_handle,
 		commands,
 		map_query,
@@ -56,7 +54,6 @@ pub fn build_layers(
 	map_size: MapSize,
 	chunk_size: ChunkSize,
 	layer_count: u16,
-	default_tile: u16,
 	material_handle: &Handle<Image>,
 	commands: &mut Commands,
 	map_query: &mut MapQuery,
@@ -74,14 +71,7 @@ pub fn build_layers(
 		let settings = settings.clone();
 		let material_handle = material_handle.clone();
 
-		let (mut layer_builder, _) = LayerBuilder::new(commands, settings, 0u16, layer_id);
-		layer_builder.set_all(TileBundle {
-			tile: Tile {
-				texture_index: default_tile,
-				..Default::default()
-			},
-			..Default::default()
-		});
+		let layer_builder = LayerBuilder::<TileBundle>::new(commands, settings, 0u16, layer_id).0;
 
 		let layer_entity = map_query.build_layer(commands, layer_builder, material_handle);
 		layers.push(layer_entity);

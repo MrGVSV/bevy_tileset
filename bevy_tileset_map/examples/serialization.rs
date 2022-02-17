@@ -7,7 +7,7 @@ use bevy::asset::{FileAssetIo, LoadState};
 use bevy::prelude::*;
 use bevy_ecs_tilemap::{ChunkSize, MapQuery, MapSize, TilemapLabel, TilemapPlugin};
 
-use bevy_ecs_tilemap_tileset::prelude::*;
+use bevy_tileset_map::prelude::*;
 
 mod helpers;
 
@@ -87,10 +87,6 @@ fn build_map(
 	let map_size = MapSize(4, 4);
 	let chunk_size = ChunkSize(5, 5);
 	let layer_count = 3;
-	let default_tile = match tileset.get_tile_index("Empty").unwrap() {
-		TileIndex::Standard(index) => index,
-		TileIndex::Animated(start, ..) => start,
-	} as u16;
 
 	// === Build === //
 	helpers::build_map(
@@ -98,7 +94,6 @@ fn build_map(
 		map_size,
 		chunk_size,
 		layer_count,
-		default_tile,
 		&mut commands,
 		&mut map_query,
 	);
