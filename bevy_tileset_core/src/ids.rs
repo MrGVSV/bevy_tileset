@@ -43,7 +43,7 @@ pub struct PartialTileId {
 
 impl TileId {
 	/// Create a new basic tile ID
-	pub fn new(group_id: TileGroupId, tileset_id: TilesetId) -> Self {
+	pub const fn new(group_id: TileGroupId, tileset_id: TilesetId) -> Self {
 		Self {
 			#[cfg(feature = "auto-tile")]
 			auto_index: None,
@@ -89,7 +89,7 @@ impl TileId {
 }
 
 impl PartialTileId {
-	pub fn new(group_id: TileGroupId) -> Self {
+	pub const fn new(group_id: TileGroupId) -> Self {
 		Self {
 			#[cfg(feature = "auto-tile")]
 			auto_index: None,
