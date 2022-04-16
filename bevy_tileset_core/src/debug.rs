@@ -2,7 +2,7 @@
 
 use bevy::app::App;
 use bevy::math::Vec3;
-use bevy::prelude::{Commands, Component, ConfigurableSystem, Local, Plugin, Transform};
+use bevy::prelude::{Commands, Component, Local, Plugin, Transform};
 use bevy::sprite::SpriteBundle;
 
 use crate::prelude::{Tileset, Tilesets};
@@ -28,13 +28,11 @@ pub struct DebugTilesetPlugin {
 
 impl Plugin for DebugTilesetPlugin {
 	fn build(&self, app: &mut App) {
-		app.add_system(display_tilesets.config(|params| {
-			params.0 = Some(DebugState {
-				loaded: false,
-				name: self.tileset_name.clone(),
-				position: self.position,
-			})
-		}));
+		let state = DebugState {
+			name: self.tileset_name.clone(),
+			position: self.position,
+		};
+		app.add_system(display_tilesets(state));
 	}
 }
 
@@ -88,44 +86,42 @@ impl DebugTilesetPlugin {
 
 #[derive(Default)]
 struct DebugState {
-	loaded: bool,
 	name: Option<String>,
 	position: Vec3,
 }
 
-fn display_tilesets(mut state: Local<DebugState>, tilesets: Tilesets, mut commands: Commands) {
-	if state.loaded {
-		return;
-	}
-
-	let mut offset = Vec3::new(0.0, 0.0, 1.0);
-	let mut loaded = false;
-	const PADDING: f32 = 10.0;
-
-	let mut spawner = |tileset: &Tileset| {
-		commands
-			.spawn_bundle(SpriteBundle {
-				texture: tileset.texture().clone(),
-				transform: Transform::from_translation(state.position + offset),
-				..Default::default()
-			})
-			.insert(DebugTilesetSprite);
-
-		offset.y -= tileset.size().y + PADDING;
-		loaded = true;
-	};
-
-	if let Some(ref name) = state.name {
-		// Specified tileset --> display single
-		if let Some(tileset) = tilesets.get_by_name(name) {
-			spawner(tileset);
+fn display_tilesets(state: DebugState) -> impl FnMut(Local<bool>, Tilesets, Commands) {
+	move |mut is_loaded: Local<bool>, tilesets: Tilesets, mut commands: Commands| {
+		if *is_loaded {
+			return;
 		}
-	} else {
-		// No specified tileset --> display all
-		for (.., tileset) in tilesets.iter() {
-			spawner(tileset);
+
+		let mut offset = Vec3::new(0.0, 0.0, 1.0);
+		const PADDING: f32 = 10.0;
+
+		let mut spawner = |tileset: &Tileset| {
+			commands
+				.spawn_bundle(SpriteBundle {
+					texture: tileset.texture().clone(),
+					transform: Transform::from_translation(state.position + offset),
+					..Default::default()
+				})
+				.insert(DebugTilesetSprite);
+
+			offset.y -= tileset.size().y + PADDING;
+			*is_loaded = true;
+		};
+
+		if let Some(ref name) = state.name {
+			// Specified tileset --> display single
+			if let Some(tileset) = tilesets.get_by_name(name) {
+				spawner(tileset);
+			}
+		} else {
+			// No specified tileset --> display all
+			for (.., tileset) in tilesets.iter() {
+				spawner(tileset);
+			}
 		}
 	}
-
-	state.loaded = loaded;
 }

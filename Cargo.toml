@@ -19,7 +19,7 @@ bevy_tileset_tiles = { path = "./bevy_tileset_tiles", version = "0.3" }
 bevy_tileset_core = { path = "./bevy_tileset_core", version = "0.3" }
 
 [dev-dependencies]
-bevy = "0.6"
+bevy = "0.7"
 ron = "0.7"
 
 [features]
