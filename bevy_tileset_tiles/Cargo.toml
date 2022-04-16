@@ -1,6 +1,6 @@
 [package]
 name = "bevy_tileset_tiles"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 authors = ["Gino Valente <gino.valente.code@gmail.com>"]
 description = "Tile definitions used by bevy_tileset"
@@ -12,8 +12,8 @@ readme = "../README.md"
 exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 
 [dependencies]
-bevy_render = { version = "0.6", default-features = false }
-bevy_asset = { version = "0.6", default-features = false }
+bevy_render = { version = "0.7", default-features = false }
+bevy_asset = { version = "0.7", default-features = false }
 serde = "1.0"
 
 [features]

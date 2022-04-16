@@ -5,7 +5,9 @@ use std::sync::{Arc, RwLock};
 use bevy::asset::{
 	Asset, AssetLoader, AssetPath, BoxedFuture, Handle, HandleId, LoadContext, LoadedAsset,
 };
-use bevy::render::texture::{Image, ImageType};
+use bevy::prelude::{FromWorld, World};
+use bevy::render::renderer::RenderDevice;
+use bevy::render::texture::{CompressedImageFormats, Image, ImageType};
 use bevy::utils::Uuid;
 use bevy_tile_atlas::TextureStore;
 use bevy_tileset_tiles::prelude::{TileDef, TileHandle};
@@ -14,8 +16,9 @@ use serde::{Deserialize, Serialize};
 use crate::prelude::{TileGroupId, Tileset, TilesetBuilder, TilesetError, TilesetId};
 use crate::tileset::load::{load_tile_handles, TextureLoader};
 
-#[derive(Default)]
-pub struct TilesetAssetLoader;
+pub struct TilesetAssetLoader {
+	supported_compressed_formats: CompressedImageFormats,
+}
 
 #[derive(Default, Deserialize, Serialize)]
 pub struct TilesetDef {
@@ -33,6 +36,7 @@ pub struct TilesetDef {
 /// Instead of loading an image right away, it tracks the paths to the images to be loaded
 /// later (so we don't need to await on _every_ image).
 struct TilesetTextureLoader<'x, 'y> {
+	supported_compressed_formats: CompressedImageFormats,
 	load_context: &'x mut LoadContext<'y>,
 	/// The images that need to be loaded
 	bytes: Arc<RwLock<HashMap<HandleId, PathBuf>>>,
@@ -62,11 +66,14 @@ impl<'x, 'y> TilesetTextureLoader<'x, 'y> {
 	fn collect_images(self) -> BoxedFuture<'x, Result<HashMap<HandleId, Image>, TilesetError>> {
 		let images = self.bytes.read().unwrap().clone();
 		Box::pin(async move {
-			let image_map = futures::future::join_all(
-				images
-					.into_iter()
-					.map(|(id, path)| load_image(&self.load_context, id, path)),
-			)
+			let image_map = futures::future::join_all(images.into_iter().map(|(id, path)| {
+				load_image(
+					&self.load_context,
+					id,
+					path,
+					self.supported_compressed_formats,
+				)
+			}))
 			.await
 			.into_iter()
 			.filter_map(|x| x.ok())
@@ -96,6 +103,19 @@ impl<'x, 'y> TextureStore for TilesetTextureStore<'x, 'y> {
 	}
 }
 
+impl FromWorld for TilesetAssetLoader {
+	fn from_world(world: &mut World) -> Self {
+		let supported_compressed_formats = match world.get_resource::<RenderDevice>() {
+			Some(render_device) => CompressedImageFormats::from_features(render_device.features()),
+
+			None => CompressedImageFormats::all(),
+		};
+		Self {
+			supported_compressed_formats,
+		}
+	}
+}
+
 impl AssetLoader for TilesetAssetLoader {
 	fn load<'a>(
 		&'a self,
@@ -107,6 +127,7 @@ impl AssetLoader for TilesetAssetLoader {
 
 			// === Load Handles === //
 			let loader = TilesetTextureLoader {
+				supported_compressed_formats: self.supported_compressed_formats,
 				bytes: Arc::new(RwLock::new(HashMap::new())),
 				load_context,
 			};
@@ -207,6 +228,7 @@ async fn load_image(
 	context: &LoadContext<'_>,
 	id: HandleId,
 	path: PathBuf,
+	supported_compressed_formats: CompressedImageFormats,
 ) -> Result<(HandleId, Image), TilesetError> {
 	let bytes = context
 		.read_asset_bytes(path.clone())
@@ -214,7 +236,12 @@ async fn load_image(
 		.map_err(|err| TilesetError::AssetIoError(err))?;
 	let path = path.as_path();
 	let ext = path.extension().unwrap().to_str().unwrap();
-	let img = Image::from_buffer(&bytes, ImageType::Extension(ext))
-		.map_err(|err| TilesetError::ImageError(err))?;
+	let img = Image::from_buffer(
+		&bytes,
+		ImageType::Extension(ext),
+		supported_compressed_formats,
+		true,
+	)
+	.map_err(|err| TilesetError::ImageError(err))?;
 	Ok((id, img))
 }
