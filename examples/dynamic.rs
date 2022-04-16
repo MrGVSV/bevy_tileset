@@ -93,10 +93,12 @@ fn check_loaded(
 
 	// Build the tileset
 	let mut builder = TilesetBuilder::default();
-	let tiles = my_tileset.tiles.take();
-	for (group_id, tile) in tiles.unwrap().into_iter().enumerate() {
+	// We use a reference here because we still need to keep these strong handles loaded
+	// (the RawTileset will only store weak handles)
+	let tiles = my_tileset.tiles.as_ref().unwrap();
+	for (group_id, tile) in tiles.iter().enumerate() {
 		builder
-			.add_tile(tile, group_id as TileGroupId, &textures)
+			.add_tile(tile.clone(), group_id as TileGroupId, &textures)
 			.unwrap();
 	}
 
@@ -113,7 +115,6 @@ fn check_loaded(
 	// ```
 
 	my_tileset.raw_tileset = Some(raw_tileset);
-	my_tileset.tiles = None;
 	my_tileset.is_loaded = true;
 }
 
@@ -155,10 +156,10 @@ fn show_tileset(
 						..Default::default()
 					});
 				}
-			}
+			},
 			TileIndex::Animated(start, end, speed) => {
 				// Do something  ✨ animated ✨
-			}
+			},
 		}
 	}
 
