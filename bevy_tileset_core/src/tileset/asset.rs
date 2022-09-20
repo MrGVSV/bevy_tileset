@@ -149,7 +149,7 @@ impl AssetLoader for TilesetAssetLoader {
 			// === Create Raw Tileset === //
 			let name = config
 				.name
-				.unwrap_or_else(|| Uuid::new_v4().to_hyphenated().to_string());
+				.unwrap_or_else(|| Uuid::new_v4().hyphenated().to_string());
 			let raw_tileset = builder.build(name, config.id, &mut store)?;
 
 			// === Finalize Tileset === //

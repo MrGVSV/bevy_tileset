@@ -60,7 +60,7 @@ fn show_tileset(
 		// === Display Tileset === //
 		let atlas = tileset.atlas();
 		let texture = tileset.texture().clone();
-		commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+		commands.spawn_bundle(Camera2dBundle::default());
 		commands.spawn_bundle(SpriteBundle {
 			texture,
 			transform: Transform::from_xyz(0.0, 0.0, 0.0),
