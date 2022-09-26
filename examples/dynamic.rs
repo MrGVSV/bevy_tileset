@@ -49,7 +49,7 @@ impl Default for MyTileset {
 /// Starts the tileset loading process
 fn load_tileset(mut my_tileset: ResMut<MyTileset>, asset_server: Res<AssetServer>) {
 	// You can dynamically load the TileDef config files
-	let asset_path = FileAssetIo::get_root_path().join("assets");
+	let asset_path = FileAssetIo::get_base_path().join("assets");
 	let dirt_path = asset_path.join("tiles/dirt.ron");
 	let glass_path = asset_path.join("tiles/glass.ron");
 
@@ -134,7 +134,7 @@ fn show_tileset(
 
 	// === Display Tileset === //
 	let texture = raw_tileset.texture().clone();
-	commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+	commands.spawn_bundle(Camera2dBundle::default());
 	commands.spawn_bundle(SpriteBundle {
 		texture,
 		transform: Transform::from_xyz(0.0, 0.0, 0.0),
