@@ -101,7 +101,7 @@ fn display_tilesets(state: DebugState) -> impl FnMut(Local<bool>, Tilesets, Comm
 
 		let mut spawner = |tileset: &Tileset| {
 			commands
-				.spawn_bundle(SpriteBundle {
+				.spawn(SpriteBundle {
 					texture: tileset.texture().clone(),
 					transform: Transform::from_translation(state.position + offset),
 					..Default::default()
