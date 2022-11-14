@@ -6,7 +6,7 @@
 Simple, configurable tilesets in Bevy using RON.
 
 <p align="center">
-	<img alt="Smart tile placement" src="https://github.com/MrGVSV/bevy_tileset/blob/b81d2d7483785e5aa58ef0b449482d9d57bca3be/screenshots/tile_placement_demo.gif" />
+	<img alt="Smart tile placement" src="https://raw.githubusercontent.com/MrGVSV/bevy_tileset/b81d2d7483785e5aa58ef0b449482d9d57bca3be/screenshots/tile_placement_demo.gif" />
 </p>
 
 > All GIFs generated with the [`bevy_tileset_map`](https://github.com/MrGVSV/bevy_tileset_map) crate
