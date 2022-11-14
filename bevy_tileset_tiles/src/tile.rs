@@ -194,7 +194,7 @@ impl TileHandle {
 	}
 
 	pub fn get_load_state(&self, asset_server: &AssetServer) -> LoadState {
-		asset_server.get_group_load_state(self.iter_handles().map(|handle| handle.id))
+		asset_server.get_group_load_state(self.iter_handles().map(|handle| handle.id()))
 	}
 
 	pub fn iter_handles(&self) -> Box<dyn Iterator<Item = &Handle<Image>> + '_> {

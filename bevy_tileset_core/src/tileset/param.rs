@@ -1,7 +1,7 @@
 use crate::prelude::{Tileset, TilesetId};
 use bevy::asset::{Assets, Handle};
 use bevy::ecs::system::SystemParam;
-use bevy::prelude::{Query, Res};
+use bevy::prelude::{Query, Res, Resource};
 use std::collections::HashMap;
 use std::ops::Deref;
 
@@ -15,7 +15,7 @@ pub struct Tilesets<'w, 's> {
 	phantom_query: Query<'w, 's, ()>,
 }
 
-#[derive(Default)]
+#[derive(Resource, Default)]
 pub struct TilesetMap {
 	name_to_id: HashMap<String, TilesetId>,
 	id_to_handle: HashMap<TilesetId, Handle<Tileset>>,

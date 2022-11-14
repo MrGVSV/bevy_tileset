@@ -55,7 +55,7 @@ impl<'x, 'y> TextureLoader for TilesetTextureLoader<'x, 'y> {
 		let path = asset_path.path().to_path_buf();
 
 		if let Ok(mut images) = self.bytes.try_write() {
-			images.insert(handle.id, path);
+			images.insert(handle.id(), path);
 		}
 		handle
 	}

@@ -21,7 +21,7 @@ fn main() {
 		.run();
 }
 
-#[derive(Default)]
+#[derive(Resource, Default)]
 struct MyTileset {
 	/// This stores the handle to our tileset so it doesn't get unloaded
 	handle: Option<Handle<Tileset>>,
@@ -60,8 +60,8 @@ fn show_tileset(
 		// === Display Tileset === //
 		let atlas = tileset.atlas();
 		let texture = tileset.texture().clone();
-		commands.spawn_bundle(Camera2dBundle::default());
-		commands.spawn_bundle(SpriteBundle {
+		commands.spawn(Camera2dBundle::default());
+		commands.spawn(SpriteBundle {
 			texture,
 			transform: Transform::from_xyz(0.0, 0.0, 0.0),
 			..Default::default()
@@ -72,7 +72,7 @@ fn show_tileset(
 			match tile_index {
 				TileIndex::Standard(index) => {
 					// Do something standard
-					commands.spawn_bundle(SpriteSheetBundle {
+					commands.spawn(SpriteSheetBundle {
 						transform: Transform {
 							translation: Vec3::new(08.0, -48.0, 0.0),
 							..Default::default()
@@ -81,10 +81,10 @@ fn show_tileset(
 						texture_atlas: atlas.clone(),
 						..Default::default()
 					});
-				}
+				},
 				TileIndex::Animated(start, end, speed) => {
 					// Do something  ✨ animated ✨
-				}
+				},
 			}
 		}
 
