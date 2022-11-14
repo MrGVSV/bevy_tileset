@@ -1,6 +1,6 @@
 [package]
 name = "bevy_tileset_core"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 authors = ["Gino Valente <gino.valente.code@gmail.com>"]
 description = "Core of bevy_tileset"
@@ -12,7 +12,7 @@ readme = "../README.md"
 exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 
 [dependencies]
-bevy_tileset_tiles = { path = "../bevy_tileset_tiles", version = "0.5" }
+bevy_tileset_tiles = { path = "../bevy_tileset_tiles", version = "0.6" }
 bevy = { version = "0.9", default-features = false, features = ["render", "png", "bevy_asset"] }
 bevy_tile_atlas = "0.5"
 ron = "0.7.0"
