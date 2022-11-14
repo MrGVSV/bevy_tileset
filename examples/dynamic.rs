@@ -28,6 +28,7 @@ fn main() {
 		.run();
 }
 
+#[derive(Resource)]
 struct MyTileset {
 	/// This stores the handle to our tileset so it doesn't get unloaded
 	tiles: Option<Vec<TileHandle>>,
@@ -134,8 +135,8 @@ fn show_tileset(
 
 	// === Display Tileset === //
 	let texture = raw_tileset.texture().clone();
-	commands.spawn_bundle(Camera2dBundle::default());
-	commands.spawn_bundle(SpriteBundle {
+	commands.spawn(Camera2dBundle::default());
+	commands.spawn(SpriteBundle {
 		texture,
 		transform: Transform::from_xyz(0.0, 0.0, 0.0),
 		..Default::default()
@@ -150,7 +151,7 @@ fn show_tileset(
 					let mut texture = handle.clone();
 					// Handles in the tileset are weak by default so we'll need to make it strong again so the image doesn't unload
 					texture.make_strong(&mut textures);
-					commands.spawn_bundle(SpriteBundle {
+					commands.spawn(SpriteBundle {
 						texture,
 						transform: Transform::from_xyz(0.0, 48.0, 0.0),
 						..Default::default()
