@@ -17,7 +17,7 @@ pub enum TilesetError {
 	#[error("invalid tile data (expected {expected:?}, found {found:?})")]
 	InvalidData { expected: String, found: String },
 	#[error("could not read tile definition file: {0:?}")]
-	InvalidDefinition(ron::Error),
+	InvalidDefinition(ron::error::SpannedError),
 	#[error("tile with group ID {0:?} already exists in the tileset")]
 	TileAlreadyExists(TileGroupId),
 }
