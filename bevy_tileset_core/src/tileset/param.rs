@@ -10,7 +10,7 @@ pub struct Tilesets<'w, 's> {
 	tileset_map: Res<'w, TilesetMap>,
 	tilesets: Res<'w, Assets<Tileset>>,
 
-	/// This field only exists so we can add the `'s` lifetime without Rust freaking out
+	// / This field only exists so we can add the `'s` lifetime without Rust freaking out
 	#[allow(dead_code)]
 	phantom_query: Query<'w, 's, ()>,
 }

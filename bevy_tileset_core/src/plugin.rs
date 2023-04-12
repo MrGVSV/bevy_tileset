@@ -26,11 +26,11 @@ fn tileset_event_sys(
 				if let Some(tileset) = tilesets.get(handle) {
 					map.register_tileset(tileset, &handle);
 				}
-			}
+			},
 			AssetEvent::<Tileset>::Removed { handle } => {
 				map.deregister_tileset(&handle);
-			}
-			_ => {}
+			},
+			_ => {},
 		}
 	}
 }

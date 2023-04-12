@@ -12,8 +12,8 @@ readme = "../README.md"
 exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 
 [dependencies]
-bevy_render = { version = "0.9", default-features = false }
-bevy_asset = { version = "0.9", default-features = false }
+bevy_render = { version = "0.10", default-features = false }
+bevy_asset = { version = "0.10", default-features = false }
 serde = "1.0"
 
 [features]
