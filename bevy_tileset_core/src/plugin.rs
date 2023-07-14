@@ -10,7 +10,7 @@ impl Plugin for TilesetPlugin {
 		app.add_asset::<Tileset>()
 			.init_asset_loader::<TilesetAssetLoader>()
 			.init_resource::<TilesetMap>()
-			.add_system(tileset_event_sys);
+			.add_systems(Update, tileset_event_sys);
 	}
 }
 

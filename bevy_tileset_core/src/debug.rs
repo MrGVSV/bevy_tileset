@@ -2,7 +2,7 @@
 
 use bevy::app::App;
 use bevy::math::Vec3;
-use bevy::prelude::{Commands, Component, Local, Plugin, Transform};
+use bevy::prelude::{Commands, Component, Local, Plugin, Transform, Update};
 use bevy::sprite::SpriteBundle;
 
 use crate::prelude::{Tileset, Tilesets};
@@ -32,7 +32,7 @@ impl Plugin for DebugTilesetPlugin {
 			name: self.tileset_name.clone(),
 			position: self.position,
 		};
-		app.add_system(display_tilesets(state));
+		app.add_systems(Update, display_tilesets(state));
 	}
 }
 

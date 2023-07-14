@@ -1,6 +1,6 @@
 [package]
 name = "bevy_tileset"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2021"
 authors = ["Gino Valente <gino.valente.code@gmail.com>"]
 description = "Simple, configurable tilesets in Bevy using RON"
@@ -15,12 +15,12 @@ exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 members = ["bevy_tileset_core", "bevy_tileset_tiles"]
 
 [dependencies]
-bevy_tileset_tiles = { path = "./bevy_tileset_tiles", version = "0.7" }
-bevy_tileset_core = { path = "./bevy_tileset_core", version = "0.7" }
+bevy_tileset_tiles = { path = "./bevy_tileset_tiles", version = "0.8" }
+bevy_tileset_core = { path = "./bevy_tileset_core", version = "0.8" }
 
 [dev-dependencies]
-bevy = "0.10"
-ron = "0.7"
+bevy = "0.11"
+ron = "0.8"
 
 [features]
 default = []
