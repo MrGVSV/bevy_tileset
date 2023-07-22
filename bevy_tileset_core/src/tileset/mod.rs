@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use bevy::prelude::{Component, Handle, Image, TextureAtlas, Vec2};
-use bevy::reflect::TypeUuid;
+use bevy::reflect::{TypeUuid, TypePath};
 
 pub(crate) use asset::TilesetAssetLoader;
 pub use asset::TilesetDef;
@@ -71,7 +71,7 @@ define_tileset!(
 
 define_tileset!(
 	/// A structure containing the registered tiles as well as a handle to their generated `TextureAtlas`
-	#[derive(Debug, TypeUuid)]
+	#[derive(Debug, TypeUuid, TypePath)]
 	#[uuid = "4a176882-d7b2-429d-af5c-be418ccc3c52"]
 	pub Tileset {
 		/// A handle to the generated texture atlas

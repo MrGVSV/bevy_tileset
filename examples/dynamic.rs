@@ -18,13 +18,11 @@ use bevy_tileset::prelude::*;
 fn main() {
 	App::new()
 		// === Required === //
-		.add_plugins(DefaultPlugins)
-		.add_plugin(TilesetPlugin::default())
+		.add_plugins((DefaultPlugins, TilesetPlugin::default()))
 		// /== Required === //
 		.init_resource::<MyTileset>()
-		.add_startup_system(load_tileset)
-		.add_system(check_loaded)
-		.add_system(show_tileset)
+		.add_systems(Startup, load_tileset)
+		.add_systems(Update, (check_loaded, show_tileset))
 		.run();
 }
 
