@@ -17,6 +17,11 @@ Simple, configurable tilesets in Bevy using RON.
 * Load a tileset directly as a Bevy asset
 * Define Standard, Animated, Variant, and Auto tiles
 
+> **Note**
+> This crate does _not_ handle rendering tiles or managing a tile map.
+> Rather, this crate is purely for _defining_ tilesets.
+> It's best used in tandem with an existing tilemap manager crate (or your own!).
+
 ## 📲 Installation
 
 Add one of the following lines to your `Cargo.toml`.
@@ -34,20 +39,20 @@ Simply **define** your tiles and tilesets in config files:
 ```rust
 // assets/tiles/my_tile.ron
 (
-name: "My Tile",
-tile: Standard("textures/my_tile.png")
+  name: "My Tile",
+  tile: Standard("textures/my_tile.png")
 )
 ```
 
 ```rust
 // assets/my_tileset.ron
 (
-name: Some("My Awesome Tileset"),
-id: 0,
-tiles: {
-0: "../tiles/my_tile.ron",
-// ...
-}
+  name: Some("My Awesome Tileset"),
+  id: 0,
+  tiles: {
+    0: "../tiles/my_tile.ron",
+    // ...
+  }
 )
 ```
 
@@ -58,8 +63,8 @@ use bevy::prelude::*;
 use bevy_tileset::prelude::*;
 
 fn load_tiles(asset_server: Res<AssetServer>) {
-    let handle: Handle<Tileset> = asset_server.load("my_tileset.ron");
-    // Store handle...
+  let handle: Handle<Tileset> = asset_server.load("my_tileset.ron");
+  // Store handle...
 }
 ```
 
@@ -67,13 +72,13 @@ Then **access** the generated tileset from anywhere:
 
 ```rust
 fn my_system(tilesets: Tilesets, /* other system params */) {
-    let tileset = tilesets.get_by_name("My Awesome Tileset").unwrap();
-    let tile_index = tileset.get_tile_index("My Tile").unwrap();
+  let tileset = tilesets.get_by_name("My Awesome Tileset").unwrap();
+  let tile_index = tileset.get_tile_index("My Tile").unwrap();
 
-    match tile_index {
-        TileIndex::Standard(texture_index) => { /* Do something */ }
-        TileIndex::Animated(start, end, speed) => { /* Do something */ }
-    }
+  match tile_index {
+    TileIndex::Standard(texture_index) => { /* Do something */ }
+    TileIndex::Animated(start, end, speed) => { /* Do something */ }
+  }
 }
 ```
 
@@ -89,8 +94,8 @@ Defines a basic tile.
 // assets/tiles/my-tile.ron
 
 (
-name: "My Tile",
-tile: Standard("textures/my_tile.png")
+  name: "My Tile",
+  tile: Standard("textures/my_tile.png")
 )
 ```
 
@@ -102,15 +107,15 @@ Defines an animated tile that can be generated with the `GPUAnimated` component 
 // assets/tiles/my-animated-tile.ron
 
 (
-name: "My Animated Tile",
-tile: Animated((
-speed: 2.25,
-frames: [
-"textures/animated-001.png",
-"textures/animated-002.png",
-"textures/animated-003.png",
-]
-))
+  name: "My Animated Tile",
+  tile: Animated((
+    speed: 2.25,
+    frames: [
+      "textures/animated-001.png",
+      "textures/animated-002.png",
+      "textures/animated-003.png",
+    ]
+  ))
 )
 ```
 
@@ -125,28 +130,28 @@ be Standard or Animated.
 // assets/tiles/my-variant-tile.ron
 
 (
-name: "My Crazy Random Tile",
-tile: Variant([
-(
-weight: 1.0,
-tile: Standard("textures/variant-standard-001.png")
-),
-(
-// Default weight: 1.0
-tile: Standard("textures/variant-standard-002.png")
-),
-(
-weight: 0.0001, // Wow that's rare!
-tile: Animated((
-// Default speed: 1.0
-frames: [
-"textures/variant-animated-001.png",
-"textures/variant-animated-002.png",
-"textures/variant-animated-003.png",
-]
-))
-)
-])
+  name: "My Crazy Random Tile",
+  tile: Variant([
+    (
+      weight: 1.0,
+      tile: Standard("textures/variant-standard-001.png")
+    ),
+    (
+      // Default weight: 1.0
+      tile: Standard("textures/variant-standard-002.png")
+    ),
+    (
+      weight: 0.0001, // Wow that's rare!
+      tile: Animated((
+        // Default speed: 1.0
+        frames: [
+          "textures/variant-animated-001.png",
+          "textures/variant-animated-002.png",
+          "textures/variant-animated-003.png",
+        ]
+      ))
+    )
+  ])
 )
 ```
 
@@ -163,40 +168,40 @@ rules. These sub-tiles are themselves Variant tiles.
 #![enable(implicit_some)]
 
 (
-name: "My Auto Tile",
-tile: Auto([
-(
-rule: (
-north: true,
-east: false,
-west: true,
-),
-variants: [
-(
-tile: Standard("textures/n_w-e-001.png")
-),
-(
-weight: 2.0,
-tile: Standard("textures/n_w-e-002.png")
-)
-]
-),
-(
-rule: (
-// Also supports short notation
-n: false,
-s: false,
-// And ordinal directions
-south_west: true,
-nw: false
-),
-variants: [
-(
-tile: Standard("textures/sw-n_s_nw.png")
-)
-]
-),
-])
+  name: "My Auto Tile",
+  tile: Auto([
+    (
+      rule: (
+        north: true,
+        east: false,
+        west: true,
+      ),
+      variants: [
+        (
+          tile: Standard("textures/n_w-e-001.png")
+        ),
+        (
+          weight: 2.0,
+          tile: Standard("textures/n_w-e-002.png")
+        )
+      ]
+    ),
+    (
+      rule: (
+        // Also supports short notation
+        n: false,
+        s: false,
+        // And ordinal directions
+        south_west: true,
+        nw: false
+      ),
+      variants: [
+        (
+          tile: Standard("textures/sw-n_s_nw.png")
+        )
+      ]
+    ),
+  ])
 )
 ```
 
