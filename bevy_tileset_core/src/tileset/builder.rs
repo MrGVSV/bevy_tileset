@@ -1,5 +1,4 @@
-use crate::ids::PartialTileId;
-use crate::prelude::*;
+use crate::{ids::PartialTileId, prelude::*};
 use bevy::prelude::{Handle, Image};
 use bevy_tile_atlas::{TextureStore, TileAtlasBuilder, TileAtlasBuilderError};
 use bevy_tileset_tiles::prelude::*;
@@ -140,14 +139,14 @@ impl TilesetBuilder {
 		Ok(match tile {
 			TileHandleType::Standard(handle) => {
 				TileType::Standard(self.insert_handle(&handle, texture_store)?)
-			}
+			},
 			TileHandleType::Animated(anim) => {
 				TileType::Animated(self.create_animated(anim, texture_store)?)
-			}
+			},
 			#[cfg(feature = "variants")]
 			TileHandleType::Variant(variants) => {
 				TileType::Variant(self.create_variants(variants, texture_store)?)
-			}
+			},
 			#[cfg(feature = "auto-tile")]
 			TileHandleType::Auto(autos) => TileType::Auto(self.create_autos(autos, texture_store)?),
 		})
@@ -191,10 +190,10 @@ impl TilesetBuilder {
 					match variant.tile {
 						SimpleTileHandle::Standard(handle) => {
 							SimpleTileType::Standard(self.insert_handle(&handle, texture_store)?)
-						}
+						},
 						SimpleTileHandle::Animated(anim) => {
 							SimpleTileType::Animated(self.create_animated(anim, texture_store)?)
-						}
+						},
 					},
 				);
 				self.current_variant = Some(1 + self.current_variant.unwrap_or(0));
@@ -240,7 +239,7 @@ impl TilesetBuilder {
 		handle: &Handle<Image>,
 		textures: &TStore,
 	) -> Result<usize, TilesetError> {
-		if let Some(texture) = textures.get(handle) {
+		if let Some(texture) = textures.get(handle.clone()) {
 			self.add_texture(handle, texture)
 		} else {
 			Err(TilesetError::ImageNotFound)

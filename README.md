@@ -28,8 +28,8 @@ Add one of the following lines to your `Cargo.toml`.
 
 ```toml
 [dependencies]
-bevy_tileset_tiles = "0.8" # For the base tile definitions
-bevy_tileset = "0.8" # For general tileset usage (includes above)
+bevy_tileset_tiles = "0.9" # For the base tile definitions
+bevy_tileset = "0.9" # For general tileset usage (includes above)
 ```
 
 ## ✨ Usage
@@ -239,6 +239,7 @@ texture atlas). Other solutions may need to be adapted in order to work with thi
 
 | bevy | bevy_tileset |
 |------|--------------|
+| 0.12 | 0.9          |
 | 0.11 | 0.8          |
 | 0.10 | 0.7          |
 | 0.9  | 0.6          |

@@ -1,19 +1,21 @@
-use bevy::asset::{Asset, AssetPath, AssetServer, Handle};
-use bevy::prelude::{Image, Res};
+use bevy::{
+	asset::{Asset, AssetPath, AssetServer, Handle},
+	prelude::{Image, Res},
+};
 use bevy_tileset_tiles::prelude::*;
 
 pub trait TextureLoader {
-	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Image>;
+	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&mut self, path: P) -> Handle<Image>;
 }
 
 impl TextureLoader for AssetServer {
-	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Image> {
+	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&mut self, path: P) -> Handle<Image> {
 		self.load(path)
 	}
 }
 
 impl<'w> TextureLoader for Res<'w, AssetServer> {
-	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&self, path: P) -> Handle<Image> {
+	fn load_texture<'a, T: Asset, P: Into<AssetPath<'a>>>(&mut self, path: P) -> Handle<Image> {
 		self.load(path)
 	}
 }
@@ -46,19 +48,19 @@ impl<'w> TextureLoader for Res<'w, AssetServer> {
 /// ```
 pub fn load_tile_handles<TTiles: IntoIterator<Item = TileDef>, TLoader: TextureLoader>(
 	tiles: TTiles,
-	asset_loader: &TLoader,
+	asset_loader: &mut TLoader,
 ) -> Vec<TileHandle> {
 	tiles
 		.into_iter()
 		.map(|tile_def| TileHandle {
 			name: tile_def.name.clone(),
-			tile: match &tile_def.tile {
-				TileDefType::Standard(path) => TileHandleType::Standard(
-					asset_loader.load_texture::<Image, &str>(path.as_str()),
-				),
+			tile: match tile_def.tile {
+				TileDefType::Standard(path) => {
+					TileHandleType::Standard(asset_loader.load_texture::<Image, String>(path))
+				},
 				TileDefType::Animated(anim) => {
-					TileHandleType::Animated(load_animated(anim, asset_loader))
-				}
+					TileHandleType::Animated(load_animated(anim.clone(), asset_loader))
+				},
 				#[cfg(feature = "variants")]
 				TileDefType::Variant(variants) => TileHandleType::Variant(
 					variants
@@ -79,15 +81,15 @@ pub fn load_tile_handles<TTiles: IntoIterator<Item = TileDef>, TLoader: TextureL
 }
 
 fn load_animated<TLoader: TextureLoader>(
-	def: &AnimatedTileDef,
-	asset_loader: &TLoader,
+	def: AnimatedTileDef,
+	asset_loader: &mut TLoader,
 ) -> AnimatedTileHandle {
 	AnimatedTileHandle {
 		speed: def.speed,
 		frames: def
 			.frames
 			.iter()
-			.map(|frame| asset_loader.load_texture::<Image, &str>(frame.as_str()))
+			.map(|frame| asset_loader.load_texture::<Image, String>(frame.to_string()))
 			.collect(),
 	}
 }
@@ -95,23 +97,26 @@ fn load_animated<TLoader: TextureLoader>(
 #[cfg(feature = "variants")]
 fn load_variant<TLoader: TextureLoader>(
 	def: &VariantTileDef,
-	asset_loader: &TLoader,
+	asset_loader: &mut TLoader,
 ) -> VariantTileHandle {
 	VariantTileHandle {
 		weight: def.weight,
 		tile: match &def.tile {
-			SimpleTileDefType::Standard(path) => {
-				SimpleTileHandle::Standard(asset_loader.load_texture::<Image, &str>(path.as_str()))
-			}
+			SimpleTileDefType::Standard(path) => SimpleTileHandle::Standard(
+				asset_loader.load_texture::<Image, String>(path.to_string()),
+			),
 			SimpleTileDefType::Animated(anim) => {
-				SimpleTileHandle::Animated(load_animated(anim, asset_loader))
-			}
+				SimpleTileHandle::Animated(load_animated(anim.clone(), asset_loader))
+			},
 		},
 	}
 }
 
 #[cfg(feature = "auto-tile")]
-fn load_auto<TLoader: TextureLoader>(def: &AutoTileDef, asset_loader: &TLoader) -> AutoTileHandle {
+fn load_auto<TLoader: TextureLoader>(
+	def: &AutoTileDef,
+	asset_loader: &mut TLoader,
+) -> AutoTileHandle {
 	AutoTileHandle {
 		rule: def.rule,
 		variants: def

@@ -15,11 +15,11 @@ exclude = ["assets/**/*", ".github/**/*", "screenshots/**/*"]
 members = ["bevy_tileset_core", "bevy_tileset_tiles"]
 
 [dependencies]
-bevy_tileset_tiles = { path = "./bevy_tileset_tiles", version = "0.8" }
-bevy_tileset_core = { path = "./bevy_tileset_core", version = "0.8" }
+bevy_tileset_tiles = { path = "./bevy_tileset_tiles", version = "0.9" }
+bevy_tileset_core = { path = "./bevy_tileset_core", version = "0.9" }
 
 [dev-dependencies]
-bevy = "0.11"
+bevy = "0.12"
 ron = "0.8"
 
 [features]
