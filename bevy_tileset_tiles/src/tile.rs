@@ -97,41 +97,27 @@ impl TileData {
 	/// 	TileType::Standard(some_texture_index)
 	/// );
 	/// ```
-	pub fn new(name: String, tile: TileType) -> Self {
-		Self { name, tile }
-	}
+	pub fn new(name: String, tile: TileType) -> Self { Self { name, tile } }
 
 	/// Gets the name of this tile
-	pub fn name(&self) -> &str {
-		&self.name
-	}
+	pub fn name(&self) -> &str { &self.name }
 
 	/// Gets the underlying tile data
-	pub fn tile(&self) -> &TileType {
-		&self.tile
-	}
+	pub fn tile(&self) -> &TileType { &self.tile }
 
 	/// Checks if the underlying tile is a [`TileType::Standard`] tile
-	pub fn is_standard(&self) -> bool {
-		matches!(self.tile, TileType::Standard(..))
-	}
+	pub fn is_standard(&self) -> bool { matches!(self.tile, TileType::Standard(..)) }
 
 	/// Checks if the underlying tile is a [`TileType::Animated`] tile
-	pub fn is_animated(&self) -> bool {
-		matches!(self.tile, TileType::Animated(..))
-	}
+	pub fn is_animated(&self) -> bool { matches!(self.tile, TileType::Animated(..)) }
 
 	/// Checks if the underlying tile is a [`TileType::Variant`] tile
 	#[cfg(feature = "variants")]
-	pub fn is_variant(&self) -> bool {
-		matches!(self.tile, TileType::Variant(..))
-	}
+	pub fn is_variant(&self) -> bool { matches!(self.tile, TileType::Variant(..)) }
 
 	/// Checks if the underlying tile is a [`TileType::Auto`] tile
 	#[cfg(feature = "auto-tile")]
-	pub fn is_auto(&self) -> bool {
-		matches!(self.tile, TileType::Auto(..))
-	}
+	pub fn is_auto(&self) -> bool { matches!(self.tile, TileType::Auto(..)) }
 }
 
 impl TileType {
@@ -190,11 +176,24 @@ impl TileHandle {
 	}
 
 	pub fn is_loaded(&self, asset_server: &AssetServer) -> bool {
-		self.get_load_state(asset_server) == LoadState::Loaded
+		self.get_load_state(asset_server) == Some(LoadState::Loaded)
 	}
 
-	pub fn get_load_state(&self, asset_server: &AssetServer) -> LoadState {
-		asset_server.get_group_load_state(self.iter_handles().map(|handle| handle.id()))
+	pub fn get_load_state(&self, asset_server: &AssetServer) -> Option<LoadState> {
+		for handle in self.iter_handles() {
+			match asset_server.get_load_state(handle) {
+				Some(status) => match status {
+					LoadState::NotLoaded => return Some(LoadState::NotLoaded),
+					LoadState::Loading => return Some(LoadState::Loading),
+					LoadState::Loaded => continue,
+					LoadState::Failed => return Some(LoadState::Failed),
+				},
+				// FIXME should it really be none if one of them is none? Can that actually happen
+				// in reality?
+				None => return None,
+			}
+		}
+		return Some(LoadState::Loaded);
 	}
 
 	pub fn iter_handles(&self) -> Box<dyn Iterator<Item = &Handle<Image>> + '_> {
